@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/prompts/hooks/salvar_conversa.sh", "timeout": 60 } ] }
+    ],
+    "PreCompact": [
+      { "hooks": [ { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/prompts/hooks/salvar_conversa.sh compactacao", "timeout": 60 } ] }
+    ]
+  }
+}
