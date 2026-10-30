@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 15:48
-- **Mensagens do time:** 10
-- **Exportado em:** 30/10/2026 19:57
+- **Mensagens do time:** 11
+- **Exportado em:** 30/10/2026 20:58
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -893,3 +893,268 @@ Os 7 padrões estão em `docs/manual/padroes.json`. É a mesma fonte que gera o 
 Por enquanto só você consegue abrir o link do protótipo. Para os colegas verem, use o menu Compartilhar da página.
 
 Se quiser mudar o tom, as cores ou a ordem dos módulos, me diga o que ajustar antes do sinal verde.
+
+
+---
+
+## 🧑 Time · 30/10 20:38
+
+PRISMA	Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis	Uma aula entra e várias versões saem. A “Sala de Materiais” é a biblioteca que os alunos acessam.
+esse é o nome da plataforma
+O material é uma questão mais complexa, quase sempre se constrói no decorrer do processo de ensino-aprendizagem, utilizando material diversos para atender a necessidade do respectivo aluno, exemplo: um aluno com TDH que seu maior desafio é concentração , trabalhar com letras móveis, quebra cabeça, material dourado, régua de cuisinaire entre outros. colocar uma plataforma multidisciplinar , pois fica mais concreto para o aluno entender que determinado tema, assunto abordado não é isolado,  que determinado conhecimento tem vários aspectos, analisado a partir das perspectivas de várias disciplinas diferentes: matemática, geografia , musica, história, artes plásticas , literatura. O material do ensino público  não é funcional, as apostilas atuais foram modificadas mas os professores a utilizam sem conexão das disciplinas, pois se faz necessário um planejamento em conjunto para ser feito uma aprendizagem efetivamente multidisciplinar, que demanda tempo para planejamento, organização das atividades conjuntas, plano de curso personalizado para turmas específicas
+essas sao colocaçoes que achei uteis de uma das integrantes do grupo e acho que vao te ajudar tambem
+melhore MUITO a base de dados conforme o que voce colocou como lacuna. dito isso, o site ainda nao esta pronto, mas eu acho que ja esta bom de base, certo? acredito que se ainda tiver lacunas, voce pode ate colocar, mas nao sera meu foco agora, irei ajudar o garoto que esta no backend. preciso que faça todo o manual e termine o mini curso. sua previa ficou muito, mas muito boa. queria que colocasse tambem graficos de pizza e semelhantes que de pra clicar e aparecer o que cada parte diz. realmente trata-se de algo bem didatico.
+preciso que de alguma forma o garoto que esta criando o site consiga somente capturar tudo que criar pra encaixar numa aba do site de instruçoes com o manual pra baixar e o minicurso, muito embora eu tambem queira ver por aqui.
+imagino que levara bastante tempo lendo os arquivos novos e integrando ao novo manual mais completo, bem mais proximo da versao final. pode colocar de todos os assuntos necessarios e lembrar que precisamos deixar claro pra quem ler quais sao os criterios. nos mesmos vamos usar essa aba pra lembrar dos criterios na hora de criar o codigo da plataforma que fara justamente essa filtraçao. tambem somos leigos, logo precisamos de explicaçoes didaticas tambem, logo seremos os primeiros a testar a didatica da explicaçao, porque tambem aprenderemos.
+meus amigos tambem estao salvando as mensagens deles. preciso que a cada mensagem minha, voce tambem fique verificando o que eles fazem, pra manter uma boa organizaçao do repositorio
+
+
+## 🤖 Claude · 30/10 20:38
+
+Vou começar conferindo o que seus colegas subiram no repositório e se há arquivos novos na sua pasta de pesquisa. Depois amplio a base de dados, renomeio tudo para PRISMA, refaço o manual e termino o mini curso num pacote pronto para o site.
+
+<details><summary>Ações executadas pelo Claude (10)</summary>
+
+- 🔧 `TaskCreate`: git fetch, ver commits/arquivos novos, organizar estrutura se preciso
+- 🔧 `TaskCreate`: Pesquisar INEP, tempo de adaptação, baixa visão/cegueira, surdez, TDAH e materiais concretos, interdisciplinaridade/BNCC, Leitura Fácil, P6, IA, família, legislação; registrar em docs/pesquisa
+- 🔧 `TaskCreate`: Renomear para PRISMA; novos padrões (materiais concretos, conexões entre disciplinas, processo contínuo); critérios mensuráveis para o código; glossário e explicações didáticas; necessidades × barreiras; PDF
+- 🔧 `TaskCreate`: Rosca/pizza clicáveis, módulos novos (concreto, interdisciplinar, critérios, glossário), aba Manual com download
+- 🔧 `TaskCreate`: Pasta web/prisma-instrucoes com index.html, PDF, padroes.json, LEIA-ME para o dev; publicar artifact; commit
+- 🔧 `TaskCreate`: Conferir dados contra fontes, abrir PDF e protótipo renderizados
+- 🔧 `Bash`: Fetch and review teammates' recent commits
+- 🔧 `remote-devices / device_list_dir`
+- 🔧 `Bash`: Pull teammates' changes and inspect them
+- 🔧 `remote-devices / device_stage_files`
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:39
+
+Tenho 26 arquivos novos. Vou extrair o texto deles, com OCR nos escaneados, e começar pelos dados oficiais do Censo.
+
+<details><summary>Ações executadas pelo Claude (3)</summary>
+
+- 🔧 `Bash`: Extract text from the new PDFs and index them
+- 🔧 `Bash`: OCR the eight scanned PDFs in the background
+- 🔧 `Bash`: Read the special education section of the INEP notes
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:40
+
+O PDF do INEP tem a codificação de fontes embaralhada e os números saem em branco no texto extraído. Vou localizar as páginas de educação especial e ler essas páginas por OCR.
+
+<details><summary>Ações executadas pelo Claude (26)</summary>
+
+- 🔧 `Bash`: Find INEP pages mentioning special education
+- 🔧 `Bash`: OCR the INEP special education pages
+- 🔧 `Bash`: Crop the INEP chart pages for viewing
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/inep/c25.png
+- 🔧 `WebSearch`: Censo Escolar 2025 educação especial matrículas por tipo de deficiência autismo deficiência intelectual 2,5 milhões
+- 🔧 `WebSearch`: pesquisa professores tempo gasto adaptando materiais alunos com deficiência horas por semana Brasil
+- 🔧 `WebSearch`: Lei 15.263 linguagem simples política nacional 2025
+- 🔧 `WebSearch`: decreto 2025 política nacional educação especial inclusiva PEI plano educacional individualizado obrigatório
+- 🔧 `WebFetch`: https://www.brasilemfolhas.com.br/2026/09/matriculas-da-educacao-especial-crescem-227-no-brasil/
+- 🔧 `WebFetch`: https://www.planalto.gov.br/ccivil_03/_Ato2023-2026/2025/decreto/D12773.htm
+- 🔧 `WebFetch`: https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/lei/l15263.htm
+- 🔧 `WebFetch`: https://www2.camara.leg.br/legin/fed/decret/2025/decreto-12773-8-dezembro-2025-798454-publicacaooriginal-177304-pe.html
+- 🔧 `WebFetch`: https://www2.camara.leg.br/legin/fed/lei/2025/lei-15263-14-novembro-2025-798293-publicacaooriginal-177011-pl.html
+- 🔧 `WebFetch`: https://institutorodrigomendes.org.br/wp-content/uploads/2026/02/Panorama-da-Educacao-Especial_2025_V2.pdf
+- 🔧 `Bash`: Print headers and abstracts of new sources
+- 🔧 `Bash`: Extract rules and findings from key new sources
+- 🔧 `Bash`: Read the Inclusion Europe written-information rules
+- 🔧 `WebSearch`: materiais concretos manipuláveis material dourado Cuisenaire inclusão TDAH deficiência intelectual aprendizagem matemática estudo
+- 🔧 `WebSearch`: BNCC temas contemporâneos transversais interdisciplinaridade integração componentes curriculares MEC 2019
+- 🔧 `WebSearch`: educação bilíngue de surdos Libras Lei 14.191/2021 material didático acessível surdos escola
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/tasks/brbucwqa8.output
+- 🔧 `WebFetch`: https://anec.org.br/wp-content/uploads/2020/04/TEMAS-CONTEMPORANEOS_contextualizacao_BNCC-MEC.pdf
+- 🔧 `WebFetch`: https://revistas.usp.br/ep/article/view/249434
+- 🔧 `WebFetch`: https://educapes.capes.gov.br/bitstream/capes/1174377/2/PR%c3%81TICAS%20INCLUSIVAS%20NO%20ENSINO%20DE%20MATEM%c3%81TICA%3a%20DO%20CONCRETO%20AO%20ABSTRATO%20-%20Oliveira%2c%20Paulo%20da%20Silva.pdf
+- 🔧 `Bash`: Read OCR abstracts of scanned sources
+- 🔧 `Bash`: Extract low-vision, audio description, visual support, and family findings
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:44
+
+Terminei a leitura dos 26 arquivos novos. Antes de escrever, vou ver a paleta de referência dos gráficos para montar as pizzas de 6 fatias.
+
+<details><summary>Ações executadas pelo Claude (5)</summary>
+
+- 🔧 `Bash`: Read the reference categorical palette and donut guidance
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/docs/manual/padroes.json
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:47
+
+Corrijo uma soma (surdez + deficiência auditiva dá 61.001), confiro autores e anos que ficaram em aberto e verifico a Lei 14.254.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Fix count and look up missing citation details
+- 🔧 `WebSearch`: Lei 14.254 de 2021 acompanhamento integral educandos dislexia TDAH transtorno de aprendizagem
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:47
+
+Lei 14.254/2021 confirmada. Atualizo os autores nas citações.
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `Bash`: Update citation authors in the standards file
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:47
+
+Agora a lista completa de referências entra no mesmo arquivo, para o PDF e o site mostrarem as mesmas fontes.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Add the full reference list to the standards file
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/docs/manual/build_manual.py
+- 🔧 `Bash`: Build the PRISMA manual PDF and contact sheet
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/pv2/montagem.png
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:50
+
+O PDF tem 39 páginas e está bem estruturado. Um título ficou órfão no fim de uma página (o mapa necessidades × padrões). Vou corrigir e conferir a pizza de perto.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Fix map page break and render page 2
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/pv2/z-02.png
+- 🔧 `Bash`: Hide small-slice labels and create site folder
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/web/prisma-instrucoes/src/pagina.html
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:55
+
+Agora o gerador da página e o LEIA-ME para quem está fazendo o site.
+
+<details><summary>Ações executadas pelo Claude (8)</summary>
+
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/web/prisma-instrucoes/build.py
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/web/prisma-instrucoes/LEIA-ME.md
+- 🔧 `Bash`: Build PDF and page, then screenshot three views
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/pv3/desk-sheet.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/pv3/mob-sheet.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/pv3/man-sheet.png
+- 🔧 `Bash`: Apply visual fixes and rebuild the page
+- 🔧 `Artifact`: Aba de instruções da PRISMA: mini curso interativo em 10 passos (três trilhas) e o manual com os 10 padrões, 51 critérios e o PDF para baixar.
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:56
+
+A página está publicada no mesmo link de antes. Agora organizo o repositório: removo o protótipo antigo, atualizo o README, o catálogo de fontes, as lacunas e a memória do projeto.
+
+<details><summary>Ações executadas pelo Claude (5)</summary>
+
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `Bash`: Remove old prototype and update research docs
+- 🔧 `Bash`: Update README and project memory
+- 🔧 `Bash`: Replace old file references and check for new remote commits
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:57
+
+Seus colegas subiram arquivos agora mesmo ("Add files via upload"). Vou ver o que é antes de juntar com o meu trabalho.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Inspect teammates' uploaded files
+- 🔧 `Bash`: See full paths and content of uploaded files
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:57
+
+Os arquivos estão no lugar certo: são conversas salvas à mão por Ricardo e Nunesmn (uma delas do Gemini) sobre um avatar em pixel art. Junto com o meu trabalho e envio.
+
+<details><summary>Ações executadas pelo Claude (5)</summary>
+
+- 🔧 `Bash`: Commit PRISMA v1.0 and push
+- 🔧 `SendUserFile`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `remote-devices / device_commit_files`
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:58
+
+O manual PRISMA v1.0 está pronto: 39 páginas, com 10 padrões e 51 critérios. O mini curso também está pronto e já atualizado no mesmo link que você viu antes. Os dois estão no GitHub, e o PDF também foi salvo em "Claude outputs", dentro da sua pasta hack.
+
+**O que mudou no manual**
+- **Três padrões novos, vindos das ideias da sua colega:**
+  - P7, *Do concreto ao abstrato*: material dourado, régua Cuisenaire e letras móveis, seguindo a sequência mexer → desenhar → símbolo.
+  - P8, *Conexões entre disciplinas*: liga cada material aos Temas Contemporâneos Transversais da BNCC.
+  - P9, *Material vivo*: o material se ajusta durante as aulas, com um mini-check no fim e alerta quando o acerto fica abaixo de 60%.
+- **Critérios claros para o código:** cada padrão tem uma tabela com código (por exemplo P3.1), limite (por exemplo "≤ 20 palavras por frase") e quem verifica. São 31 critérios automáticos, 18 que a IA propõe e o professor revisa, e 2 manuais. A Parte 6 explica, em linguagem de leigo, como o backend usa essas tabelas.
+- **Partes didáticas:** cada padrão abre com "Em palavras simples". Há também uma parte "Quem são os estudantes" com 12 necessidades, um glossário e partes separadas para famílias e estudantes.
+- **Base legal nova, encontrada nesta rodada:**
+  - Lei 15.263/2025, de Linguagem Simples, com 18 técnicas oficiais.
+  - Decreto 12.686/2025, que tornou o PEI obrigatório e garante o profissional de apoio sem laudo.
+  - Números oficiais do INEP 2025: 2,5 milhões de matrículas e 96% dos estudantes em classes comuns.
+  - Normas europeias de Leitura Fácil.
+
+**No mini curso**
+- São 10 passos, cada um em três versões: professor, família e estudante.
+- Gráficos de pizza e semelhantes que se clicam e explicam cada parte:
+  - Pizza dos tipos de deficiência: cada fatia mostra o que aquela necessidade pede do material.
+  - As 18 técnicas da lei em quadrinhos clicáveis.
+  - Mapa da "Água" ligando seis disciplinas.
+  - Barras do mini-check que sugerem um ajuste quando o acerto fica baixo.
+  - Montagem de ½ + ¼ com peças.
+- Na aba Manual, dá para filtrar os critérios ("mostrar só os automáticos"), o que deve ajudar o colega do backend.
+
+**Para quem está fazendo o site**
+A pasta `web/prisma-instrucoes/` está pronta para encaixar: basta copiar a pasta para o site, e o `LEIA-ME.md` explica três formas de fazer isso. Ninguém deve editar a página nem o PDF à mão. Tudo sai do arquivo `docs/manual/padroes.json`, e ao mudar esse arquivo é só rodar os dois geradores de novo.
+
+Na prévia do Claude o botão de baixar só tenta abrir o PDF, porque esse visualizador bloqueia downloads; no site real ele baixa normalmente. O link da prévia só abre para quem você der acesso pelo menu Compartilhar.
+
+**Dois cuidados ao apresentar os números**
+- **Pizza dos tipos de deficiência:** ela conta **registros** (2,38 milhões), não alunos (2,08 milhões), porque um aluno pode ter mais de um registro. Isso está escrito no gráfico.
+- **Mini-check do mini curso:** os números são fictícios e estão marcados como exemplo.
+
+**Repositório**
+- Removi o protótipo antigo e atualizei o README com o nome PRISMA.
+- Na memória do projeto, registrei a regra de revisar o que vocês sobem a cada mensagem sua.
+- Ricardo e Nunesmn salvaram conversas sobre o avatar em pixel art. Estão na pasta certa e não precisaram de ajuste.
+
+**O que ainda falta pesquisar**
+A lista completa está em `docs/pesquisa/lacunas.md`. O mais importante continua sendo **quanto tempo o professor gasta adaptando material**. Nenhuma fonte mede isso, e um questionário rápido com professores conhecidos resolveria e daria o número mais forte do pitch.
+
+Fontes consultadas na web nesta rodada:
+- [Lei 15.263/2025](https://www2.camara.leg.br/legin/fed/lei/2025/lei-15263-14-novembro-2025-798293-publicacaooriginal-177011-pl.html)
+- [Decreto 12.773/2025](https://www2.camara.leg.br/legin/fed/decret/2025/decreto-12773-8-dezembro-2025-798454-publicacaooriginal-177304-pe.html)
+- [Lei 14.254/2021](https://www2.camara.leg.br/legin/fed/lei/2021/lei-14254-30-novembro-2021-792022-publicacaooriginal-164005-pl.html)
+- [Lei 14.191/2021](https://www2.camara.leg.br/legin/fed/lei/2021/lei-14191-3-agosto-2021-791630-publicacaooriginal-163262-pl.html)
+- [Panorama da Educação Especial 2025](https://institutorodrigomendes.org.br/wp-content/uploads/2026/02/Panorama-da-Educacao-Especial_2025_V2.pdf)
+- [Temas Contemporâneos Transversais na BNCC](https://anec.org.br/wp-content/uploads/2020/04/TEMAS-CONTEMPORANEOS_contextualizacao_BNCC-MEC.pdf)
+- [Minholi & Rocha (2026)](https://revistas.usp.br/ep/article/view/249434)
+- [Oliveira (2026), Do concreto ao abstrato](https://educapes.capes.gov.br/bitstream/capes/1174377/2/PR%c3%81TICAS%20INCLUSIVAS%20NO%20ENSINO%20DE%20MATEM%c3%81TICA%3a%20DO%20CONCRETO%20AO%20ABSTRATO%20-%20Oliveira%2c%20Paulo%20da%20Silva.pdf)
+- [Matrículas crescem 227%](https://www.brasilemfolhas.com.br/2026/09/matriculas-da-educacao-especial-crescem-227-no-brasil/)
