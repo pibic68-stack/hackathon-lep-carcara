@@ -23,3 +23,35 @@
 | 17 | Tsuchiya (2022). DUA e TEA. TCC UNESP | Revisão sistemática | Os 3 princípios do DUA aplicados ao TEA | P5, P6 |
 
 Fontes de fora da pasta usadas no manual: Instituto Rodrigo Mendes, *Panorama da Educação Especial 2025*; WCAG 2.2; Leis 13.146/2015 e 13.709/2018.
+
+## Segunda rodada (30/10, noite): 26 arquivos novos
+
+| Fonte | Tipo | O que aproveitamos | Padrões |
+|---|---|---|---|
+| INEP, Notas Estatísticas do Censo 2024 e 2025 | Estatística oficial | 2,1 mi (2024) e 2,5 mi (2025) matrículas; 95,7% e 96% de 4 a 17 anos em classes comuns | Dados |
+| Inclusion Europe, *Information for all* | Norma europeia de Leitura Fácil | Mais de 40 regras verificáveis: fonte ≥ 14, sem serifa, sem itálico, sem justificar, uma frase por linha | P2, P3, P4 |
+| Finatto & Schmidt (2025), *Práxis Educacional* | 43 atendimentos videogravados, 8 alunos com TEA | Apoio visual, análise de tarefa e CAA como práticas baseadas em evidências | P6 |
+| Nascimento & Venceslau, mapeamento sistemático | 273 estudos, 13 incluídos | Suporte visual digital aumenta a autonomia de estudantes com TEA | P6 |
+| Serôa (UFRGS, 2025) | Revisão sistemática 2015–2025 | Simplificar não garante compreensão; resultados inconsistentes | P3, P9 |
+| Osmar (UFRGS), BERT e níveis de simplicidade | Computação | Corpus PorSimplesSent e modelos para medir simplicidade em português | P3 (futuro) |
+| BRITO (2026), ChatGPT + Linguagem Simples | Computação | IA reescreve, mas exige curadoria por imprecisões e alucinações | P10 |
+| Além das barreiras (2026), IA e DI | Bibliográfico | IA não produz inclusão sozinha; depende do professor | P5, P10 |
+| Máquina (2025), *Encaixe*, Montessori + DUA | Dissertação | Adaptar material é ato pedagógico | P7 |
+| Evangelista & Borges (2020) | Observação + entrevista | Adaptações de acesso ao currículo e materiais | P7 |
+| Almeida, Sousa & Rocha (2026), TEA e TDAH | Bibliográfico | Práticas colaborativas e interdisciplinares | P8 |
+| *Utopia em busca de possibilidade* (UNILA) | Livro | Abordagens interdisciplinares em ciências | P8 |
+| Santos & Brandão (2020), *Ciência & Educação* | Estudo de caso | Audiodescrição deu autonomia a estudante cego em física | P4 |
+| Farias Júnior & Araújo (2023) | Pesquisa-ação | Formação docente para imagens acessíveis | P4 |
+| Mendes et al. (UNIFIPMoc), ampliação de materiais | Extensão | Demanda alta e reprimida por material ampliado no CAP | P2 |
+| Vilaronga & Caiado (2013), *RBEE* | Histórias de vida | Livros que não chegam ampliados | P2 |
+| Anjos (UFSC), braile e matemática | Dissertação | Erros na transcrição de matemática para o braile | Limites |
+| Romualdo et al. (2015), material de fonética em braile | Relato | Braile como recurso mais eficaz para cegos | Limites |
+| Tecnologia assistiva no contexto escolar (*RELACult*, 2025) | Relato de autora com baixa visão | Lupas, ampliação e leitores | P2 |
+| Educação freiriana e deficiência visual | Ensaio | Crítica a políticas linguísticas | Contexto |
+| Ribeiro (UFSC, 2009), dislexia | Avaliação de sites | Pequenas acomodações visuais bastam para disléxicos | P2 |
+| Quevedo (UFMA), ambientes para TEA | Estudo de caso | Estímulos sensoriais do ambiente | P6 |
+| Ferreira & Grossi (2024), escola–família | Estudo de caso | Inclusão só avança com escola e família juntas | P10 |
+| Santos, J. R. (UFSCar, 2020), PEI nos IFs | Dissertação | Modos de PEI no ensino médio | P10 |
+| Onohara (UNESP, 2024), adaptação de leitura e escrita | Dissertação | Insegurança docente na adaptação para DI | P3 |
+
+**Fontes da web (não estão na pasta):** Lei 15.263/2025 (Linguagem Simples, 18 técnicas); Decreto 12.686/2025 alterado pelo 12.773/2025 (PEI obrigatório; apoio sem laudo); Lei 14.254/2021 (dislexia e TDAH); Lei 14.191/2021 (educação bilíngue de surdos); MEC, Temas Contemporâneos Transversais (2019); Panorama 2025 do Instituto Rodrigo Mendes (registros por tipo); Minholi & Rocha (2026), materiais para surdos; Oliveira (2026), do concreto ao abstrato.

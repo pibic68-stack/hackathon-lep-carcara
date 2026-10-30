@@ -252,3 +252,4 @@ Thumbs.db
 # ===== Segredos =====
 *.key
 secrets.*
+web/prisma-instrucoes/_previa_artifact.html
