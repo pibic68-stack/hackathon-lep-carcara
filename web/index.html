@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trama · Um tema, várias disciplinas, todos aprendendo juntos</title>
+  <meta name="description" content="Plataforma multidisciplinar para o ensino fundamental (1º ao 9º ano) que aponta barreiras de aprendizagem e adapta o material de aula para cada aluno, sem diagnosticar.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Filtro que simula como uma pessoa com daltonismo verde-vermelho enxerga as cores (usado na demonstração). -->
+  <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+    <filter id="sim-daltonismo" color-interpolation-filters="linearRGB">
+      <feColorMatrix type="matrix" values="0.367 0.861 -0.228 0 0  0.280 0.673 0.047 0 0  -0.012 0.043 0.969 0 0  0 0 0 1 0"/>
+    </filter>
+  </svg>
+
+  <header class="topo">
+    <a class="marca" href="#" aria-label="Trama, início">Trama</a>
+    <nav aria-label="Principal">
+      <ul class="pilulas">
+        <li><a href="#demonstracao">Demonstração</a></li>
+        <li><a href="#como-funciona">Como funciona</a></li>
+        <li><a href="#guias">Guias</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-branco" href="#demonstracao">Testar</a>
+  </header>
+
+  <main id="conteudo">
+    <section class="hero" aria-labelledby="titulo-hero">
+      <img class="hero-cena" src="img/hero.png" alt="" width="360" height="216">
+      <div class="hero-texto">
+        <h1 id="titulo-hero">Um tema, várias disciplinas, todos aprendendo juntos.</h1>
+        <p class="lide">Do 1º ao 9º ano, a Trama liga o que o aluno aprende em cada matéria e adapta o material para quem lê, enxerga ou se concentra de outro jeito.</p>
+        <div class="acoes">
+          <a class="btn btn-branco" href="#demonstracao">Testar com um aluno fictício</a>
+          <a class="btn btn-vidro" href="#como-funciona">Ver como funciona</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao demo" id="demonstracao" aria-labelledby="titulo-demo">
+      <h2 id="titulo-demo">Um tema em seis disciplinas, <span class="suave">do jeito que cada aluno precisa.</span></h2>
+      <div class="janela" id="janela">
+        <div class="janela-barra">
+          <p class="janela-tema"><strong>Tema da semana:</strong> A água que usamos</p>
+          <p class="janela-turma">5º ano · turma fictícia</p>
+        </div>
+
+        <aside class="lateral" aria-label="Perfil do aluno">
+          <h3>Aluno Fictício A</h3>
+          <p class="nota">Marque o que o aluno precisa. Isso não é diagnóstico.</p>
+          <div class="perfil" id="perfil" role="group" aria-label="Necessidades do aluno"></div>
+          <h3 class="sub">Regras aplicadas</h3>
+          <ul class="regras" id="regras"></ul>
+        </aside>
+
+        <div class="principal" id="principal">
+          <div class="abas" id="abas" role="tablist" aria-label="Disciplinas"></div>
+          <div class="palco" id="palco" role="tabpanel" tabindex="0"></div>
+          <div class="rodape-janela" id="rodape-janela"></div>
+        </div>
+      </div>
+      <p class="aviso-demo">Conteúdo de exemplo. Na versão final, a IA gera as adaptações e o professor revisa cada uma.</p>
+    </section>
+
+    <section class="secao como" id="como-funciona" aria-labelledby="titulo-como">
+      <div class="como-texto">
+        <h2 id="titulo-como">Da aula original <span class="suave">ao material de cada aluno</span></h2>
+        <p class="como-lide">Cada regra do Manual de Acessibilidade vira uma adaptação que a Trama aplica sozinha. O professor revisa antes de chegar ao aluno.</p>
+        <div class="acordeao">
+          <details name="etapa" open>
+            <summary><span class="num">1.1</span>Perfil</summary>
+            <p>O professor marca o que o aluno precisa, em palavras do dia a dia, como “cores difíceis de distinguir”. Nada de diagnóstico.</p>
+          </details>
+          <details name="etapa">
+            <summary><span class="num">1.2</span>Material</summary>
+            <p>A aula entra em texto ou PDF. A Trama organiza o tema por disciplina: o que a Matemática, a Geografia, a Música e as outras dizem sobre ele.</p>
+          </details>
+          <details name="etapa">
+            <summary><span class="num">1.3</span>Adaptação</summary>
+            <p>Cor com símbolo, frases curtas, letra grande, uma etapa por vez. O conteúdo é o mesmo para toda a turma.</p>
+          </details>
+          <details name="etapa">
+            <summary><span class="num">1.4</span>Guia e mini-check</summary>
+            <p>Professor e família recebem um guia curto. Depois da aula, poucas perguntas mostram onde ainda há barreira, e a adaptação se ajusta.</p>
+          </details>
+        </div>
+      </div>
+
+      <div class="tela" aria-hidden="true">
+        <div class="tela-col">
+          <span class="chip">Perfil</span>
+          <div class="no ativo"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="#2457D6"/></svg><span><strong>Cores difíceis de distinguir</strong><small>Professor</small></span></div>
+          <div class="no apagado"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2" fill="#6B6B66"/></svg><span><strong>Leitura cansativa</strong><small>Professor</small></span></div>
+        </div>
+        <div class="tela-col">
+          <span class="chip">Adaptação</span>
+          <div class="no ativo"><svg viewBox="0 0 20 20"><path d="M10 2 L18.5 17.5 H1.5 Z" fill="#B45309"/></svg><span><strong>Cor com símbolo e palavra</strong><small>Regra R-DALT-01</small></span></div>
+          <div class="no apagado"><svg viewBox="0 0 20 20"><path d="M10 1 L19 10 L10 19 L1 10 Z" fill="#6B6B66"/></svg><span><strong>Frases curtas e letra espaçada</strong><small>Regra R-DISL-01</small></span></div>
+        </div>
+        <div class="tela-col">
+          <span class="chip">Guia</span>
+          <div class="no ativo"><svg viewBox="0 0 20 20"><path d="M5.5 2 H14.5 L19 10 L14.5 18 H5.5 L1 10 Z" fill="#0F766E"/></svg><span><strong>Guia do professor e da família</strong><small>Aguarda aprovação</small></span></div>
+          <div class="no apagado"><svg viewBox="0 0 20 20"><path d="M7 2 h6 v5 h5 v6 h-5 v5 H7 v-5 H2 V7 h5 z" fill="#6B6B66"/></svg><span><strong>Mini-check da aula</strong><small>Depois da aula</small></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao limites" aria-labelledby="titulo-limites">
+      <h2 id="titulo-limites">Aponta a barreira. <span class="suave">Não dá laudo.</span></h2>
+      <div class="limites-colunas">
+        <div>
+          <h3>A Trama faz</h3>
+          <ul>
+            <li>Mostra onde o aluno travou: leitura, cores, excesso de informação.</li>
+            <li>Muda a forma e mantém o objetivo de aprendizagem.</li>
+            <li>Deixa o professor aprovar tudo antes de chegar ao aluno.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>A Trama nunca</h3>
+          <ul>
+            <li>Diz que um aluno “tem” uma condição.</li>
+            <li>Substitui um profissional de saúde ou o atendimento educacional especializado.</li>
+            <li>Usa dados reais de crianças na demonstração.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao guias" id="guias" aria-labelledby="titulo-guias">
+      <h2 id="titulo-guias">Um guia para o professor <span class="suave">e outro para a família</span></h2>
+      <div class="guias-pares">
+        <article class="folha" aria-labelledby="g-prof">
+          <h3 id="g-prof">Para o professor</h3>
+          <p class="folha-cab">Aluno Fictício A, 5º ano</p>
+          <h4>O que a Trama observou</h4>
+          <p>Na atividade de Matemática, a resposta dependia só da cor das barras. Com padrão, símbolo e valores, ficou possível responder.</p>
+          <h4>O que fazer na sala</h4>
+          <p>Use sempre um símbolo ou uma palavra junto com a cor, e prefira frases curtas.</p>
+        </article>
+        <article class="folha" aria-labelledby="g-fam">
+          <h3 id="g-fam">Para a família</h3>
+          <p class="folha-cab">Linguagem simples, sem termos técnicos</p>
+          <h4>Como ajudar em casa</h4>
+          <p>Converse sobre o tema com exemplos do dia a dia, como a conta de água e a chuva.</p>
+          <h4>Quando buscar apoio</h4>
+          <p>Se a dificuldade aparecer em várias tarefas, converse com a coordenação da escola sobre procurar um profissional. Quem avalia é ele, não a Trama.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <p class="rodape-marca">Trama</p>
+    <p>Protótipo do time Carcará 3301, feito para o hackathon da Liga de Empreendedorismo da Praia Vermelha. Todos os alunos mostrados aqui são fictícios.</p>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

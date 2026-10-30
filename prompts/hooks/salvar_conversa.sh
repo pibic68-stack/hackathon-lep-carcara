@@ -25,6 +25,8 @@ git diff --cached --quiet && exit 0
 MSG="Atualiza registro da conversa com IA"
 [ -n "$ETIQUETA" ] && MSG="Registro da conversa antes da compactação"
 git commit -q -m "$MSG" >/dev/null 2>&1 || exit 0
-# Envia sem travar a sessão; se falhar (sem internet), vai no próximo push.
-( git pull -q --rebase origin main && git push -q origin HEAD:main ) >/dev/null 2>&1 || true
+# Envia a branch atual (nunca direto para a main): os registros seguem junto com o Pull Request.
+RAMO="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+[ -n "$RAMO" ] && [ "$RAMO" != "HEAD" ] || exit 0
+( git pull -q --rebase origin "$RAMO" ; git push -q origin "HEAD:refs/heads/$RAMO" ) >/dev/null 2>&1 || true
 exit 0

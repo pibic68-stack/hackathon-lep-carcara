@@ -23,6 +23,8 @@ O arquivo `.claude/settings.json` deste repositório registra dois hooks:
 - **Stop**: roda depois de cada resposta do Claude → atualiza `conversas/` e faz push.
 - **PreCompact**: roda antes de compactar → guarda o snapshot e faz push.
 
+O push vai para a **branch em que você está**, não para a `main`. Assim os registros entram na `main` junto com o seu Pull Request. Se ficar numa branch sem abrir PR, as conversas dela só chegam à `main` quando a branch for mesclada.
+
 ## Para os outros membros do time
 
 - **Usando Claude Code dentro deste repositório:** os hooks já funcionam sozinhos (o Claude Code pede para aprovar na primeira vez).
