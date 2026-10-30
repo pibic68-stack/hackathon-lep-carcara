@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 15:48
-- **Mensagens do time:** 9
-- **Exportado em:** 30/10/2026 17:40
+- **Mensagens do time:** 10
+- **Exportado em:** 30/10/2026 19:57
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -636,3 +636,260 @@ Quer que eu coloque esses achados e as buscas em `docs/pesquisa/` no repositóri
 
 Sources:
 - [Panorama da Educação Especial 2025 (Instituto Rodrigo Mendes)](https://institutorodrigomendes.org.br/panorama-educacao-especial-2025/)
+
+
+---
+
+## 🧑 Time · 30/10 19:40
+
+certo, temos algumas ideias. aqui eu guardo toda a base de dados que eu encontrei e acredito que ja e um grande avanço. precisamos primeiro de um manual em pdf com as ideias que vao reger o site, ja que estamos buscando criar uma plataforma que recria materiais em padroes definidos. a funçao do manual em tese é tornar transparente os metodos de transformaçao da plataforma e mostrar, com dados de verdade, em que se baseiam e ensinar de verdade quem a estiver utilizando, de forma que o professor mande os materiais, a plataforma filtra e deixa os resultados todos salvos e listados para que alunos acessando a plataforma possam ver os materiais entao criados. para isso, eu quero que o manual esteja disponivel em uma aba do site e tambem aja uma especie de mini curso interativo, ou seja, uma tela rolante que apresente textos didaticos para que alunos, pais, professores entendam. claro que tem que haver uma parte que seja mais tecnica e seja mais pra professores e a parte pra crianças e pais seja mais educativa e orientadora. a ideia é que os materiais tambem sejam uteis para quem nao tiver nenhuma deficiencia.
+sua missao aqui é de fato montar a primeira tentativa do manual pra que seja exposto no site e quero que arrume um jeito de criar algum esboço desse mini curso numa aba do site (ainda nao temos o site e nao precisa criar ele agora, so quero entender melhor a interface, ver a qualidade dos graficos que colocar com informaçoes etc). nao sou o melhor em montar prompts para resultados mais especificos com relaçao à interface, estou apenas abrindo minha mente aqui, me ajuda a criar algo original mesmo. me mostre o que pode fazer e deixe salvo de alguma forma, pra que eu dê luz verde pra montar tudo e entao encaixar no site que esta sendo criado por outra pessoa.
+a pasta que disponibilizei tem todo material que eu achei nas minhas pesquisas. claro que pretendo pesquisar mais. e no caso tambem peço que me diga lacunas e assuntos que direcionem melhor os temas que devo integrar à pasta
+
+
+## 🤖 Claude · 30/10 19:40
+
+Vou ler o material da sua pasta, montar o manual em PDF a partir dele, fazer um protótipo do mini curso para você ver a interface e os gráficos, e listar o que falta pesquisar.
+
+<details><summary>Ações executadas pelo Claude (12)</summary>
+
+- 🔧 `TaskCreate`: Listar, copiar e extrair os dados úteis dos arquivos em C:\Users\adler\Downloads\hack
+- 🔧 `TaskCreate`: Manual com padrões de transformação, base em dados reais, partes técnica e educativa. Fonte única que serve ao PDF e à aba do site.
+- 🔧 `TaskCreate`: Página rolante com trilhas para professores, pais e alunos, gráficos com dados reais. Publicar para visualização.
+- 🔧 `TaskCreate`: Commit do manual, PDF e protótipo; lista de lacunas para a pasta de pesquisa
+- 🔧 `TaskCreate`: Abrir o PDF e o protótipo renderizados, conferir números contra as fontes
+- 🔧 `remote-devices / device_list_dir`
+- 🔧 `remote-devices / device_stage_files`
+- 🔧 `Bash`: Extract text from each PDF and preview
+- 🔧 `Bash`: Check OCR tools available
+- 🔧 `Bash`: Download Portuguese OCR language data
+- 🔧 `Bash`: Fetch Portuguese OCR data via git sparse checkout
+- 🔧 `Bash`: OCR the six scanned PDFs in Portuguese
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:44
+
+Todos os 17 PDFs estão legíveis agora (6 eram escaneados e precisaram de OCR). Vou ler os resumos e as conclusões de cada um.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Print abstract and conclusion of each source
+- 🔧 `Read`: /root/.claude/projects/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/tool-results/ba5tz8f0t.txt
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:44
+
+Já tenho o panorama das 17 fontes. Agora vou extrair os dados numéricos e as regras práticas que vão alimentar o manual.
+
+<details><summary>Ações executadas pelo Claude (5)</summary>
+
+- 🔧 `Bash`: Pull percentage findings from key sources
+- 🔧 `Bash`: Extract PEI data and easy-read writing rules
+- 🔧 `Bash`: Read key passages for manual rules
+- 🔧 `Bash`: Get authors and years of remaining sources
+- 🔧 `Bash`: Confirm publication years of a few sources
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:45
+
+Terminei a leitura: as 17 fontes trazem material suficiente para os padrões do manual. Antes de desenhar as páginas, vou carregar as diretrizes de design e de gráficos.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `Skill`
+- 🔧 `Skill`
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:46
+
+Agora vou validar a paleta dos gráficos para daltonismo, já que um manual de acessibilidade com gráficos inacessíveis seria um erro grave.
+
+<details><summary>Ações executadas pelo Claude (7)</summary>
+
+- 🔧 `Bash`: Validate the chart palette for color blindness
+- 🔧 `Bash`: Re-validate the dark-mode chart palette
+- 🔧 `Bash`: Re-validate with a darker orange
+- 🔧 `Bash`: Install font files from npm for the PDF
+- 🔧 `Bash`: Retry font installation with output
+- 🔧 `Bash`: Check proxy status and npm guidance
+- 🔧 `Bash`: Retry fonts through the proxy
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:47
+
+O acesso a fontes pelo npm e pelo Google está bloqueado aqui, então vou buscá-las pelo repositório oficial do Google Fonts no GitHub.
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `Bash`: Fetch font files from the Google Fonts GitHub repo
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:47
+
+Fontes prontas. Agora escrevo o conteúdo: primeiro os 7 padrões de transformação num arquivo único, que alimenta o PDF, a aba do site e o código de quem fizer o backend.
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/docs/manual/padroes.json
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:48
+
+Agora o manual em si. Ele usa as mesmas fontes, os mesmos números e os mesmos padrões que a aba do site vai usar.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/docs/manual/build_manual.py
+- 🔧 `Edit`: /home/claude/hackathon-lep-carcara/docs/manual/build_manual.py
+- 🔧 `Bash`: Build the manual HTML and PDF
+- 🔧 `Bash`: Build PDF with embedded fonts and check fonts
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:50
+
+O PDF tem 19 páginas com as fontes embutidas. Vou olhar as páginas renderizadas para conferir o layout e os gráficos.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Render PDF pages into a contact sheet
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/pv/montagem.png
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:51
+
+Duas correções: o rótulo do gráfico de inclinação está cortado na borda direita, e o título do exemplo de Leitura Fácil ficou sozinho no fim de uma página.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Fix chart label and page break, rebuild PDF
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/pv/z-02.png
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:51
+
+O manual está bom. Corrijo uma nota imprecisa da fonte do gráfico e parto para o protótipo do mini curso.
+
+<details><summary>Ações executadas pelo Claude (5)</summary>
+
+- 🔧 `Bash`: Fix chart note and rebuild PDF
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `Bash`: Locate the chart note text
+- 🔧 `Bash`: Apply the note fix and rebuild
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:52
+
+Agora o protótipo do mini curso, com as três trilhas (professor, família, estudante), os gráficos interativos e as demonstrações ao vivo dos padrões.
+
+<details><summary>Ações executadas pelo Claude (7)</summary>
+
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/web/minicurso/index.html
+- 🔧 `Bash`: Fix legend and screenshot the prototype
+- 🔧 `Bash`: Make screenshot sheets for review
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/pv/desk-sheet.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/pv/mob-sheet.png
+- 🔧 `Bash`: Fix audience visibility and measurement timing
+- 🔧 `Artifact`: Protótipo do mini curso e da aba Manual da plataforma Carcará: trilhas para professores, famílias e estudantes, com gráficos e demonstrações ao vivo dos padrões de acessibilidade.
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:56
+
+O protótipo está publicado. Agora vou registrar as lacunas de pesquisa e o catálogo das fontes, atualizar a memória do projeto e enviar tudo ao GitHub.
+
+<details><summary>Ações executadas pelo Claude (9)</summary>
+
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/docs/pesquisa/fontes.md
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/docs/pesquisa/lacunas.md
+- 🔧 `Edit`: /home/claude/hackathon-lep-carcara/CLAUDE.md
+- 🔧 `Bash`: Commit manual, prototype, and research docs, then push
+- 🔧 `SendUserFile`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+
+</details>
+
+
+## 🤖 Claude · 30/10 19:57
+
+Fiz a primeira versão do manual em PDF, com 19 páginas, e um protótipo do mini curso para você ver a interface e os gráficos antes de dar sinal verde. O protótipo tem também uma aba "Manual". Tudo está no GitHub.
+
+**O que li da sua pasta**
+Li os 17 PDFs. Seis eram digitalizados, então converti as imagens em texto antes de ler.
+
+**Os 7 padrões do manual**
+O manual define as regras que a plataforma segue para transformar um material. Cada padrão traz o que a plataforma faz, como conferir se deu certo e as pesquisas em que se apoia.
+
+| Código | Padrão |
+|---|---|
+| P1 | Cor nunca sozinha |
+| P2 | Página limpa e legível |
+| P3 | Leitura Fácil em três níveis |
+| P4 | Imagem com propósito e descrita |
+| P5 | Mais de um caminho |
+| P6 | Estrutura previsível |
+| P7 | Professor no comando |
+
+Cada evidência leva uma marca de tipo: **Dados**, **Prática**, **Norma** ou **Projeto**. "Projeto" indica decisão nossa, ainda sem teste com alunos. Assim os avaliadores veem o que é comprovado e o que ainda falta testar.
+
+**O manual tem uma parte para cada público**
+- **Professores:** parte técnica, com dados, princípios, como a plataforma funciona e os padrões em detalhe.
+- **Famílias:** linguagem simples, com como apoiar em casa e que perguntas fazer à escola.
+- **Estudantes:** escrita em Leitura Fácil.
+
+O próprio manual segue as regras que descreve. Por exemplo, usa uma fonte criada para leitores com baixa visão, e as cores dos gráficos foram testadas para daltonismo.
+
+**O que dá para testar no mini curso**
+- **Escolher a trilha:** professor, família ou estudante. O texto muda de tom conforme a escolha.
+- **Prova corrigida em verde e vermelho:** dá para ver como uma pessoa daltônica enxerga e ligar o P1 para comparar.
+- **Ciclo da água:** o mesmo texto em quatro níveis, com contagem de palavras calculada na hora.
+- **Página antes e depois:** mostra o contraste e os caracteres por linha medidos de verdade.
+- **Tela do aluno escolhendo a versão:** inclui leitura em voz alta, que depende de o navegador ter voz em português.
+- **Mini-check:** três perguntas no fim, diferentes para cada trilha.
+
+**O que precisa de atenção**
+- **Números de matrícula:** vêm de um resumo do Instituto Rodrigo Mendes, não do INEP direto. O site do INEP bloqueia meu acesso, então você precisa baixar os dados oficiais.
+- **Texto do ciclo da água:** é um exemplo que eu escrevi, e está identificado como tal.
+- **Dado da palestra:** a frase "mais de 90% dos professores não sabem incluir" não entrou, porque não tem fonte.
+
+**Lacunas para a próxima rodada de pesquisa**
+A lista completa, com termos de busca, está em `docs/pesquisa/lacunas.md`. As mais importantes:
+1. **Quanto tempo o professor gasta adaptando material.** Nenhuma fonte mede isso, e é a dor central do pitch. Se não acharem, um questionário rápido com professores conhecidos resolve.
+2. **Dados primários do INEP e do IBGE.**
+3. **Baixa visão, cegueira e surdez.** Nenhuma das 17 fontes cobre esses temas.
+4. **Evidência para o P6.** É o padrão com evidência mais fraca.
+
+**Para quem estiver montando o site**
+Os 7 padrões estão em `docs/manual/padroes.json`. É a mesma fonte que gera o PDF, então a aba Manual pode ler direto desse arquivo. O protótipo do mini curso está em `web/minicurso/index.html`.
+
+Por enquanto só você consegue abrir o link do protótipo. Para os colegas verem, use o menu Compartilhar da página.
+
+Se quiser mudar o tom, as cores ou a ordem dos módulos, me diga o que ajustar antes do sinal verde.
