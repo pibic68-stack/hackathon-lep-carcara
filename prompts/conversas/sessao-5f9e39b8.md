@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `5f9e39b8`
 
 - **Início:** 30/10 19:41
-- **Mensagens do time:** 3
-- **Exportado em:** 30/10/2026 20:43
+- **Mensagens do time:** 4
+- **Exportado em:** 30/10/2026 20:44
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -901,3 +901,34 @@ Troquei o limite de contexto de 400k para 1M. A mudança está em `C:\Users\Rica
 Com isso, a conversa só é resumida automaticamente perto de 1 milhão de tokens. A mudança pode valer só a partir da próxima sessão; se não pegar, abra uma sessão nova.
 
 Esse arquivo também define `"model": "sonnet"` como modelo padrão, e o limite novo vale só para o Opus 5.5. Se quiser o mesmo limite para o Sonnet, é só pedir que eu adiciono.
+
+
+---
+
+## 🧑 Time · 30/10 20:44
+
+O que é fazer o commit e abrir o PR?
+
+
+## 🤖 Claude · 30/10 20:44
+
+São os dois passos para o site sair só do seu computador e chegar ao time.
+
+**Commit: salvar uma versão no histórico**
+- Hoje os arquivos do site existem só na sua pasta, como um rascunho que o Git ainda não guardou.
+- Fazer o commit é tirar uma "foto" desse estado, com uma mensagem tipo "Cria o site inicial do PRISMA".
+- Essa foto fica no histórico da branch `ricardo/site-inicial` e dá para voltar a ela se algo quebrar depois.
+- Antes do commit vem o **push**, que envia essa foto para o GitHub. Sem push, o commit continua só no seu computador.
+
+**PR (Pull Request): pedir para juntar ao projeto principal**
+- O time trabalha na branch `main`. A sua `ricardo/site-inicial` é uma cópia paralela, onde o site foi feito sem mexer no trabalho dos outros.
+- O PR é um pedido no GitHub dizendo "quero juntar minhas mudanças à `main`".
+- Ele mostra para o time tudo o que mudou, arquivo por arquivo. O pessoal pode ver, comentar e aprovar.
+- Quando aprovado, alguém clica em **Merge** e o site passa a fazer parte da `main` para todo mundo.
+
+**Na prática, se você pedir, eu faço:**
+1. O commit dos arquivos do site, conferindo antes que não vai nenhum segredo nem dado real de aluno.
+2. O push da branch para o GitHub.
+3. A abertura do PR com um resumo do que o site tem, para o time revisar.
+
+Isso não altera a `main`: ela só muda quando alguém do time aprovar e fizer o merge.
