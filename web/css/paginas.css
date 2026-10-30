@@ -1,0 +1,109 @@
+/* Seções da página inicial. */
+
+/* ---------- hero com a escola pixel ---------- */
+.hero {
+  position: relative; overflow: hidden;
+  height: clamp(600px, 56.25vw, 880px);
+  container-type: size;
+  border-bottom: 3px solid var(--cor-borda);
+  background: #57B3F9;
+}
+.hero-cena { position: absolute; inset: 0; }
+.palco {
+  --pw: max(100cqw, 179.17cqh);
+  position: absolute; bottom: 0;
+  width: var(--pw); aspect-ratio: 1376 / 768;
+  left: clamp(calc(100cqw - var(--pw)), calc(50cqw - var(--pw) * .66), 0px);
+  overflow: hidden;
+}
+.palco > img { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+
+.hero-texto { position: relative; z-index: 2; padding-top: clamp(32px, 6cqh, 72px); }
+/* "placa" clara atrás do texto: a imagem da escola é cheia de detalhes */
+.hero-placa {
+  max-width: 600px; padding: 22px 24px 12px;
+  background: rgba(251, 247, 238, .93);
+  box-shadow: 0 -3px 0 0 #1E2235, 0 3px 0 0 #1E2235, -3px 0 0 0 #1E2235, 3px 0 0 0 #1E2235, 8px 11px 0 0 rgba(30, 34, 53, .35);
+}
+.hero .rotulo { color: #1E2235; }
+.hero h1 { color: #1E2235; }
+.hero-sub { font-size: 1.15rem; color: #1E2235; }
+.hero-acoes { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 1.25rem; }
+:root[data-contraste="alto"] .hero-placa { background: #000; box-shadow: 0 0 0 3px #fff; }
+:root[data-contraste="alto"] .hero-placa * { color: #fff; }
+:root[data-contraste="alto"] .hero-placa .botao { color: var(--texto); }
+
+.hero-mascote {
+  position: absolute; z-index: 3; margin: 0;
+  right: clamp(16px, 4vw, 64px); bottom: clamp(16px, 5cqh, 48px);
+}
+.hero-mascote img { width: clamp(78px, 9vw, 156px); height: auto; animation: pulinho 4s steps(1) infinite; }
+@keyframes pulinho { 0%, 86%, 100% { transform: translateY(0); } 88%, 94% { transform: translateY(-6px); } 91% { transform: translateY(-10px); } }
+.balao-fala {
+  /* encostado na cabeça do carcará (ele olha para a esquerda) */
+  position: absolute; right: calc(100% + 10px); bottom: 66%;
+  width: max-content; max-width: 180px;
+  background: #FFFFFF; color: #1E2235; padding: .5rem .75rem; font-size: .95rem; font-weight: 700; line-height: 1.3;
+  box-shadow: 0 -3px 0 0 #1E2235, 0 3px 0 0 #1E2235, -3px 0 0 0 #1E2235, 3px 0 0 0 #1E2235;
+}
+.balao-fala::after { content: ""; position: absolute; right: -12px; bottom: 10px; width: 9px; height: 9px; background: #FFFFFF; box-shadow: 3px 0 0 #1E2235, 0 3px 0 #1E2235, 3px 3px 0 #1E2235; }
+@media (max-width: 640px) {
+  /* No celular a altura acompanha o texto e sobra uma faixa da escola embaixo da placa */
+  .hero { height: auto; container-type: inline-size; padding-bottom: 300px; }
+  .palco { height: 100%; width: auto; left: 50%; transform: translateX(-64%); }
+  .balao-fala { display: none; }
+  .hero-placa { padding: 18px 16px 8px; }
+  .hero-sub { font-size: 1.05rem; }
+}
+
+/* ---------- seções ---------- */
+.secao { padding-block: clamp(64px, 9vw, 120px); }
+.secao--papel2 { background: var(--cor-fundo-2); border-block: 3px solid var(--cor-borda); }
+.secao--lousa { background: var(--lousa); color: #FBF7EE; }
+:root[data-contraste="alto"] .secao--lousa { background: #000; }
+.secao--lousa .rotulo, .secao--lousa .suave { color: #E3E8E0; }
+.secao-cab { max-width: 760px; margin-bottom: clamp(32px, 4vw, 56px); }
+.secao-intro { font-size: 1.15rem; color: var(--cor-texto-suave); max-width: 620px; }
+
+/* ---------- públicos ---------- */
+.publico { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 72px); align-items: center; }
+.publico + .publico { margin-top: clamp(64px, 8vw, 112px); }
+.publico--invertido .publico-texto { order: 2; }
+.publico h3 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+.publico-texto > p:not(.rotulo) { color: var(--cor-texto-suave); }
+.publico-palco {
+  position: relative; min-height: 400px; display: grid; place-items: center;
+  box-shadow: 0 -3px 0 0 var(--cor-borda), 0 3px 0 0 var(--cor-borda), -3px 0 0 0 var(--cor-borda), 3px 0 0 0 var(--cor-borda);
+  margin: 3px;
+}
+.publico-palco .anim { width: min(78%, 380px); height: auto; aspect-ratio: auto; } /* o JS corrige para um múltiplo inteiro */
+.publico-avatar {
+  position: absolute; left: 20px; top: 20px; width: 96px; height: 96px;
+  box-shadow: 0 0 0 3px var(--cor-borda), 5px 5px 0 3px var(--cor-sombra);
+}
+.publico-legenda {
+  position: absolute; left: 20px; top: 128px; margin: 0;
+  font-family: var(--fonte-mono); font-size: .85rem; text-transform: uppercase; letter-spacing: .06em;
+  background: var(--cor-superficie); padding: .1rem .45rem; box-shadow: 0 0 0 2px var(--cor-borda);
+}
+@media (max-width: 860px) {
+  .publico { grid-template-columns: 1fr; }
+  .publico--invertido .publico-texto { order: 0; }
+  .publico-palco { min-height: 300px; }
+}
+
+/* ---------- princípios ---------- */
+.principios { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 24px; }
+.principios .cartao { --cor-sombra: #FFC93C; }
+.principios h3 { font-size: 1.25rem; margin-top: .8rem; }
+.principios p { margin: 0; color: var(--cor-texto-suave); font-size: 1rem; }
+.principio-icone { display: inline-grid; place-items: center; width: 48px; height: 48px; background: var(--sol-claro); box-shadow: 0 0 0 3px var(--cor-borda); }
+.principio-icone .icone { width: 28px; height: 28px; }
+
+/* ---------- chamada final ---------- */
+.chamada { text-align: center; padding-bottom: clamp(96px, 12vw, 160px); }
+.chamada h2 { margin-top: 1.5rem; }
+.chamada p { color: var(--cor-texto-suave); }
+.chamada-avatares { display: flex; justify-content: center; gap: 18px; }
+.chamada-avatares img { width: 84px; height: 84px; box-shadow: 0 0 0 3px var(--cor-borda), 5px 5px 0 3px var(--cor-sombra); }
+.chamada-avatares img:nth-child(2) { transform: translateY(-14px); }

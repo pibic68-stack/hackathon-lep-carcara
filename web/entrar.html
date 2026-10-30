@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · PRISMA</title>
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <link rel="stylesheet" href="css/entrar.css">
+  <script src="js/acessibilidade.js"></script>
+</head>
+<body class="pagina-entrar">
+  <a class="pular-link" href="#conteudo">Pular para o conteúdo</a>
+  <div id="barra-acessibilidade"></div>
+
+  <header class="topo">
+    <div class="conteiner">
+      <a class="marca" href="index.html" aria-label="PRISMA, página inicial">
+        <img class="pixel" src="assets/img/prisma-logo.svg" alt="" width="45" height="27">
+        <span>PRISMA</span>
+      </a>
+      <a class="botao botao--secundario botao--pequeno voltar" href="index.html"><span data-icone="arrow-left"></span> Voltar ao site</a>
+    </div>
+  </header>
+
+  <main id="conteudo" class="entrar">
+    <div class="entrar-arte pixel" aria-hidden="true">
+      <img src="assets/img/escola.jpg" alt="">
+      <img class="entrar-carcara" src="assets/img/carcara.png" alt="">
+    </div>
+
+    <div class="entrar-painel">
+      <!-- PASSO 1: escolher o perfil -->
+      <section id="passo-perfil" aria-labelledby="titulo-perfil">
+        <p class="rotulo">Entrar</p>
+        <h1 id="titulo-perfil">Quem está chegando?</h1>
+        <p class="suave">Cada pessoa tem a sua entrada. Escolha a sua.</p>
+        <ul class="perfis">
+          <li><button type="button" class="perfil" data-perfil="professor">
+            <img class="pixel" src="assets/img/professor.png" alt="">
+            <span class="perfil-texto"><strong>Professor(a)</strong><span>Turmas, materiais e aprovações</span></span>
+            <span data-icone="arrow-right"></span></button></li>
+          <li><button type="button" class="perfil" data-perfil="familia">
+            <img class="pixel" src="assets/img/familia.png" alt="">
+            <span class="perfil-texto"><strong>Família</strong><span>Guias e recados da escola</span></span>
+            <span data-icone="arrow-right"></span></button></li>
+          <li><button type="button" class="perfil" data-perfil="aluno">
+            <img class="pixel" src="assets/img/aluno.png" alt="">
+            <span class="perfil-texto"><strong>Aluno(a)</strong><span>Minhas atividades</span></span>
+            <span data-icone="arrow-right"></span></button></li>
+        </ul>
+      </section>
+
+      <!-- PASSO 2: formulário do perfil -->
+      <section id="passo-form" hidden aria-labelledby="titulo-form">
+        <button type="button" class="botao botao--fantasma trocar" id="trocar-perfil"><span data-icone="arrow-left"></span> Trocar perfil</button>
+        <div class="form-cab">
+          <img class="pixel" id="form-avatar" src="assets/img/professor.png" alt="">
+          <div>
+            <p class="rotulo" id="form-rotulo">Professor(a)</p>
+            <h1 id="titulo-form" tabindex="-1">Olá, professor(a)!</h1>
+          </div>
+        </div>
+
+        <!-- professor e família: e-mail e senha -->
+        <form id="form-email" class="form" novalidate>
+          <div class="abas" id="abas-familia" role="tablist" aria-label="Como você quer entrar" hidden>
+            <button type="button" role="tab" aria-selected="true" data-aba="email">E-mail e senha</button>
+            <button type="button" role="tab" aria-selected="false" data-aba="codigo">Código da escola</button>
+          </div>
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" autocomplete="username" inputmode="email" aria-describedby="erro-email">
+            <p class="erro" id="erro-email" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="senha">Senha</label>
+            <div class="senha-linha">
+              <input id="senha" name="senha" type="password" autocomplete="current-password" aria-describedby="erro-senha">
+              <button type="button" class="botao botao--secundario botao--pequeno" id="mostrar-senha" aria-pressed="false"><span data-icone="eye"></span> Mostrar</button>
+            </div>
+            <p class="erro" id="erro-senha" hidden></p>
+          </div>
+          <label class="lembrar"><input type="checkbox" name="lembrar"> Lembrar de mim neste computador</label>
+          <button type="submit" class="botao botao--largo"><span data-icone="login"></span> Entrar</button>
+          <p class="links"><a href="#" data-em-breve>Esqueci a senha</a><span id="criar-conta"> · <a href="#" data-em-breve>Criar conta da escola</a></span></p>
+        </form>
+
+        <!-- família: código enviado pela escola -->
+        <form id="form-codigo" class="form" novalidate hidden>
+          <div class="abas" role="tablist" aria-label="Como você quer entrar">
+            <button type="button" role="tab" aria-selected="false" data-aba="email">E-mail e senha</button>
+            <button type="button" role="tab" aria-selected="true" data-aba="codigo">Código da escola</button>
+          </div>
+          <div class="campo">
+            <label for="codigo">Código da escola</label>
+            <p class="dica" id="dica-codigo">Está no bilhete ou na mensagem que a escola enviou. Ex.: URSO-2048</p>
+            <input id="codigo" name="codigo" type="text" autocomplete="one-time-code" autocapitalize="characters" aria-describedby="dica-codigo erro-codigo">
+            <p class="erro" id="erro-codigo" hidden></p>
+          </div>
+          <button type="submit" class="botao botao--largo"><span data-icone="login"></span> Entrar</button>
+        </form>
+
+        <!-- aluno: código da turma + senha de figurinhas -->
+        <form id="form-aluno" class="form" novalidate hidden>
+          <div class="campo">
+            <label for="turma">Código da turma</label>
+            <p class="dica" id="dica-turma">Está no cartão que o professor entregou. Ex.: SOL-42</p>
+            <input id="turma" name="turma" type="text" autocomplete="off" autocapitalize="characters" aria-describedby="dica-turma erro-turma">
+            <p class="erro" id="erro-turma" hidden></p>
+          </div>
+          <fieldset class="campo figurinhas">
+            <legend>Sua senha de figurinhas</legend>
+            <p class="dica">Toque nas 3 figurinhas da sua senha, na ordem certa.</p>
+            <ol class="senha-slots" id="senha-slots" aria-label="Figurinhas escolhidas" aria-live="polite"></ol>
+            <div class="grade-figurinhas" id="grade-figurinhas"></div>
+            <button type="button" class="botao botao--fantasma" id="limpar-figuras"><span data-icone="reload"></span> Começar de novo</button>
+            <p class="erro" id="erro-figuras" hidden></p>
+          </fieldset>
+          <button type="submit" class="botao botao--largo"><span data-icone="login"></span> Entrar</button>
+        </form>
+
+        <p class="aviso" role="note"><span data-icone="info-box"></span> <span><strong>Protótipo:</strong> nenhum dado é enviado nem salvo. Use dados fictícios.</span></p>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/icones.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/entrar.js"></script>
+</body>
+</html>
