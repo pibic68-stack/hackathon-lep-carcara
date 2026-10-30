@@ -218,3 +218,37 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ===== C =====
+*.o
+*.obj
+*.exe
+*.out
+a.out
+
+# ===== LaTeX (versionar .tex e o PDF final; ignorar intermediários) =====
+*.aux
+*.log
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+*.nav
+*.snm
+*.lof
+*.lot
+
+# ===== Node / web =====
+node_modules/
+
+# ===== Editores e sistema =====
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ===== Segredos =====
+*.key
+secrets.*
