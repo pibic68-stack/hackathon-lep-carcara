@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `ef1b860e`
 
 - **Início:** 30/10 20:18
-- **Mensagens do time:** 3
-- **Exportado em:** 30/10/2026 20:22
+- **Mensagens do time:** 4
+- **Exportado em:** 30/10/2026 20:24
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -87,3 +87,32 @@ Para escolher:
 - "PRISMA" e "Farol" já são nomes comuns. Vale ver se o @ no Instagram e o domínio estão livres antes de fechar.
 
 Quando o grupo decidir, me avise que eu registro no `CLAUDE.md` como decisão do time.
+
+
+---
+
+## 🧑 Time · 30/10 20:24
+
+PRISMA é incrivel
+
+
+## 🤖 Claude · 30/10 20:24
+
+Vou registrar o nome como decisão do time no `CLAUDE.md`.
+
+<details><summary>Ações executadas pelo Claude (3)</summary>
+
+- 🔧 `ccd_turn / update_plan`
+- 🔧 `Edit`: C:\Users\Ricardo Coelho\Desktop\Hackaton\hackathon-lep-carcara\.claude\worktrees\worktree-envio-conversas-ed7c64\CLAUDE.md
+- 🔧 `ccd_turn / wrap_up`
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:24
+
+Registrei **PRISMA** como o nome do projeto no [CLAUDE.md](CLAUDE.md), com o significado da sigla e a ideia por trás: uma aula entra e sai em várias versões, para todos.
+
+A mudança ainda está sem commit. Enquanto isso, o envio automático das conversas fica parado e volta assim que o commit for feito. Se fizermos o commit, ele também vai direto para o `main`.
+
+Falta ver se o @ no Instagram e o domínio com o nome PRISMA estão livres.
