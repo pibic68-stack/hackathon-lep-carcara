@@ -1,0 +1,150 @@
+/* =========================================================
+   Tokens do PRISMA: cores, fontes, tamanhos.
+   Mude aqui e o site inteiro acompanha.
+   ========================================================= */
+
+@font-face { font-family: "Pixelify Sans"; src: url("../assets/fontes/pixelify-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Pixelify Sans"; src: url("../assets/fontes/pixelify-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Atkinson Hyperlegible Next"; src: url("../assets/fontes/atkinson-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Atkinson Hyperlegible Next"; src: url("../assets/fontes/atkinson-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Departure Mono"; src: url("../assets/fontes/departure-mono.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "OpenDyslexic"; src: url("../assets/fontes/opendyslexic-400.woff2") format("woff2"); font-display: swap; }
+
+:root {
+  /* paleta base (contraste conferido: ver docs/plano-site.md) */
+  --papel: #FBF7EE;
+  --papel-2: #F3EDDF;
+  --branco: #FFFFFF;
+  --tinta: #1E2235;
+  --tinta-2: #3A3F5C;
+  --tinta-3: #5B6078;
+  --ceu: #57B3F9;
+  --ceu-claro: #CDEBFE;
+  --ceu-escuro: #1F6FB2;
+  --sol: #FFC93C;
+  --sol-claro: #FFE9A8;
+  --laranja: #FFAD60;
+  --laranja-escuro: #A3401F;
+  --grama: #7BD389;
+  --grama-claro: #D5F2D9;
+  --grama-escuro: #2E7D32;
+  --carcara: #8A5A2B;
+  --lousa: #2F4F3E;
+  --lilas: #B89AF0;
+
+  /* papéis semânticos (o modo alto contraste troca só estes) */
+  --cor-fundo: var(--papel);
+  --cor-fundo-2: var(--papel-2);
+  --cor-superficie: var(--branco);
+  --cor-texto: var(--tinta);
+  --cor-texto-suave: var(--tinta-3);
+  --cor-borda: var(--tinta);
+  --cor-sombra: var(--tinta);
+  --cor-link: var(--ceu-escuro);
+  --cor-destaque: var(--sol);
+  --cor-destaque-texto: var(--tinta);
+  --cor-foco: var(--ceu-escuro);
+  --cor-pontos: rgba(30, 34, 53, .16);
+  --cor-linha: rgba(30, 34, 53, .35);
+  --cor-erro: #A3401F;
+  --cor-erro-fundo: #FFF4EE;
+
+  /* fontes */
+  --fonte-titulo: "Pixelify Sans", "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --fonte-texto: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fonte-mono: "Departure Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  /* escala de letra (a barra de acessibilidade muda) */
+  --escala: 1;
+
+  /* pixel */
+  --b: 3px;          /* espessura da borda pixel */
+  --sombra: 4px;     /* altura da sombra sólida */
+  --raio: 0;         /* nada arredondado: é pixel */
+
+  --largura: 1180px;
+  --gutter: clamp(16px, 4vw, 40px);
+}
+
+/* ---------- modo alto contraste ---------- */
+:root[data-contraste="alto"] {
+  --papel: #000000;
+  --papel-2: #000000;
+  --branco: #000000;
+  --cor-fundo: #000000;
+  --cor-fundo-2: #000000;
+  --cor-superficie: #000000;
+  --cor-texto: #FFFFFF;
+  --cor-texto-suave: #FFFFFF;
+  --cor-borda: #FFFFFF;
+  --cor-sombra: #FFE600;
+  --cor-link: #7FDBFF;
+  --cor-destaque: #FFE600;
+  --cor-destaque-texto: #000000;
+  --cor-foco: #FFE600;
+  --cor-erro: #FFE600;
+  --cor-erro-fundo: #000000;
+  --cor-pontos: rgba(255, 255, 255, .25);
+  --cor-linha: #FFFFFF;
+  --ceu-claro: #000000;
+  --sol-claro: #000000;
+  --grama-claro: #000000;
+  --tinta: #FFFFFF;
+  --tinta-2: #FFFFFF;
+  --tinta-3: #FFFFFF;
+}
+
+/* ---------- daltonismo (escolhido na barra de acessibilidade) ----------
+   Cada tipo troca as cores que ele confunde por outras que ele separa bem.
+   Além das cores, todos os modos reforçam sinais que não dependem de cor (ver base.css). */
+
+/* protanopia e deuteranopia: confundem vermelho e verde → verde vira azul, vermelho vira âmbar escuro */
+:root[data-daltonismo="protanopia"],
+:root[data-daltonismo="deuteranopia"] {
+  --grama: #8DB4F0;
+  --grama-claro: #DCE6FA;
+  --grama-escuro: #1F5FBF;
+  --laranja: #F2B266;
+  --laranja-escuro: #8A4B00;
+  --cor-erro: #8A4B00;
+  --cor-erro-fundo: #FFF3E0;
+}
+
+/* tritanopia: confunde azul com verde e amarelo com rosa → verde vira vermelho, azuis ficam mais escuros */
+:root[data-daltonismo="tritanopia"] {
+  --ceu-escuro: #0E5A87;
+  --grama: #E57373;
+  --grama-claro: #FADADD;
+  --grama-escuro: #B0232F;
+  --sol-claro: #FFF1C2;
+  --cor-link: #0E5A87;
+  --cor-foco: #B0232F;
+}
+
+/* acromatopsia: não vê cores → tudo em tons de cinza bem separados pela claridade */
+:root[data-daltonismo="acromatopsia"] {
+  --ceu: #9A9A9A;
+  --ceu-claro: #E6E6E6;
+  --ceu-escuro: #2B2B2B;
+  --sol: #CFCFCF;
+  --sol-claro: #F2F2F2;
+  --laranja: #B3B3B3;
+  --laranja-escuro: #262626;
+  --grama: #7A7A7A;
+  --grama-claro: #D0D0D0;
+  --grama-escuro: #1A1A1A;
+  --carcara: #555555;
+  --lousa: #333333;
+  --lilas: #A6A6A6;
+  --cor-link: #1A1A1A;
+  --cor-foco: #000000;
+  --cor-erro: #000000;
+  --cor-erro-fundo: #EDEDED;
+}
+
+/* ---------- fonte para dislexia ---------- */
+:root[data-fonte="dislexia"] {
+  --fonte-titulo: "OpenDyslexic", sans-serif;
+  --fonte-texto: "OpenDyslexic", sans-serif;
+  --fonte-mono: "OpenDyslexic", sans-serif;
+}

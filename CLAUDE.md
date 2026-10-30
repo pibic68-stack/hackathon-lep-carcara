@@ -8,7 +8,12 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
 - Fluxo: perfil de necessidades → material da aula → adaptações (regras do Manual) → guia para professor e família → mini-check para medir de novo.
 - O Manual de Acessibilidade é a base de regras da ferramenta (`docs/manual/padroes.json`), não um documento solto.
 - Princípios: identificar barreiras, nunca diagnosticar; o professor aprova o que a IA gera; mesmo conteúdo para todos; alunos fictícios (LGPD); interface acessível.
-- Divisão do time em 4 frentes: `docs/divisao-tarefas.md`. Adler é o responsável pela pesquisa.
+- Divisão do time em 4 frentes: `docs/divisao-tarefas.md`.
+- O carcará é o mascote do time (aparece no site como mascote, não como nome do produto).
+- Site (protótipo de interface) em `web/`: HTML/CSS/JS puro, abre com duplo clique, sem internet. Estilo pixel inspirado no cofounder.co. Plano em `docs/plano-site.md`, guia em `web/README.md`.
+- Personagens: coruja = professor, preguiça = aluno, urso = família. A escola do topo é a imagem do time (`web/assets/img/escola.jpg`).
+- Seletor de necessidades da demo: daltonismo (protanopia, deuteranopia, tritanopia, acromatopsia), baixa visão e TEA, cada um com sua versão da ficha "O caminho da água" (`web/js/dados.js` e `web/js/material.js`). A barra de acessibilidade do site também tem esses 4 modos de daltonismo, que trocam a paleta do próprio site.
+- Login ainda é falso; o backend entra só em `web/js/auth.js`. Adler é o responsável pela pesquisa.
 - Plataforma: o professor envia o material → a plataforma transforma → o professor aprova → o material fica salvo e listado numa biblioteca que os alunos acessam. As versões servem para todos, não só para alunos PCD.
 - Manual PRISMA v1.0 (30/10, noite): 10 padrões (P1 cor, P2 página limpa, P3 Linguagem Simples em níveis, P4 imagem descrita, P5 mais de um caminho, P6 estrutura previsível, P7 do concreto ao abstrato, P8 conexões entre disciplinas, P9 material vivo, P10 professor no comando) e 51 critérios verificáveis com código (P3.1 etc.), limite e quem verifica (automatico / ia_revisao / manual). Fonte única: `docs/manual/padroes.json` (também tem necessidades, dados dos gráficos, glossário e referências). `docs/manual/build_manual.py` gera o PDF; `web/prisma-instrucoes/build.py` gera a aba Instruções do site. Nunca editar `index.html` ou o PDF à mão.
 - P7, P8 e P9 vieram da colega professora do grupo: material concreto (letras móveis, material dourado, Cuisenaire) para TDAH/DI; integração entre disciplinas; o material se constrói durante o processo de ensino.

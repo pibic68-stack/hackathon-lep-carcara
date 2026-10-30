@@ -7,6 +7,11 @@ Time **Carcará 3301** · Hackathon LEP (Educação)
 > Time de alunos do IME no hackathon da Liga de Empreendedorismo da Praia Vermelha.
 > **Trilhas:** 1 (Inclusão e acessibilidade) + 4 (Aprendizagem individualizada).
 
+## PRISMA
+
+**Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis.**
+Protótipo do site em [`web/`](web/README.md): abra `web/index.html` com duplo clique.
+
 ## A ideia em uma frase
 
 **Ajudar o professor a fazer todos os alunos, inclusive os alunos PCD, aprenderem juntos o mesmo conteúdo**:

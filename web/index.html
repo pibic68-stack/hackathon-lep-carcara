@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PRISMA · Recursos inclusivos para a sala de aula</title>
+  <meta name="description" content="PRISMA: Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis. Adapta o material da aula para cada aluno aprender o mesmo conteúdo, junto com a turma.">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <link rel="stylesheet" href="css/paginas.css">
+  <link rel="stylesheet" href="css/diagramas.css">
+  <link rel="stylesheet" href="css/ficha.css">
+  <script src="js/acessibilidade.js"></script>
+</head>
+<body>
+  <a class="pular-link" href="#conteudo">Pular para o conteúdo</a>
+  <div id="barra-acessibilidade"></div>
+
+  <header class="topo">
+    <div class="conteiner">
+      <a class="marca" href="index.html" aria-label="PRISMA, página inicial">
+        <img class="pixel" src="assets/img/prisma-logo.svg" alt="" width="45" height="27">
+        <span>PRISMA</span>
+      </a>
+      <button class="botao botao--secundario botao--pequeno menu-botao" type="button" aria-expanded="false" aria-controls="menu">
+        <span data-icone="menu"></span> Menu
+      </button>
+      <nav class="menu" id="menu" aria-label="Principal">
+        <ul>
+          <li><a href="#como-funciona">Como funciona</a></li>
+          <li><a href="#antes-depois">Antes e depois</a></li>
+          <li><a href="#publicos">Para quem</a></li>
+          <li><a href="#principios">Princípios</a></li>
+        </ul>
+        <a class="botao botao--escuro botao--pequeno" href="entrar.html"><span data-icone="login"></span> Entrar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <!-- ================= HERO ================= -->
+    <section class="hero" aria-labelledby="hero-titulo">
+      <div class="hero-cena" aria-hidden="true">
+        <div class="palco pixel">
+          <img src="assets/img/escola.jpg" alt="">
+        </div>
+      </div>
+      <div class="conteiner hero-texto">
+        <div class="hero-placa">
+        <p class="rotulo">Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis</p>
+        <h1 id="hero-titulo">Uma aula.<br>Todos aprendendo juntos.</h1>
+        <p class="hero-sub">O PRISMA identifica as barreiras de cada aluno, adapta o material da aula com as regras do nosso Manual de Acessibilidade e entrega um guia prático para o professor e para a família.</p>
+        <div class="hero-acoes">
+          <a class="botao" href="#como-funciona"><span data-icone="play"></span> Ver como funciona</a>
+          <a class="botao botao--secundario" href="entrar.html"><span data-icone="login"></span> Entrar</a>
+        </div>
+        </div>
+      </div>
+      <figure class="hero-mascote">
+        <img class="pixel" src="assets/img/carcara.png" alt="Mascote: um carcará pixelado pousado num galho" width="78" height="90">
+        <figcaption class="balao-fala">Oi! Sou o carcará do time 3301.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ================= DIAGRAMA RADIAL ================= -->
+    <section class="secao" id="como-funciona" aria-labelledby="cf-titulo">
+      <div class="conteiner">
+        <div class="secao-cab">
+          <p class="rotulo">Como funciona</p>
+          <h2 id="cf-titulo">Um ciclo que começa no aluno<br><span class="suave">e volta para ele.</span></h2>
+          <p class="secao-intro">Escolha um aluno fictício e veja o PRISMA passar pelas cinco etapas. O professor aprova tudo antes de chegar à turma.</p>
+        </div>
+
+        <div class="radial-cartao cartao cartao--plano">
+          <div class="radial-topo">
+            <div class="seletor" id="seletor-radial" data-seletor-necessidade data-rotulo="Aluno fictício com:"></div>
+          </div>
+          <div class="radial-corpo">
+            <div class="radial grade-pontos" id="radial">
+              <!-- desenhado por js/diagrama.js -->
+            </div>
+            <aside class="caderno" aria-label="Detalhe da etapa">
+              <div class="caderno-cab">
+                <span class="etiqueta" id="caderno-aluno">Aluno fictício</span>
+                <span class="caderno-passo" id="caderno-passo">1 / 5</span>
+              </div>
+              <div class="caderno-corpo" id="caderno-corpo" aria-live="polite"></div>
+              <div class="caderno-acoes">
+                <button type="button" class="botao botao--secundario botao--pequeno" id="etapa-anterior" aria-label="Etapa anterior"><span data-icone="arrow-left"></span></button>
+                <button type="button" class="botao botao--secundario botao--pequeno" id="etapa-pausa" aria-pressed="false"><span data-icone="pause"></span> <span class="txt">Pausar</span></button>
+                <button type="button" class="botao botao--secundario botao--pequeno" id="etapa-proxima" aria-label="Próxima etapa"><span data-icone="arrow-right"></span></button>
+              </div>
+            </aside>
+          </div>
+          <ul class="radial-rodape">
+            <li><strong>Identifica barreiras, não diagnostica.</strong> O perfil descreve como o aluno aprende, nunca um laudo.</li>
+            <li><strong>O professor aprova.</strong> A IA sugere; nada chega ao aluno sem revisão.</li>
+            <li><strong>Mesmo conteúdo.</strong> Muda a forma, nunca o objetivo da aula.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ANTES E DEPOIS ================= -->
+    <section class="secao secao--papel2" id="antes-depois" aria-labelledby="ad-titulo">
+      <div class="conteiner">
+        <div class="secao-cab">
+          <p class="rotulo">Antes e depois</p>
+          <h2 id="ad-titulo">A mesma ficha,<br><span class="suave">do jeito de cada aluno.</span></h2>
+          <p class="secao-intro">Uma ficha de Ciências do 5º ano passa pelas regras do Manual. Troque o aluno e veja a versão adaptada mudar.</p>
+        </div>
+
+        <div class="fluxo-controles cartao cartao--plano">
+          <div class="seletor" id="seletor-fluxo" data-seletor-necessidade data-rotulo="Adaptar para:"></div>
+          <div class="fluxo-opcoes">
+            <label class="alternar" id="alt-simular"><input type="checkbox" id="simular"> <span>Ver como o aluno enxerga</span></label>
+            <label class="alternar"><input type="checkbox" id="barreiras"> <span>Marcar barreiras na ficha original</span></label>
+          </div>
+        </div>
+
+        <div class="fluxo grade-pontos" id="fluxo">
+          <div class="fluxo-linha">
+            <div class="fluxo-no">
+              <p class="fluxo-tag"><span data-icone="file"></span> Ficha original</p>
+              <div class="ficha-moldura" id="ficha-original"></div>
+              <ol class="lista-barreiras" id="lista-barreiras" hidden></ol>
+            </div>
+            <div class="conector" aria-hidden="true"><span class="pacote"></span></div>
+            <div class="fluxo-no fluxo-no--regras">
+              <p class="fluxo-tag"><span data-icone="script-text"></span> Regras do Manual</p>
+              <div class="cartao regras-cartao" id="regras"></div>
+            </div>
+            <div class="conector" aria-hidden="true"><span class="pacote"></span></div>
+            <div class="fluxo-no">
+              <p class="fluxo-tag"><span data-icone="zap"></span> Versão adaptada</p>
+              <div class="ficha-moldura" id="ficha-adaptada"></div>
+            </div>
+          </div>
+          <div class="fluxo-ramo" aria-hidden="true">
+            <svg viewBox="0 0 100 40" preserveAspectRatio="none"><path d="M83 0 V20 H17 V40 M83 20 V40 M50 20 V40" /></svg>
+          </div>
+          <div class="fluxo-linha fluxo-linha--fim">
+            <div class="cartao mini-no">
+              <img class="pixel avatar" src="assets/img/professor.png" alt="">
+              <div><strong>Professor(a) revisa</strong><p>Aceita, edita ou recusa cada mudança.</p>
+                <button type="button" class="botao botao--pequeno" id="aprovar"><span data-icone="check"></span> Aprovar</button></div>
+            </div>
+            <div class="cartao mini-no">
+              <img class="pixel avatar" src="assets/img/familia.png" alt="">
+              <div><strong>Guia da família</strong><p id="guia-familia">O que fazer em casa, em linguagem simples.</p></div>
+            </div>
+            <div class="cartao mini-no">
+              <img class="pixel avatar" src="assets/img/aluno.png" alt="">
+              <div><strong>Mini-check do aluno</strong><p>Três perguntas no fim da aula. Se precisar, o perfil é ajustado.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- filtros que simulam como cada aluno enxerga (matrizes de Machado et al., 2009) -->
+        <svg class="so-leitor" aria-hidden="true" focusable="false">
+          <filter id="sim-protanopia"><feColorMatrix type="matrix" values="0.152286 1.052583 -0.204868 0 0  0.114503 0.786281 0.099216 0 0  -0.003882 -0.048116 1.051998 0 0  0 0 0 1 0"/></filter>
+          <filter id="sim-deuteranopia"><feColorMatrix type="matrix" values="0.367322 0.860646 -0.227968 0 0  0.280085 0.672501 0.047413 0 0  -0.011820 0.042940 0.968881 0 0  0 0 0 1 0"/></filter>
+          <filter id="sim-tritanopia"><feColorMatrix type="matrix" values="1.255528 -0.076749 -0.178779 0 0  -0.078411 0.930809 0.147602 0 0  0.004733 0.691367 0.303900 0 0  0 0 0 1 0"/></filter>
+          <filter id="sim-acromatopsia"><feColorMatrix type="saturate" values="0"/></filter>
+          <filter id="sim-baixa-visao"><feGaussianBlur stdDeviation="1.6"/><feComponentTransfer><feFuncR type="linear" slope="0.6" intercept="0.25"/><feFuncG type="linear" slope="0.6" intercept="0.25"/><feFuncB type="linear" slope="0.6" intercept="0.25"/></feComponentTransfer></filter>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ================= PÚBLICOS ================= -->
+    <section class="secao" id="publicos" aria-labelledby="pub-titulo">
+      <div class="conteiner">
+        <div class="secao-cab">
+          <p class="rotulo">Para quem</p>
+          <h2 id="pub-titulo">Feito para a turma toda.<br><span class="suave">Professor, família e aluno.</span></h2>
+        </div>
+
+        <div class="publico">
+          <div class="publico-texto">
+            <p class="rotulo">1.0 · Professores</p>
+            <h3>Menos tempo adaptando,<br>mais tempo ensinando.</h3>
+            <p>Hoje o professor adapta tudo sozinho, à noite, para cada aluno. Com o PRISMA, ele descreve o aluno uma vez e cada aula sai pronta para revisar.</p>
+            <div class="sanfona">
+              <details open><summary><span class="num">1.1</span> Cadastrar as necessidades <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>Um checklist de necessidades funcionais, sem diagnóstico. Ex.: “precisa de instruções em etapas”.</p></div></details>
+              <details><summary><span class="num">1.2</span> Enviar o material <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>PDF, texto ou slide. Do jeito que você já usa.</p></div></details>
+              <details><summary><span class="num">1.3</span> Revisar e aprovar <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>Original e adaptado lado a lado. Você aceita, edita ou recusa cada mudança.</p></div></details>
+              <details><summary><span class="num">1.4</span> Mini-check no fim da aula <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>Três perguntas rápidas mostram se a adaptação funcionou.</p></div></details>
+            </div>
+          </div>
+          <div class="publico-palco grade-pontos">
+            <img class="pixel publico-avatar" src="assets/img/professor.png" alt="Coruja de óculos, a personagem do professor">
+            <canvas class="pixel anim" data-anim="computador" data-res="128" aria-hidden="true"></canvas>
+            <p class="publico-legenda">Prof.ª Coruja</p>
+          </div>
+        </div>
+
+        <div class="publico publico--invertido">
+          <div class="publico-texto">
+            <p class="rotulo">2.0 · Famílias</p>
+            <h3>Saber como ajudar em casa,<br>sem jargão.</h3>
+            <p>A família recebe um guia curto, em linguagem simples, feito para aquele aluno e aquela aula.</p>
+            <div class="sanfona">
+              <details open><summary><span class="num">2.1</span> Guia em linguagem simples <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>O que a criança está aprendendo e o que mudou no material dela.</p></div></details>
+              <details><summary><span class="num">2.2</span> O que fazer em casa <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>Dicas práticas: luz, rotina, como ler junto.</p></div></details>
+              <details><summary><span class="num">2.3</span> Quando procurar um profissional <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>Sinais observáveis que valem uma conversa com a escola ou com um especialista. O PRISMA orienta; não diagnostica.</p></div></details>
+            </div>
+          </div>
+          <div class="publico-palco grade-pontos">
+            <img class="pixel publico-avatar" src="assets/img/familia.png" alt="Urso sorridente, o personagem da família">
+            <canvas class="pixel anim" data-anim="livro" data-res="112" aria-hidden="true"></canvas>
+            <p class="publico-legenda">Família Urso</p>
+          </div>
+        </div>
+
+        <div class="publico">
+          <div class="publico-texto">
+            <p class="rotulo">3.0 · Alunos</p>
+            <h3>O mesmo conteúdo da turma,<br>do seu jeito.</h3>
+            <p>Ninguém fica com uma “atividade diferente”. Todos estudam a mesma coisa; só muda a forma.</p>
+            <div class="sanfona">
+              <details open><summary><span class="num">3.1</span> Mesmo conteúdo, outra forma <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>Letra maior, cores seguras, passos numerados ou áudio.</p></div></details>
+              <details><summary><span class="num">3.2</span> Escolher como estudar <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>O aluno também diz o que funciona para ele.</p></div></details>
+              <details><summary><span class="num">3.3</span> Mini-check divertido <span class="mais" aria-hidden="true">+</span></summary><div class="corpo"><p>Três perguntas rápidas no fim da aula, sem nota.</p></div></details>
+            </div>
+          </div>
+          <div class="publico-palco grade-pontos">
+            <img class="pixel publico-avatar" src="assets/img/aluno.png" alt="Preguiça sorridente pendurada num galho, a personagem do aluno">
+            <canvas class="pixel anim" data-anim="livros" data-res="120" aria-hidden="true"></canvas>
+            <p class="publico-legenda">Preguiça, 5º ano</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PRINCÍPIOS ================= -->
+    <section class="secao secao--lousa" id="principios" aria-labelledby="pr-titulo">
+      <div class="conteiner">
+        <div class="secao-cab">
+          <p class="rotulo">Princípios</p>
+          <h2 id="pr-titulo">O que o PRISMA nunca negocia.</h2>
+        </div>
+        <ul class="principios">
+          <li class="cartao"><span class="principio-icone" data-icone="search"></span><h3>Identificar, não diagnosticar</h3><p>Registramos necessidades funcionais. Diagnóstico é com profissional de saúde.</p></li>
+          <li class="cartao"><span class="principio-icone" data-icone="check-double"></span><h3>O professor aprova</h3><p>A IA sugere. Nada chega ao aluno sem a revisão de quem conhece a turma.</p></li>
+          <li class="cartao"><span class="principio-icone" data-icone="users"></span><h3>Mesmo conteúdo para todos</h3><p>Muda a forma, nunca o objetivo de aprendizagem.</p></li>
+          <li class="cartao"><span class="principio-icone" data-icone="shield"></span><h3>Dados protegidos (LGPD)</h3><p>Dados de crianças são sensíveis. Nesta demo, todos os alunos são fictícios.</p></li>
+          <li class="cartao"><span class="principio-icone" data-icone="human"></span><h3>Interface acessível</h3><p>Contraste, teclado, leitor de tela e menos animação. Teste na barra lá em cima.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ================= CHAMADA FINAL ================= -->
+    <section class="secao chamada" aria-labelledby="ch-titulo">
+      <div class="conteiner">
+        <div class="chamada-avatares" aria-hidden="true">
+          <img class="pixel" src="assets/img/professor.png" alt="">
+          <img class="pixel" src="assets/img/familia.png" alt="">
+          <img class="pixel" src="assets/img/aluno.png" alt="">
+        </div>
+        <h2 id="ch-titulo">Comece pela sua turma.</h2>
+        <p>Professor, família ou aluno: cada um tem a sua entrada.</p>
+        <a class="botao" href="entrar.html"><span data-icone="login"></span> Entrar no PRISMA</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="conteiner">
+      <div>
+        <a class="marca" href="index.html"><img class="pixel" src="assets/img/prisma-logo.svg" alt="" width="45" height="27"><span>PRISMA</span></a>
+        <p>Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis.</p>
+      </div>
+      <div>
+        <h3>Navegar</h3>
+        <ul>
+          <li><a href="#como-funciona">Como funciona</a></li>
+          <li><a href="#antes-depois">Antes e depois</a></li>
+          <li><a href="entrar.html">Entrar</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>O time</h3>
+        <ul>
+          <li>Carcará 3301 · IME</li>
+          <li>Hackathon LEP · Educação</li>
+          <li><a href="https://github.com/pibic68-stack/hackathon-lep-carcara">Código no GitHub</a></li>
+        </ul>
+      </div>
+      <p class="fim">Protótipo de interface. Todos os alunos e dados são fictícios.</p>
+    </div>
+  </footer>
+
+  <script src="js/icones.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/material.js"></script>
+  <script src="js/seletor.js"></script>
+  <script src="js/diagrama.js"></script>
+  <script src="js/fluxo.js"></script>
+  <script src="vendor/lottie.min.js"></script>
+  <script src="assets/anim/computador.js"></script>
+  <script src="assets/anim/livro.js"></script>
+  <script src="assets/anim/livros.js"></script>
+  <script src="js/lottie-pixel.js"></script>
+</body>
+</html>
