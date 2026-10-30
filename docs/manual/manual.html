@@ -1,0 +1,281 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<title>Manual Carcará de Materiais Acessíveis</title>
+<style>@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Lexend:wght@400;500;600;700&display=swap");
+@page { size: A4; }
+:root { --ink:#142033; --muted:#4A5668; --line:#D8DEE6; --soft:#EEF2F7; --blue:#1F5FBF; --amber:#C26A00;
+  --display:'Lexend',system-ui,sans-serif; --body:'Atkinson Hyperlegible',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace; }
+* { box-sizing:border-box }
+body { margin:0; color:var(--ink); background:#fff; font:11.5pt/1.55 var(--body); }
+h1,h2,h3,h4 { font-family:var(--display); line-height:1.2; margin:0; text-wrap:balance; }
+h2 { font-size:22pt; font-weight:600; margin-bottom:10pt; }
+h3 { font-size:15pt; font-weight:600; }
+.h3s { margin:16pt 0 6pt; }
+h4 { font-size:10pt; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:10pt 0 4pt; }
+p { margin:0 0 8pt; max-width:62ch; }
+ul,ol { margin:0 0 8pt; padding-left:16pt; }
+li { margin-bottom:3pt; }
+cite { font-style:normal; color:var(--muted); font-size:9.5pt; }
+.eyebrow { font-family:var(--mono); font-size:9pt; letter-spacing:.08em; text-transform:uppercase; color:var(--blue); margin-bottom:4pt; }
+.mono { font-family:var(--mono); }
+.capa { min-height:250mm; display:flex; flex-direction:column; justify-content:center; break-after:page; border-left:6pt solid var(--blue); padding-left:18pt; }
+.capa h1 { font-size:38pt; font-weight:700; letter-spacing:-.01em; margin:6pt 0 14pt; max-width:14ch; }
+.capa .sub { font-size:14pt; max-width:40ch; }
+.capa-leitores { list-style:none; padding:0; margin:20pt 0; display:grid; gap:8pt; }
+.capa-leitores li { display:grid; grid-template-columns:42mm 1fr; gap:8pt; padding:8pt 0; border-top:1px solid var(--line); }
+.capa-leitores b { font-family:var(--display); font-weight:600; }
+.nota-capa { font-size:9.5pt; color:var(--muted); max-width:70ch; }
+.parte { break-before:page; }
+.parte:nth-of-type(2) { break-before:auto; }
+.numeros { display:grid; grid-template-columns:repeat(3,1fr); gap:10pt; margin:12pt 0 4pt; }
+.numeros div { border-top:3pt solid var(--ink); padding-top:6pt; }
+.numeros b { display:block; font-family:var(--display); font-size:22pt; font-weight:700; font-variant-numeric:tabular-nums; }
+.numeros span { font-size:10pt; color:var(--muted); }
+.fonte-solta { font-size:9pt; color:var(--muted); }
+figure { margin:14pt 0; break-inside:avoid; }
+.grafico { width:100%; height:auto; font-family:var(--body); }
+figcaption.tit { font-family:var(--display); font-weight:600; font-size:11.5pt; margin-bottom:4pt; }
+figcaption.fonte { font-size:8.5pt; color:var(--muted); margin-top:2pt; }
+.legenda { display:flex; gap:16pt; font-size:9.5pt; margin:2pt 0 4pt; }
+.legenda i { display:inline-block; width:14pt; height:4pt; border-radius:2pt; margin-right:5pt; vertical-align:middle; }
+.falas { list-style:none; padding:0; }
+.falas li { padding:5pt 0 5pt 12pt; border-left:2pt solid var(--line); margin-bottom:6pt; }
+.falas cite { display:block; }
+.principios li { margin-bottom:7pt; }
+.fluxo { list-style:none; padding:0; display:grid; gap:0; }
+.fluxo li { display:grid; grid-template-columns:24pt 26mm 1fr; gap:8pt; align-items:baseline; padding:8pt 0; border-top:1px solid var(--line); }
+.fluxo .n { font-family:var(--mono); font-weight:500; color:var(--blue); }
+.fluxo b { font-family:var(--display); font-weight:600; }
+.tab { width:100%; border-collapse:collapse; font-size:10pt; }
+.tab th { text-align:left; font-family:var(--display); font-weight:600; border-bottom:1.5pt solid var(--ink); padding:4pt 6pt 4pt 0; }
+.tab td { border-bottom:1px solid var(--line); padding:5pt 6pt 5pt 0; vertical-align:top; }
+.chave { list-style:none; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:4pt 14pt; font-size:10pt; }
+.tag { display:inline-block; font-family:var(--mono); font-size:8pt; letter-spacing:.04em; text-transform:uppercase; padding:1pt 5pt; border:1px solid var(--ink); border-radius:3pt; white-space:nowrap; }
+.tag-dados { background:var(--ink); color:#fff; }
+.tag-pratica { background:#fff; }
+.tag-norma { background:var(--soft); }
+.tag-projeto { border-style:dashed; color:var(--muted); border-color:var(--muted); }
+.resumo { list-style:none; padding:0; margin:12pt 0 4pt; }
+.resumo li { display:grid; grid-template-columns:20pt 42mm 1fr; gap:8pt; padding:6pt 0; border-top:1px solid var(--line); font-size:10pt; }
+.cod { font-family:var(--mono); font-weight:500; color:var(--blue); }
+.padrao { break-before:page; }
+.padrao header { display:flex; align-items:baseline; gap:10pt; border-bottom:2pt solid var(--ink); padding-bottom:6pt; margin-bottom:8pt; }
+.padrao header .cod { font-size:26pt; }
+.padrao h3 { font-size:20pt; }
+.regra { font-family:var(--display); font-size:13pt; font-weight:500; max-width:52ch; }
+.duas { display:grid; grid-template-columns:1.25fr 1fr; gap:16pt; }
+.duas > div:last-child { background:var(--soft); padding:4pt 10pt 8pt; border-radius:4pt; }
+.duas ul { font-size:10.5pt; }
+.niveis { display:grid; grid-template-columns:auto 1fr; gap:3pt 8pt; font-size:10pt; margin:6pt 0; }
+.niveis dt { font-family:var(--mono); font-weight:500; }
+.niveis dd { margin:0; }
+.param { border-collapse:collapse; font-size:9.5pt; margin-top:6pt; }
+.param th { text-align:left; font-weight:400; color:var(--muted); padding:2pt 10pt 2pt 0; }
+.param td { padding:2pt 0; font-weight:700; }
+.evid { list-style:none; padding:0; font-size:10pt; }
+.evid li { display:grid; grid-template-columns:22mm 1fr; gap:8pt; padding:5pt 0; border-top:1px solid var(--line); break-inside:avoid; }
+.evid cite { display:block; }
+.lf-grade { display:grid; grid-template-columns:1fr 1fr; gap:10pt; break-inside:avoid; }
+.lf-caixa { border:1px solid var(--line); border-radius:4pt; padding:8pt 10pt; font-size:10.5pt; }
+.lf-rot { font-family:var(--mono); font-size:8.5pt; text-transform:uppercase; letter-spacing:.05em; color:var(--blue); margin-bottom:4pt; }
+.linhas span { display:block; }
+.glos { font-size:9pt; color:var(--muted); border-top:1px dashed var(--line); padding-top:4pt; }
+.lf1 { display:flex; align-items:center; gap:8pt; margin-bottom:5pt; font-size:12pt; }
+.ico { width:26pt; height:26pt; flex:none; }
+.exemplo { break-before:page; }
+.limites li { margin-bottom:7pt; }
+.familia p, .familia li { font-size:12.5pt; }
+.aviso { border:1.5pt solid var(--ink); border-radius:4pt; padding:8pt 10pt; margin-top:12pt; }
+.estudante .linhas { font-size:16pt; line-height:1.7; }
+.refs ol { font-size:9.5pt; padding-left:14pt; }
+.refs li { margin-bottom:5pt; }
+</style></head><body>
+
+<section class="capa">
+  <p class="eyebrow">Carcará 3301 · versão 0.1 (rascunho para validação do time)</p>
+  <h1>Manual de Materiais Acessíveis</h1>
+  <p class="sub">Os padrões que a plataforma usa para transformar um material de aula em versões que toda a turma consegue usar. E em que pesquisas cada padrão se apoia.</p>
+  <ul class="capa-leitores">
+    <li><b>Professores e escolas</b><span>Partes 1 a 5: dados, princípios, funcionamento e os 7 padrões em detalhe.</span></li>
+    <li><b>Famílias</b><span>Parte 6: o que a plataforma faz e como apoiar em casa, em linguagem simples.</span></li>
+    <li><b>Estudantes</b><span>Parte 7: escrita em Leitura Fácil.</span></li>
+  </ul>
+  <p class="nota-capa">Este manual segue as próprias regras: fonte Atkinson Hyperlegible no texto (criada para leitores com baixa visão), Lexend nos títulos (criada para facilitar a leitura), linhas curtas e nenhuma informação passada só por cor.</p>
+</section>
+
+<section class="parte">
+  <p class="eyebrow">Parte 1</p><h2>Por que este manual existe</h2>
+  <p>Quase todos os estudantes com deficiência já estudam na mesma sala que os colegas. O desafio agora é que eles <b>aprendam</b> junto com a turma. Para isso, o material da aula precisa chegar a todos.</p>
+  <div class="numeros">
+    <div><b>2,07 milhões</b><span>matrículas na educação especial em 2024, contra 930 mil em 2015</span></div>
+    <div><b>92,6%</b><span>dessas matrículas estão em classes comuns</span></div>
+    <div><b>6,4%</b><span>dos professores regentes têm formação continuada em educação especial</span></div>
+  </div>
+  <p class="fonte-solta">Fonte dos três números: Instituto Rodrigo Mendes, Panorama da Educação Especial 2025, com dados do Censo Escolar/INEP.</p>
+  <figure><figcaption class="tit">Quem são os estudantes da educação especial: participação nas matrículas</figcaption><div class="legenda"><span><i style="background:#1F5FBF"></i>Autismo (TEA), linha contínua</span><span><i style="background:#C26A00"></i>Deficiência intelectual, linha tracejada</span></div><svg viewBox="0 0 640 300" role="img" aria-label="Participação de TEA e deficiência intelectual nas matrículas da educação especial, 2015 e 2024" class="grafico"><line x1="80" y1="250.0" x2="420" y2="250.0" stroke="#D8DEE6" stroke-width="1"/><line x1="80" y1="195.0" x2="420" y2="195.0" stroke="#D8DEE6" stroke-width="1"/><line x1="80" y1="140.0" x2="420" y2="140.0" stroke="#D8DEE6" stroke-width="1"/><line x1="80" y1="85.0" x2="420" y2="85.0" stroke="#D8DEE6" stroke-width="1"/><line x1="80" y1="30.0" x2="420" y2="30.0" stroke="#D8DEE6" stroke-width="1"/><text x="120" y="282" fill="#142033" font-size="14" font-weight="700" text-anchor="middle">2015</text><text x="380" y="282" fill="#142033" font-size="14" font-weight="700" text-anchor="middle">2024</text><line x1="120" y1="59.4" x2="380" y2="116.6" stroke="#C26A00" stroke-width="2.5" stroke-dasharray="4 3"/><circle cx="120" cy="59.4" r="6" fill="#C26A00" stroke="#fff" stroke-width="2"/><circle cx="380" cy="116.6" r="6" fill="#C26A00" stroke="#fff" stroke-width="2"/><text x="106" y="64.4" fill="#142033" font-size="13" text-anchor="end">69,3%</text><text x="394" y="110.6" fill="#142033" font-size="13" font-weight="700">48,5% · Deficiência intelectual</text><line x1="120" y1="234.6" x2="380" y2="128.4" stroke="#1F5FBF" stroke-width="2.5"/><circle cx="120" cy="234.6" r="6" fill="#1F5FBF" stroke="#fff" stroke-width="2"/><circle cx="380" cy="128.4" r="6" fill="#1F5FBF" stroke="#fff" stroke-width="2"/><text x="106" y="239.6" fill="#142033" font-size="13" text-anchor="end">5,6%</text><text x="394" y="144.4" fill="#142033" font-size="13" font-weight="700">44,2% · Autismo (TEA)</text></svg><figcaption class="fonte">Fonte: Instituto Rodrigo Mendes, Panorama da Educação Especial 2025 (dados do Censo Escolar/INEP). Os demais tipos de deficiência e as altas habilidades completam o total e não aparecem no gráfico.</figcaption></figure>
+  <p>Autismo e deficiência intelectual concentram a maior parte das matrículas. Por isso os padrões P3 (Leitura Fácil), P5 (mais de um caminho) e P6 (estrutura previsível) são o centro da plataforma.</p>
+  <figure><figcaption class="tit">Pessoas com deficiência que frequentam a escola, por idade (2022)</figcaption><svg viewBox="0 0 640 174" role="img" aria-label="Pessoas com deficiência que frequentam a escola, por idade (2022)" class="grafico"><line x1="150.0" y1="8" x2="150.0" y2="144" stroke="#D8DEE6" stroke-width="1"/><text x="150.0" y="162" fill="#4A5668" font-size="12" text-anchor="middle">0%</text><line x1="255.0" y1="8" x2="255.0" y2="144" stroke="#D8DEE6" stroke-width="1"/><text x="255.0" y="162" fill="#4A5668" font-size="12" text-anchor="middle">25%</text><line x1="360.0" y1="8" x2="360.0" y2="144" stroke="#D8DEE6" stroke-width="1"/><text x="360.0" y="162" fill="#4A5668" font-size="12" text-anchor="middle">50%</text><line x1="465.0" y1="8" x2="465.0" y2="144" stroke="#D8DEE6" stroke-width="1"/><text x="465.0" y="162" fill="#4A5668" font-size="12" text-anchor="middle">75%</text><line x1="570.0" y1="8" x2="570.0" y2="144" stroke="#D8DEE6" stroke-width="1"/><text x="570.0" y="162" fill="#4A5668" font-size="12" text-anchor="middle">100%</text><text x="138" y="34" fill="#142033" font-size="14" text-anchor="end">6 a 14 anos</text><path d="M150,18 h395.0 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-395.0 z" fill="#1F5FBF"/><text x="557.0" y="35" fill="#142033" font-size="14" font-weight="700">95%</text><text x="138" y="78" fill="#142033" font-size="14" text-anchor="end">15 a 17 anos</text><path d="M150,62 h348.8 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-348.8 z" fill="#1F5FBF"/><text x="510.8" y="79" fill="#142033" font-size="14" font-weight="700">84%</text><text x="138" y="122" fill="#142033" font-size="14" text-anchor="end">18 a 24 anos</text><path d="M150,106 h96.8 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-96.8 z" fill="#1F5FBF"/><text x="258.8" y="123" fill="#142033" font-size="14" font-weight="700">24%</text></svg><figcaption class="fonte">Fonte: IBGE, PNAD Contínua 2022, citada por Bacelar (2024)</figcaption></figure>
+  <p>A escola chega a quase todas as crianças com deficiência, mas elas vão ficando pelo caminho. Entre 18 e 24 anos, só uma em cada quatro ainda estuda.</p>
+  <h3 class="h3s">O que os professores dizem</h3>
+  <ul class="falas">
+    <li>Falta tempo para planejar adaptações. É a principal queixa. <cite>Marques &amp; Duarte (2013)</cite></li>
+    <li>Sentem angústia por uma formação que consideram insuficiente. <cite>Tavares, Santos &amp; Freitas (2016), 52 professores</cite></li>
+    <li>Conhecem o PEI na teoria, mas não se sentem preparados para aplicá-lo. <cite>Santos (2024), 32 docentes</cite></li>
+    <li>Sentem-se sozinhos e sem materiais adequados. <cite>Brito &amp; Flores (2023)</cite></li>
+    <li>O ensino comum e a sala de recursos trabalham distantes um do outro. <cite>Moscardini (2011)</cite></li>
+  </ul>
+  <p>A plataforma ataca o problema do tempo: o professor envia o material uma vez, e as versões adaptadas saem prontas para ele revisar.</p>
+</section>
+
+<section class="parte">
+  <p class="eyebrow">Parte 2</p><h2>Princípios</h2>
+  <ol class="principios">
+    <li><b>Universal primeiro.</b> A versão padrão de todo material já segue os padrões básicos. Ninguém precisa pedir para ter acesso. Domaredzki, Hummel &amp; Costa (2026) mostraram que o que é essencial para um aluno com deficiência foi benéfico para toda a turma.</li>
+    <li><b>Mesmo conteúdo para todos.</b> Muda a forma, nunca o objetivo de aprendizagem.</li>
+    <li><b>O aluno escolhe, sem rótulo.</b> As versões aparecem como opções ("prefiro ouvir", "texto mais direto"), nunca como "versão para deficientes".</li>
+    <li><b>Necessidades, não diagnósticos.</b> A plataforma registra o que ajuda o aluno a aprender. Diagnóstico é tarefa de profissionais de saúde.</li>
+    <li><b>Professor no comando.</b> A IA propõe; o professor decide.</li>
+    <li><b>Transparência.</b> Todo material mostra quais padrões foram aplicados, e este manual mostra em que cada padrão se baseia.</li>
+  </ol>
+</section>
+
+<section class="parte">
+  <p class="eyebrow">Parte 3</p><h2>Como a plataforma funciona</h2>
+  <ol class="fluxo"><li><span class="n">1</span><b>Enviar</b><span>O professor envia o material (PDF, texto ou imagem) e marca as necessidades da turma.</span></li><li><span class="n">2</span><b>Analisar</b><span>A plataforma encontra barreiras: informação só por cor, frases longas, páginas cheias, imagens sem descrição.</span></li><li><span class="n">3</span><b>Transformar</b><span>Aplica os padrões P1 a P6 e gera as versões: Universal, Ampliada, Leitura Fácil II e I, Áudio.</span></li><li><span class="n">4</span><b>Revisar</b><span>O professor confere, edita e aprova cada versão (P7). Nada é publicado sem ele.</span></li><li><span class="n">5</span><b>Publicar</b><span>O material fica salvo na biblioteca da turma. Cada aluno escolhe a versão que funciona melhor.</span></li></ol>
+  <h3 class="h3s">As versões que a plataforma gera</h3>
+  <table class="tab"><thead><tr><th>Versão</th><th>Padrões</th><th>Para quem</th></tr></thead><tbody><tr><td><b>Universal</b></td><td class="mono">P1 P2 P4 P5 P6</td><td>Toda a turma. É a versão padrão.</td></tr><tr><td><b>Ampliada e alto contraste</b></td><td class="mono">P2</td><td>Quem prefere letras maiores ou mais contraste.</td></tr><tr><td><b>Leitura Fácil II</b></td><td class="mono">P3 P4</td><td>Quem quer o texto mais direto.</td></tr><tr><td><b>Leitura Fácil I</b></td><td class="mono">P3 P4</td><td>Quem aprende melhor com pouco texto e muitas imagens.</td></tr><tr><td><b>Áudio</b></td><td class="mono">P5</td><td>Quem prefere ouvir.</td></tr></tbody></table>
+</section>
+
+<section class="parte">
+  <p class="eyebrow">Parte 4</p><h2>Os 7 padrões de transformação</h2>
+  <p>Cada padrão tem uma regra, o que a plataforma faz para cumpri-la, como conferir se deu certo e as evidências em que se apoia. As evidências estão marcadas pelo tipo:</p>
+  <ul class="chave">
+    <li><span class="tag tag-dados">● Dados</span> estudo com dados coletados</li>
+    <li><span class="tag tag-pratica">◆ Prática</span> relato de prática, revisão ou estudo qualitativo</li>
+    <li><span class="tag tag-norma">■ Norma</span> norma técnica ou lei</li>
+    <li><span class="tag tag-projeto">○ Projeto</span> decisão do time, ainda a validar</li>
+  </ul>
+  <ul class="resumo"><li><span class="cod">P1</span><b>Cor nunca sozinha</b><span>Toda informação passada por cor também aparece em texto, símbolo ou padrão de preenchimento.</span></li><li><span class="cod">P2</span><b>Página limpa e legível</b><span>Texto com contraste alto, fonte de alta legibilidade, linhas curtas, margens largas e um assunto por página.</span></li><li><span class="cod">P3</span><b>Leitura Fácil em três níveis</b><span>Cada texto pode sair em três níveis de complexidade, sem perder o conteúdo nem o caráter de texto escrito.</span></li><li><span class="cod">P4</span><b>Imagem com propósito e descrita</b><span>Imagem só entra quando apoia uma palavra-chave. A mesma ideia usa sempre o mesmo desenho, e toda imagem tem descrição em texto.</span></li><li><span class="cod">P5</span><b>Mais de um caminho</b><span>Cada material sai em pelo menos dois formatos, e cada atividade aceita mais de uma forma de resposta.</span></li><li><span class="cod">P6</span><b>Estrutura previsível</b><span>O material abre dizendo o que vai acontecer, dá instruções numeradas com uma ação por passo e usa linguagem literal.</span></li><li><span class="cod">P7</span><b>Professor no comando</b><span>Nada chega ao aluno sem aprovação do professor. A plataforma registra necessidades de aprendizagem, nunca diagnósticos, e explica cada transformação feita.</span></li></ul>
+  
+<section class="padrao">
+  <header><span class="cod">P1</span><h3>Cor nunca sozinha</h3></header>
+  <p class="regra">Toda informação passada por cor também aparece em texto, símbolo ou padrão de preenchimento.</p>
+  <div class="duas">
+    <div><h4>Exemplos</h4><ul><li>Certo e errado com ✓ e ✗, não só verde e vermelho</li><li>Gráfico com rótulo direto em cada barra ou linha</li><li>Mapa com hachuras diferentes além das cores</li></ul><h4>O que a plataforma faz</h4><ul><li>Encontra trechos que dependem de cor (&quot;marque em vermelho&quot;, &quot;a parte verde&quot;) e acrescenta um símbolo ou palavra</li><li>Troca preenchimentos coloridos de gráficos e tabelas por cor + padrão</li><li>Não recolore fotos automaticamente: oferece uma versão com mais contraste como opção</li></ul></div>
+    <div><h4>Como conferir</h4><p>Veja o material em escala de cinza. Toda a informação continua compreensível?</p>
+         <h4>Também ajuda</h4><p>Cópias em preto e branco, projetores fracos e telas de celular ao sol.</p></div>
+  </div>
+  <h4>Em que se baseia</h4><ul class="evid"><li><span class="tag tag-dados">● Dados</span><span>Cerca de 8% dos homens e 0,5% das mulheres têm alguma deficiência na visão de cores. <cite>American Optometric Association, citada por Alves &amp; Alves (UniFOA, 2025)</cite></span></li><li><span class="tag tag-dados">● Dados</span><span>Em 90 respostas de uma comunidade universitária, 22,1% relataram dificuldade com cores em gráficos, mapas ou tabelas; 25,6% tiveram obstáculos em provas por causa das cores; 30,2% precisaram pedir ajuda para interpretar cores. <cite>Alves &amp; Alves (UniFOA, 2025)</cite></span></li><li><span class="tag tag-dados">● Dados</span><span>Recolorir não funciona igual para todos: pessoas com tritanomalia preferiram as ilustrações originais (66,7%), enquanto as com deuteranomalia e protanomalia preferiram versões com mais contraste. <cite>Bacelar (UFMA, 2024)</cite></span></li><li><span class="tag tag-pratica">◆ Prática</span><span>A recoloração de imagens não é 100% efetiva e pode piorar a identificação em alguns tipos de daltonismo. <cite>Costa et al. (2017)</cite></span></li><li><span class="tag tag-norma">■ Norma</span><span>A cor não pode ser o único meio visual de transmitir informação. <cite>WCAG 2.2, critério 1.4.1</cite></span></li></ul>
+</section>
+<section class="padrao">
+  <header><span class="cod">P2</span><h3>Página limpa e legível</h3></header>
+  <p class="regra">Texto com contraste alto, fonte de alta legibilidade, linhas curtas, margens largas e um assunto por página.</p>
+  <div class="duas">
+    <div><h4>O que a plataforma faz</h4><ul><li>Reformata o material numa fonte sem serifa de alta legibilidade</li><li>Quebra páginas densas em páginas menores, com um assunto cada</li><li>Gera uma versão ampliada com contraste reforçado</li></ul><table class="param"><tbody><tr><th>Contraste texto padrao</th><td>mínimo 4,5:1</td></tr><tr><th>Contraste versao ampliada</th><td>mínimo 7:1</td></tr><tr><th>Caracteres por linha</th><td>no máximo 60</td></tr><tr><th>Corpo do texto padrao</th><td>14 pt (decisão de projeto)</td></tr><tr><th>Corpo do texto ampliado</th><td>18 pt ou mais (decisão de projeto)</td></tr></tbody></table></div>
+    <div><h4>Como conferir</h4><p>Meça o contraste entre texto e fundo e conte os caracteres de uma linha cheia.</p>
+         <h4>Também ajuda</h4><p>Quem lê no celular, quem está cansado, quem tem dificuldade de atenção.</p></div>
+  </div>
+  <h4>Em que se baseia</h4><ul class="evid"><li><span class="tag tag-pratica">◆ Prática</span><span>A legibilidade depende de contraste, tamanho, estilo e cor da fonte e das margens da página. <cite>Pires &amp; Machado (2021)</cite></span></li><li><span class="tag tag-pratica">◆ Prática</span><span>Página limpa, margens largas e no máximo 60 caracteres por linha. <cite>Muñoz (2012), em Pires &amp; Machado (2021)</cite></span></li><li><span class="tag tag-norma">■ Norma</span><span>Contraste mínimo de 4,5:1 (nível AA) e 7:1 (nível AAA) para texto. <cite>WCAG 2.2, critérios 1.4.3 e 1.4.6</cite></span></li><li><span class="tag tag-projeto">○ Projeto</span><span>Tamanhos de 14 pt e 18 pt são escolha inicial do time e precisam ser testados com alunos. <cite>Carcará 3301</cite></span></li></ul>
+</section>
+<section class="padrao">
+  <header><span class="cod">P3</span><h3>Leitura Fácil em três níveis</h3></header>
+  <p class="regra">Cada texto pode sair em três níveis de complexidade, sem perder o conteúdo nem o caráter de texto escrito.</p>
+  <div class="duas">
+    <div><h4>O que a plataforma faz</h4><ul><li>A IA reescreve o texto nos níveis pedidos e monta um glossário</li><li>Mantém o mesmo objetivo de aprendizagem nos três níveis</li><li>O professor revisa e aprova antes de publicar</li></ul><dl class="niveis"><dt>Nível III</dt><dd>Próximo do original. Mantém o texto e explica palavras difíceis num glossário.</dd><dt>Nível II</dt><dd>Vocabulário do dia a dia, ações fáceis de seguir e imagens de apoio.</dd><dt>Nível I</dt><dd>Texto curto, poucas ideias por página e muitas imagens.</dd></dl><table class="param"><tbody><tr><th>Palavras por oracao</th><td>no máximo 20</td></tr><tr><th>Oracoes por linha</th><td>uma</td></tr><tr><th>Ordem</th><td>direta (sujeito, verbo, complemento)</td></tr></tbody></table></div>
+    <div><h4>Como conferir</h4><p>Conte as palavras das frases mais longas. O nível I ainda ensina o mesmo conceito?</p>
+         <h4>Também ajuda</h4><p>Quem está se alfabetizando, estudantes estrangeiros e qualquer pessoa fazendo uma revisão rápida.</p></div>
+  </div>
+  <h4>Em que se baseia</h4><ul class="evid"><li><span class="tag tag-pratica">◆ Prática</span><span>Leitura Fácil em três níveis: I com muitas ilustrações e pouco texto; II com vocabulário cotidiano e ações fáceis de seguir; III mais longo, com algumas palavras incomuns. <cite>Muñoz (2012), em Souza, Campos &amp; Carrizalez</cite></span></li><li><span class="tag tag-pratica">◆ Prática</span><span>No máximo 20 palavras por oração, uma oração por linha. Texto acessível não é texto oral nem simplista. <cite>Muñoz (2012), em Pires &amp; Machado (2021)</cite></span></li><li><span class="tag tag-pratica">◆ Prática</span><span>A Linguagem Simples rompe barreiras de comunicação com estudantes com deficiência intelectual. <cite>Campos (UFRN, 2023)</cite></span></li></ul>
+</section>
+<section class="padrao">
+  <header><span class="cod">P4</span><h3>Imagem com propósito e descrita</h3></header>
+  <p class="regra">Imagem só entra quando apoia uma palavra-chave. A mesma ideia usa sempre o mesmo desenho, e toda imagem tem descrição em texto.</p>
+  <div class="duas">
+    <div><h4>O que a plataforma faz</h4><ul><li>Escreve uma descrição para cada imagem (texto alternativo)</li><li>Gera áudio da descrição quando o professor pede</li><li>Avisa quando uma imagem parece só decorativa</li></ul></div>
+    <div><h4>Como conferir</h4><p>Esconda as imagens. A descrição transmite o que a imagem ensinava?</p>
+         <h4>Também ajuda</h4><p>Leitores de tela, internet lenta e quem estuda ouvindo.</p></div>
+  </div>
+  <h4>Em que se baseia</h4><ul class="evid"><li><span class="tag tag-pratica">◆ Prática</span><span>A imagem deve ser útil, não bonita. Mesmo desenho para a mesma ideia; nunca o mesmo desenho para duas ideias. <cite>Muñoz (2012), em Pires &amp; Machado (2021)</cite></span></li><li><span class="tag tag-pratica">◆ Prática</span><span>A audiodescrição é uma forma de tradução entre linguagens que torna a imagem acessível. <cite>Pires &amp; Machado (2021)</cite></span></li><li><span class="tag tag-norma">■ Norma</span><span>Todo conteúdo não textual precisa de alternativa em texto. <cite>WCAG 2.2, critério 1.1.1; Lei 13.146/2015 (LBI)</cite></span></li></ul>
+</section>
+<section class="padrao">
+  <header><span class="cod">P5</span><h3>Mais de um caminho</h3></header>
+  <p class="regra">Cada material sai em pelo menos dois formatos, e cada atividade aceita mais de uma forma de resposta.</p>
+  <div class="duas">
+    <div><h4>O que a plataforma faz</h4><ul><li>Gera texto e áudio de todo material</li><li>Sugere formas alternativas de resposta: falar, desenhar, escolher entre figuras</li><li>Marca no material quais caminhos estão disponíveis</li></ul></div>
+    <div><h4>Como conferir</h4><p>Um aluno que não lê bem ainda consegue acessar e responder?</p>
+         <h4>Também ajuda</h4><p>A turma inteira: mais caminhos aumentam a participação de todos.</p></div>
+  </div>
+  <h4>Em que se baseia</h4><ul class="evid"><li><span class="tag tag-pratica">◆ Prática</span><span>O Desenho Universal para a Aprendizagem (DUA) pede múltiplos meios de engajamento, de representação e de ação e expressão. <cite>CAST; Tsuchiya (UNESP, 2022)</cite></span></li><li><span class="tag tag-dados">● Dados</span><span>Aulas planejadas com DUA e Comunicação Aumentativa e Alternativa deixaram a turma de 1º ano motivada e engajada. O que é essencial para um aluno com deficiência foi benéfico para todos. <cite>Domaredzki, Hummel &amp; Costa (2026)</cite></span></li><li><span class="tag tag-pratica">◆ Prática</span><span>DUA com tecnologias digitais, tecnologia assistiva e IA generativa ampliou acesso, comunicação e autonomia de estudantes com TEA. <cite>Alonso &amp; Souza (2026)</cite></span></li></ul>
+</section>
+<section class="padrao">
+  <header><span class="cod">P6</span><h3>Estrutura previsível</h3></header>
+  <p class="regra">O material abre dizendo o que vai acontecer, dá instruções numeradas com uma ação por passo e usa linguagem literal.</p>
+  <div class="duas">
+    <div><h4>O que a plataforma faz</h4><ul><li>Insere no topo um quadro &quot;Hoje vamos&quot; com as etapas</li><li>Quebra enunciados longos em passos numerados</li><li>Sinaliza expressões figuradas e ironias para o professor revisar</li></ul></div>
+    <div><h4>Como conferir</h4><p>Cada passo pede uma única ação? Há alguma expressão com duplo sentido?</p>
+         <h4>Também ajuda</h4><p>Alunos ansiosos, turmas grandes e qualquer pessoa diante de uma tarefa nova.</p></div>
+  </div>
+  <h4>Em que se baseia</h4><ul class="evid"><li><span class="tag tag-pratica">◆ Prática</span><span>O TEA envolve diferenças na comunicação e padrões restritos de comportamento; o DUA reduz barreiras pedagógicas para esses estudantes. <cite>Tsuchiya (UNESP, 2022)</cite></span></li><li><span class="tag tag-dados">● Dados</span><span>Apoio visual e Comunicação Aumentativa e Alternativa amenizaram barreiras de comunicação de um aluno com TEA. <cite>Domaredzki, Hummel &amp; Costa (2026)</cite></span></li><li><span class="tag tag-projeto">○ Projeto</span><span>Quadro &quot;Hoje vamos&quot; e sinalização de linguagem figurada são propostas do time, a validar com professores do AEE. <cite>Carcará 3301</cite></span></li></ul>
+</section>
+<section class="padrao">
+  <header><span class="cod">P7</span><h3>Professor no comando</h3></header>
+  <p class="regra">Nada chega ao aluno sem aprovação do professor. A plataforma registra necessidades de aprendizagem, nunca diagnósticos, e explica cada transformação feita.</p>
+  <div class="duas">
+    <div><h4>O que a plataforma faz</h4><ul><li>Fila de revisão: o professor aprova, edita ou descarta cada versão</li><li>Perfil por necessidades (&quot;precisa de instruções em etapas&quot;), sem campo de diagnóstico</li><li>Cada material mostra quais padrões foram aplicados, o que ajuda a montar o PEI</li></ul></div>
+    <div><h4>Como conferir</h4><p>O professor consegue explicar a uma família por que cada mudança foi feita?</p>
+         <h4>Também ajuda</h4><p>A escola, que ganha registro do que foi adaptado, e a família, que entende o porquê.</p></div>
+  </div>
+  <h4>Em que se baseia</h4><ul class="evid"><li><span class="tag tag-pratica">◆ Prática</span><span>Dos 16 artigos nacionais sobre o PEI analisados, nenhum explica com clareza como elaborá-lo e só 1 mostrou ganhos com dados. <cite>Silva &amp; Camargo (2021)</cite></span></li><li><span class="tag tag-pratica">◆ Prática</span><span>Sem formação continuada, professoras se sentem inseguras para elaborar o PEI; em um município, a formação era oferecida só aos profissionais de apoio. <cite>Carvalho et al. (2026)</cite></span></li><li><span class="tag tag-pratica">◆ Prática</span><span>A falta de tempo para planejar adaptações é a principal queixa dos professores. <cite>Marques &amp; Duarte (2013)</cite></span></li><li><span class="tag tag-pratica">◆ Prática</span><span>Professoras relatam solidão e falta de materiais para incluir alunos com deficiência intelectual. <cite>Brito &amp; Flores (2023)</cite></span></li><li><span class="tag tag-norma">■ Norma</span><span>Dados de saúde de crianças são dados sensíveis e exigem cuidado redobrado. <cite>Lei 13.709/2018 (LGPD)</cite></span></li></ul>
+</section>
+  <div class="exemplo"><h3 class="h3s">Exemplo: o mesmo conteúdo em quatro níveis (P3 + P4)</h3>
+  
+<div class="lf-grade">
+  <div class="lf-caixa"><p class="lf-rot">Original · livro do 6º ano (exemplo criado pelo time)</p><p>O ciclo hidrológico consiste na circulação contínua da água entre a superfície terrestre e a atmosfera, impulsionada pela energia solar. Ao ser aquecida, a água de oceanos, rios e lagos sofre evaporação; o vapor, ao ascender e resfriar-se, condensa-se formando nuvens, que, saturadas, originam a precipitação.</p></div>
+  <div class="lf-caixa"><p class="lf-rot">Nível III · com glossário</p><p>O ciclo da água é a circulação contínua da água entre a superfície da Terra e a atmosfera. A energia do Sol movimenta esse ciclo. O calor faz a água de oceanos, rios e lagos <b>evaporar</b>. O vapor sobe, esfria e se <b>condensa</b>: assim se formam as nuvens. Quando as nuvens ficam carregadas, a água cai. Isso se chama <b>precipitação</b>.</p>
+    <p class="glos"><b>evaporar</b>: virar vapor · <b>condensar</b>: o vapor voltar a ser gotinhas · <b>precipitação</b>: chuva, neve ou granizo</p></div>
+  <div class="lf-caixa"><p class="lf-rot">Nível II · uma frase por linha</p><p class="linhas"><span>A água da Terra está sempre em movimento.</span><span>O Sol esquenta a água dos rios e do mar.</span><span>A água vira vapor e sobe para o céu.</span><span>Lá em cima, o vapor esfria e forma as nuvens.</span><span>As nuvens ficam pesadas de água.</span><span>Então a água cai. É a chuva.</span><span>Depois, tudo começa de novo.</span></p></div>
+  <div class="lf-caixa"><p class="lf-rot">Nível I · pouco texto, imagem de apoio</p><div class="lf1"><svg viewBox="0 0 40 40" class="ico"><circle cx="20" cy="20" r="8" fill="#C26A00"/><g stroke="#C26A00" stroke-width="3" stroke-linecap="round"><path d="M20 3v6M20 31v6M3 20h6M31 20h6M8 8l4 4M28 28l4 4M8 32l4-4M28 12l4-4"/></g></svg><span>O Sol esquenta a água.</span></div><div class="lf1"><svg viewBox="0 0 40 40" class="ico"><path d="M12 30h17a7 7 0 0 0 0-14 10 10 0 0 0-19 3 6 6 0 0 0 2 11z" fill="#4A5668"/></svg><span>A água sobe e vira nuvem.</span></div><div class="lf1"><svg viewBox="0 0 40 40" class="ico"><path d="M12 22h17a7 7 0 0 0 0-14 10 10 0 0 0-19 3 6 6 0 0 0 2 11z" fill="#4A5668"/><g stroke="#1F5FBF" stroke-width="3" stroke-linecap="round"><path d="M14 27l-2 6M21 27l-2 6M28 27l-2 6"/></g></svg><span>A nuvem solta a chuva.</span></div><div class="lf1"><svg viewBox="0 0 40 40" class="ico"><g fill="none" stroke="#1F5FBF" stroke-width="3.5" stroke-linecap="round"><path d="M31 15a12 12 0 0 0-22 0"/><path d="M9 25a12 12 0 0 0 22 0"/></g><path d="M31 8v8h-8M9 32v-8h8" fill="none" stroke="#1F5FBF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>E tudo começa de novo.</span></div></div>
+</div></div>
+</section>
+
+<section class="parte">
+  <p class="eyebrow">Parte 5</p><h2>Limites e transparência</h2>
+  <ul class="limites">
+    <li><b>A plataforma não faz diagnóstico.</b> Se a família ou a escola notar dificuldades persistentes, o caminho é procurar a equipe da escola e um profissional de saúde.</li>
+    <li><b>A IA pode errar.</b> Uma simplificação pode mudar o sentido de um conceito. Por isso nenhuma versão é publicada sem a revisão do professor (P7).</li>
+    <li><b>Não substitui pessoas.</b> O Atendimento Educacional Especializado (AEE), o intérprete de Libras, o professor de apoio e a transcrição profissional em braile continuam necessários.</li>
+    <li><b>Recolorir imagens não serve para todos</b> os tipos de daltonismo (Bacelar, 2024). Por isso a regra principal é acrescentar símbolos e rótulos, não trocar cores.</li>
+    <li><b>Muitas evidências vêm de estudos pequenos</b> e qualitativos. Os parâmetros marcados como ○ Projeto precisam ser testados com alunos e professores.</li>
+    <li><b>Alguns números são de fontes secundárias</b> e serão conferidos nas bases oficiais do INEP e do IBGE.</li>
+  </ul>
+</section>
+
+<section class="parte familia">
+  <p class="eyebrow">Parte 6 · Para famílias</p><h2>O que a plataforma faz pelo seu filho ou filha</h2>
+  <p>O professor coloca o material da aula na plataforma. A plataforma prepara versões diferentes do mesmo conteúdo. Por exemplo: letras maiores, um texto mais direto ou um áudio.</p>
+  <p>Seu filho ou filha escolhe a versão que funciona melhor. Todos os colegas podem usar as mesmas versões. Ninguém é separado.</p>
+  <h3 class="h3s">Como apoiar em casa</h3>
+  <ul>
+    <li>Peça para a criança mostrar qual versão ela prefere e por quê.</li>
+    <li>Leiam juntos a versão em Leitura Fácil antes de uma prova.</li>
+    <li>Use o áudio em momentos fora da tela, como no caminho para a escola.</li>
+    <li>Conte ao professor o que funciona em casa. Essa informação ajuda a escolher as próximas adaptações.</li>
+  </ul>
+  <h3 class="h3s">Perguntas que você pode fazer à escola</h3>
+  <ul>
+    <li>Meu filho ou filha tem um Plano Educacional Individualizado (PEI)? Posso participar?</li>
+    <li>Há Atendimento Educacional Especializado (AEE) na escola?</li>
+    <li>Como vocês vão avaliar o que ele ou ela aprendeu?</li>
+  </ul>
+  <p class="aviso">A plataforma nunca diz se uma criança tem uma deficiência. Se você tem dúvidas sobre o desenvolvimento do seu filho ou filha, converse com a escola e procure um profissional de saúde.</p>
+</section>
+
+<section class="parte estudante">
+  <p class="eyebrow">Parte 7 · Para estudantes</p><h2>Este site é seu também</h2>
+  <p class="linhas"><span>Aqui ficam os materiais da sua turma.</span><span>Cada material tem jeitos diferentes de estudar.</span><span>Você pode ler com letras grandes.</span><span>Você pode ler um texto mais curto.</span><span>Você pode ouvir.</span><span>Você escolhe o jeito que é melhor para você.</span><span>Pode trocar de jeito quando quiser.</span><span>Se algo estiver difícil, fale com o seu professor.</span></p>
+</section>
+
+<section class="parte refs">
+  <p class="eyebrow">Referências</p><h2>Fontes usadas neste manual</h2>
+  <ol><li>ALONSO, S. A. N.; SOUZA, J. L. O uso de tecnologias digitais e tecnologia assistiva no Desenho Universal para Aprendizagem na educação inclusiva de estudantes com autismo. <i>South American Journal of Basic Education, Technical and Technological</i>, v. 12, supl. 2, 2026.</li><li>ALVES, A. L. C.; ALVES, P. S. R. Daltonismo no ambiente educacional: desafios, percepções e estratégias de inclusão. Centro Universitário de Volta Redonda (UniFOA), 2025.</li><li>BACELAR, C. C. <i>Pesquisa e inovações sobre tecnologias assistivas: recursos educacionais da UNA-SUS/UFMA para daltônicos</i>. Dissertação (Mestrado em Design), UFMA, 2024.</li><li>BRASIL. Lei nº 13.146, de 6 de julho de 2015 (Lei Brasileira de Inclusão).</li><li>BRASIL. Lei nº 13.709, de 14 de agosto de 2018 (Lei Geral de Proteção de Dados).</li><li>BRITO, G. A.; FLORES, M. M. L. A inclusão de alunos com deficiência intelectual: em foco as práticas pedagógicas. <i>Boletim de Conjuntura (BOCA)</i>, v. 16, n. 48, 2023.</li><li>CAMPOS, G. G. G. <i>O uso da linguagem simples como ferramenta de inclusão para pessoas com deficiência intelectual</i>. TCC (Pedagogia), UFRN, 2023.</li><li>CARVALHO, K. P. G. et al. O Plano Educacional Individualizado (PEI) e os desafios gerados pela falta de formação continuada para professores. <i>REASE</i>, v. 12, n. 6, 2026.</li><li>COSTA, R. C. M. et al. A acessibilidade de pessoas com daltonismo: a construção de um protótipo de AVA inclusivo. <i>Informática na Educação: teoria &amp; prática</i>, v. 20, n. 2, 2017.</li><li>DOMAREDZKI, A. B.; HUMMEL, E. I.; COSTA, P. K. A. Tecnologia assistiva educacional como recurso no planejamento do Desenho Universal para Aprendizagem. <i>Revista Educação Especial</i>, v. 38, 2025 (publicado em 2026).</li><li>INSTITUTO RODRIGO MENDES. <i>Panorama da Educação Especial 2025</i>. São Paulo, 2026.</li><li>MARQUES, A.; DUARTE, M. O trabalho colaborativo: uma estratégia de ensino na aprendizagem de alunos com deficiência intelectual. <i>Revista de Ciências Humanas</i>, v. 14, n. 23, 2013.</li><li>MOSCARDINI, S. F. <i>Escolarização de alunos com deficiência intelectual em classes comuns e em salas de recursos multifuncionais</i>. Dissertação (Mestrado), UNESP Araraquara, 2011.</li><li>MUÑOZ, Ó. G. <i>Lectura fácil: métodos de redacción y evaluación</i>. Madri, 2012. (citado por Pires &amp; Machado e por Souza, Campos &amp; Carrizalez)</li><li>PIRES, V. O. D.; MACHADO, V. P. Adaptação textual para pessoas com deficiência intelectual: uma proposta de mediação pedagógica. 2021.</li><li>SANTOS, J. C. <i>A prática do professor na elaboração de um Plano Educacional Individualizado (PEI) para alunos em sala de aula inclusiva, no Rio de Janeiro</i>. Dissertação (Mestrado em Ciências da Educação), 2024.</li><li>SILVA, G. L.; CAMARGO, S. P. H. Revisão integrativa da produção científica nacional sobre o Plano Educacional Individualizado. <i>Revista Educação Especial</i>, v. 34, 2021.</li><li>SILVA, T. M. <i>Desenho Universal na Aprendizagem e autoscopia: formação continuada docente para a inclusão escolar de alunos com TEA</i>. Tese (Doutorado em Educação), UERJ, 2022.</li><li>SOUZA, C. S. M.; CAMPOS, R. H. F.; CARRIZALEZ, D. M. La lectura fácil como estrategia de accesibilidad cognitiva para la educación inclusiva de estudiantes con discapacidad intelectual. <i>Revista Saber Incluir</i> (ano a confirmar).</li><li>TAVARES, L. M. F. L.; SANTOS, L. M. M.; FREITAS, M. N. C. A educação inclusiva: um estudo sobre a formação docente. <i>Revista Brasileira de Educação Especial</i>, v. 22, 2016.</li><li>TSUCHIYA, A. M. <i>O Desenho Universal da Aprendizagem e o estudante com Transtorno do Espectro Autista</i>. TCC (Pedagogia), UNESP Bauru, 2022.</li><li>W3C. <i>Web Content Accessibility Guidelines (WCAG) 2.2</i>. 2023.</li></ol>
+</section>
+</body></html>

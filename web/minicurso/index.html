@@ -1,0 +1,561 @@
+<title>Carcará Mini Curso</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Lexend:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: uma coluna de leitura (~66ch) com barra fixa de trilha + progresso; módulos numerados porque o curso é uma sequência. */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --soft:#E9EEF5; --ink:#142033; --muted:#4A5668; --line:#D3DAE3;
+  --accent:#1F5FBF; --accent-ink:#FFFFFF; --s1:#1F5FBF; --s2:#C26A00;
+  --ok:#2E8B3A; --bad:#C8312B; --weak:#A3ACB8; --focus:#C26A00;
+  --display:'Lexend',system-ui,sans-serif; --body:'Atkinson Hyperlegible',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --fs-0:.8125rem; --fs-1:1rem; --fs-2:1.1875rem; --fs-3:1.5rem; --fs-4:2.125rem; --fs-5:clamp(2.1rem,6vw,3.25rem);
+  --radius:6px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E141C; --surface:#16202B; --soft:#1C2733; --ink:#E6EBF2; --muted:#A3AFBF; --line:#2A3644;
+  --accent:#7FAEF2; --accent-ink:#0E141C; --s1:#5B93E6; --s2:#CC7A1F;
+  --ok:#3FA34D; --bad:#D9483F; --weak:#4E5967; --focus:#E39A43; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0E141C; --surface:#16202B; --soft:#1C2733; --ink:#E6EBF2; --muted:#A3AFBF; --line:#2A3644;
+  --accent:#7FAEF2; --accent-ink:#0E141C; --s1:#5B93E6; --s2:#CC7A1F;
+  --ok:#3FA34D; --bad:#D9483F; --weak:#4E5967; --focus:#E39A43; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:var(--fs-1)/1.6 var(--body);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+h1,h2,h3{font-family:var(--display);line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+.wrap{max-width:46rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-family:var(--mono);font-size:var(--fs-0);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+
+/* barra fixa */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding-block:10px}
+.marca{font-family:var(--display);font-weight:700;font-size:var(--fs-1);display:flex;gap:8px;align-items:center;margin-right:auto}
+.marca svg{width:22px;height:22px}
+.abas{display:flex;gap:4px}
+.abas a{font-family:var(--display);font-weight:500;font-size:.9375rem;text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:var(--radius)}
+.abas a[aria-current="page"]{color:var(--ink);background:var(--soft)}
+.progresso{height:4px;background:var(--soft)}
+.progresso i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+
+/* abertura */
+.abertura{padding-block:40px 28px}
+.abertura h1{font-size:var(--fs-5);font-weight:700;letter-spacing:-.015em;max-width:15ch;margin:10px 0 14px}
+.abertura .lead{font-size:var(--fs-2);color:var(--muted);max-width:52ch}
+.quem{margin-top:26px}
+.quem p{font-family:var(--display);font-weight:600;margin-bottom:10px}
+.trilhas{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.trilhas button{display:flex;flex-direction:column;gap:2px;text-align:left;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--radius);background:var(--surface);cursor:pointer;min-width:0}
+.trilhas button b{font-family:var(--display);font-weight:600}
+.trilhas button span{font-size:var(--fs-0);color:var(--muted)}
+.trilhas button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+@media (max-width:560px){.trilhas{grid-template-columns:1fr}}
+
+/* trilha ativa: mostra só o texto do público escolhido */
+body[data-trilha="prof"] [data-aud]:not([data-aud~="prof"]),
+body[data-trilha="fam"] [data-aud]:not([data-aud~="fam"]),
+body[data-trilha="est"] [data-aud]:not([data-aud~="est"]){display:none!important}
+.lf span{display:block}
+body[data-trilha="est"] .texto{font-size:1.125rem;line-height:1.75}
+
+/* módulos */
+.modulo{padding-block:36px;border-top:1px solid var(--line)}
+.mod-cab{display:flex;gap:14px;align-items:baseline;margin-bottom:14px}
+.mod-n{font-family:var(--mono);font-weight:500;color:var(--accent);font-size:var(--fs-2)}
+.modulo h2{font-size:var(--fs-4);font-weight:600}
+.texto{display:grid;gap:12px;max-width:62ch}
+.texto p{margin:0}
+.padrao-tag{display:inline-block;font-family:var(--mono);font-size:var(--fs-0);border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--muted)}
+
+.painel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-top:18px;min-width:0}
+.painel h3{font-size:var(--fs-1);font-weight:600;margin-bottom:4px}
+.painel .sub{font-size:var(--fs-0);color:var(--muted);margin-bottom:12px}
+.fonte{font-size:var(--fs-0);color:var(--muted);margin-top:10px}
+
+.numeros{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.numeros div{border-top:3px solid var(--ink);padding-top:8px;min-width:0}
+.numeros b{display:block;font-family:var(--display);font-size:var(--fs-3);font-weight:700;font-variant-numeric:tabular-nums}
+.numeros span{font-size:var(--fs-0);color:var(--muted)}
+@media (max-width:560px){.numeros{grid-template-columns:1fr}}
+
+/* gráficos */
+.grafico{position:relative}
+.grafico svg{width:100%;height:auto;display:block;overflow:visible}
+.grafico text{font-family:var(--body);fill:var(--ink)}
+.grafico .eixo{fill:var(--muted);font-size:12px}
+.grafico .grade{stroke:var(--line);stroke-width:1}
+.grafico .m1{fill:var(--s1)} .grafico .m2{fill:var(--s2)}
+.grafico .l1{stroke:var(--s1)} .grafico .l2{stroke:var(--s2)}
+.grafico .anel{stroke:var(--surface);stroke-width:2}
+.grafico .alvo{fill:transparent;cursor:default}
+.legenda{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:var(--fs-0);margin-bottom:6px}
+.legenda i{display:inline-block;width:16px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.legenda .tr{background:repeating-linear-gradient(90deg,var(--s2) 0 4px,transparent 4px 7px)}
+.dica{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:var(--fs-0);padding:6px 8px;border-radius:4px;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px));opacity:0;transition:opacity .1s}
+.dica.on{opacity:1}
+.tabela-dados summary{cursor:pointer;font-size:var(--fs-0);color:var(--muted);margin-top:8px}
+.tabela-dados table{border-collapse:collapse;font-size:var(--fs-0);margin-top:6px;font-variant-numeric:tabular-nums}
+.tabela-dados td,.tabela-dados th{padding:3px 12px 3px 0;text-align:left;border-bottom:1px solid var(--line)}
+
+/* controles */
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.seg button{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.9375rem;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chave{display:flex;align-items:center;gap:10px;cursor:pointer;font-family:var(--display);font-weight:500;margin-bottom:12px}
+.chave input{width:20px;height:20px;accent-color:var(--accent)}
+.btn{border:0;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:600;padding:8px 14px;border-radius:var(--radius);cursor:pointer}
+.btn-sec{border:1.5px solid var(--line);background:var(--surface);font-family:var(--display);font-weight:500;padding:7px 12px;border-radius:var(--radius);cursor:pointer}
+
+/* simulador de daltonismo */
+.prova{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.q{aspect-ratio:1;max-width:100%;border-radius:var(--radius);display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:700;font-size:1.05rem;position:relative}
+.q.certa{background:var(--ok)} .q.errada{background:var(--bad)}
+.q small{display:none;font-size:.7rem;font-weight:500}
+.p1-on .q{grid-template-rows:auto auto;align-content:center;gap:0}
+.p1-on .q small{display:block}
+.p1-on .q.errada{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.28) 0 4px,transparent 4px 10px)}
+.leg-cor{display:flex;gap:16px;font-size:var(--fs-0);margin-top:10px}
+.leg-cor i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.leg-cor .lc{background:var(--ok)} .leg-cor .le{background:var(--bad)}
+.leg-cor .sym{display:none} .p1-on .leg-cor .sym{display:inline}
+.filtrado{transition:filter .2s}
+.resposta{margin-top:12px;font-size:.9375rem;min-height:1.6em}
+
+/* leitura fácil */
+.lf-caixa{background:var(--soft);border-radius:var(--radius);padding:16px;font-size:1.0625rem;line-height:1.7;min-height:9.5rem}
+.lf-caixa .glos{font-size:var(--fs-0);color:var(--muted);border-top:1px dashed var(--line);padding-top:6px;margin-top:10px}
+.lf1{display:flex;align-items:center;gap:12px;margin-bottom:6px;font-size:1.25rem}
+.lf1 svg{width:36px;height:36px;flex:none}
+.medidas{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.medidas div{border-top:1px solid var(--line);padding-top:6px;min-width:0}
+.medidas b{display:block;font-family:var(--display);font-size:var(--fs-3);font-variant-numeric:tabular-nums}
+.medidas span{font-size:var(--fs-0);color:var(--muted)}
+.medidas .alerta b{color:var(--bad)}
+
+/* página limpa */
+.amostra{border-radius:var(--radius);padding:16px;overflow-wrap:anywhere}
+.amostra.antes{font:12px/1.35 Georgia,serif;color:var(--weak);text-align:justify;background:var(--surface);border:1px solid var(--line)}
+.amostra.depois{font:1.125rem/1.7 var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line);max-width:34em}
+.amostra.depois .longo{display:none}
+.amostra.antes .curto{display:none}
+
+/* biblioteca */
+.material{display:grid;gap:12px}
+.material-cab{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.material-cab h3{font-size:var(--fs-2)}
+.meta{font-size:var(--fs-0);color:var(--muted)}
+.versoes{display:flex;flex-wrap:wrap;gap:6px}
+.versoes button{border:1.5px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:6px 10px;cursor:pointer;font-size:.9375rem}
+.versoes button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent);font-weight:700}
+.previa{border:1px solid var(--line);border-radius:var(--radius);padding:16px;min-height:9rem}
+.previa.ampliada{font-size:1.375rem;line-height:1.7;background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.aplicados{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:var(--fs-0);color:var(--muted)}
+
+.fluxo{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:0}
+.fluxo li{display:grid;grid-template-columns:2rem 7.5rem 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);align-items:baseline}
+.fluxo .n{font-family:var(--mono);color:var(--accent)}
+.fluxo b{font-family:var(--display);font-weight:600}
+@media (max-width:560px){.fluxo li{grid-template-columns:2rem 1fr}.fluxo li span:last-child{grid-column:2}}
+
+/* quiz */
+.pergunta{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.pergunta:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.pergunta p{font-family:var(--display);font-weight:500;margin-bottom:8px}
+.opcoes{display:grid;gap:6px}
+.opcoes button{text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:8px 12px;cursor:pointer}
+.opcoes button.certo{border-color:var(--ok);font-weight:700}
+.opcoes button.certo::before{content:"✓ Certo · "}
+.opcoes button.errado{border-color:var(--bad)}
+.opcoes button.errado::before{content:"✗ Não é essa · "}
+.explica{font-size:.9375rem;color:var(--muted);margin-top:6px}
+.placar{font-family:var(--display);font-weight:600;margin-top:16px}
+
+/* manual */
+.manual-cab{padding-block:36px 10px}
+.manual-cab h1{font-size:var(--fs-4);font-weight:700;margin:8px 0 10px}
+.chaves-ev{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:var(--fs-0);color:var(--muted);margin-top:12px}
+.tag{display:inline-block;font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--ink);border-radius:4px;white-space:nowrap;color:var(--ink)}
+.tag.dados{background:var(--ink);color:var(--bg)}
+.tag.norma{background:var(--soft)}
+.tag.projeto{border-style:dashed;color:var(--muted);border-color:var(--muted)}
+.lista-padroes{display:grid;gap:10px;padding-block:16px 48px}
+.lista-padroes details{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.lista-padroes summary{display:grid;grid-template-columns:2.75rem 1fr;gap:4px 10px;padding:14px 16px;cursor:pointer;list-style:none}
+.lista-padroes summary::-webkit-details-marker{display:none}
+.lista-padroes summary .cod{font-family:var(--mono);font-weight:500;color:var(--accent);font-size:var(--fs-2);grid-row:span 2}
+.lista-padroes summary b{font-family:var(--display);font-weight:600;font-size:var(--fs-2)}
+.lista-padroes summary span{color:var(--muted);font-size:.9375rem}
+.corpo-padrao{padding:0 16px 16px;display:grid;gap:12px}
+.corpo-padrao h4{font-family:var(--mono);font-size:var(--fs-0);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:6px 0 0;font-weight:500}
+.corpo-padrao ul{margin:0;padding-left:18px}
+.ev{list-style:none;padding:0!important;display:grid;gap:8px}
+.ev li{display:grid;grid-template-columns:6.5rem 1fr;gap:10px;font-size:.9375rem;border-top:1px solid var(--line);padding-top:8px}
+.ev cite{display:block;font-style:normal;color:var(--muted);font-size:var(--fs-0)}
+@media (max-width:560px){.ev li{grid-template-columns:1fr;gap:4px}}
+.rodape{padding-block:28px 48px;font-size:var(--fs-0);color:var(--muted);border-top:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="f-prot" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="0.152286 1.052583 -0.204868 0 0  0.114503 0.786281 0.099216 0 0  -0.003882 -0.048116 1.051998 0 0  0 0 0 1 0"/></filter>
+    <filter id="f-deut" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="0.367322 0.860646 -0.227968 0 0  0.280085 0.672501 0.047413 0 0  -0.011820 0.042940 0.968881 0 0  0 0 0 1 0"/></filter>
+    <filter id="f-trit" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="1.255528 -0.076749 -0.178779 0 0  -0.078411 0.930809 0.147602 0 0  0.004733 0.691367 0.303900 0 0  0 0 0 1 0"/></filter>
+  </defs>
+</svg>
+
+<header class="bar">
+  <div class="wrap">
+    <span class="marca"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14c3-6 8-9 15-9-2 2-3 4-3 6l5 1-6 2c-1 3-4 5-8 5l2-3z" fill="var(--accent)"/></svg>Carcará</span>
+    <nav class="abas" aria-label="Seções">
+      <a href="#curso" id="aba-curso">Mini curso</a>
+      <a href="#manual" id="aba-manual">Manual</a>
+    </nav>
+  </div>
+  <div class="progresso" aria-hidden="true"><i id="barra"></i></div>
+</header>
+
+<main id="vista-curso">
+  <div class="wrap">
+    <section class="abertura">
+      <p class="eyebrow">Mini curso · protótipo v0.1</p>
+      <h1>O mesmo conteúdo, para toda a turma</h1>
+      <p class="lead">Em seis passos curtos, você vê como a plataforma transforma um material de aula e por que cada mudança ajuda quem estuda.</p>
+      <div class="quem">
+        <p id="quem-rot">Quem está estudando agora?</p>
+        <div class="trilhas" role="group" aria-labelledby="quem-rot">
+          <button type="button" id="t-prof" data-t="prof"><b>Sou professor(a)</b><span>Versão técnica, com evidências</span></button>
+          <button type="button" id="t-fam" data-t="fam"><b>Sou da família</b><span>Como apoiar em casa</span></button>
+          <button type="button" id="t-est" data-t="est"><b>Sou estudante</b><span>Texto fácil de ler</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1 -->
+    <section class="modulo" id="m1">
+      <div class="mod-cab"><span class="mod-n">1/6</span><h2>Juntos na mesma sala</h2></div>
+      <div class="texto" data-aud="prof">
+        <p>Mais de nove em cada dez estudantes com deficiência já estão em classes comuns. O acesso avançou. O que falta é o material chegar a todos: só 6,4% dos professores regentes têm formação continuada em educação especial.</p>
+        <p>O perfil também mudou. Autismo e deficiência intelectual concentram as matrículas, por isso Leitura Fácil, mais de um caminho e estrutura previsível são o centro da plataforma.</p>
+      </div>
+      <div class="texto" data-aud="fam">
+        <p>Hoje, quase todos os estudantes com deficiência estudam na mesma sala que os colegas. Isso é uma conquista. Mas estar na sala não basta: o material da aula precisa fazer sentido para cada criança.</p>
+        <p>Os números abaixo mostram por que isso importa, principalmente quando os jovens crescem.</p>
+      </div>
+      <div class="texto lf" data-aud="est">
+        <span>Na sua escola, todos estudam juntos.</span>
+        <span>Cada pessoa aprende de um jeito.</span>
+        <span>Alguns preferem ler. Outros preferem ouvir.</span>
+        <span>Este site ajuda cada um a aprender do seu jeito.</span>
+      </div>
+
+      <div class="numeros" data-aud="prof fam">
+        <div><b>2,07 mi</b><span>matrículas na educação especial em 2024 (930 mil em 2015)</span></div>
+        <div><b>92,6%</b><span>em classes comuns</span></div>
+        <div><b>6,4%</b><span>dos professores regentes com formação continuada na área</span></div>
+      </div>
+
+      <div class="painel" data-aud="prof">
+        <h3>Participação nas matrículas da educação especial</h3>
+        <p class="sub">Passe o mouse ou toque nos pontos para ver os valores.</p>
+        <div class="legenda"><span><i style="background:var(--s1)"></i>Autismo (TEA), linha contínua</span><span><i class="tr"></i>Deficiência intelectual, linha tracejada</span></div>
+        <div class="grafico" id="g-perfil"></div>
+        <p class="fonte">Fonte: Instituto Rodrigo Mendes, Panorama da Educação Especial 2025 (Censo Escolar/INEP). Os demais tipos de deficiência completam o total.</p>
+      </div>
+
+      <div class="painel" data-aud="prof fam">
+        <h3>Pessoas com deficiência que frequentam a escola, por idade (2022)</h3>
+        <p class="sub">A escola chega a quase todas as crianças. Depois, os jovens vão ficando pelo caminho.</p>
+        <div class="grafico" id="g-escola"></div>
+        <details class="tabela-dados"><summary>Ver como tabela</summary>
+          <table><thead><tr><th>Idade</th><th>Frequentam a escola</th></tr></thead><tbody><tr><td>6 a 14 anos</td><td>95%</td></tr><tr><td>15 a 17 anos</td><td>84%</td></tr><tr><td>18 a 24 anos</td><td>24%</td></tr></tbody></table></details>
+        <p class="fonte">Fonte: IBGE, PNAD Contínua 2022, citada por Bacelar (2024).</p>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="modulo" id="m2">
+      <div class="mod-cab"><span class="mod-n">2/6</span><h2>Cor nunca sozinha</h2></div>
+      <div class="texto" data-aud="prof">
+        <p>Cerca de 8% dos homens e 0,5% das mulheres têm alguma deficiência na visão de cores. Numa turma de 30 alunos, é provável que pelo menos um enxergue assim. Correção em verde e vermelho é exatamente o par mais difícil.</p>
+        <p>O padrão <span class="padrao-tag">P1</span> não troca as cores: acrescenta símbolo, palavra ou textura. Recolorir não funciona para todos os tipos de daltonismo (Bacelar, 2024).</p>
+      </div>
+      <div class="texto" data-aud="fam">
+        <p>Algumas pessoas não distinguem bem certas cores, principalmente verde e vermelho. Isso se chama daltonismo e é mais comum em meninos. Muitas crianças nem sabem que enxergam assim.</p>
+        <p>Teste abaixo: veja a prova corrigida como uma pessoa daltônica veria.</p>
+      </div>
+      <div class="texto lf" data-aud="est">
+        <span>Algumas pessoas veem as cores de outro jeito.</span>
+        <span>Para elas, verde e vermelho podem parecer iguais.</span>
+        <span>Por isso, aqui a cor sempre vem com um sinal.</span>
+        <span>✓ quer dizer certo. ✗ quer dizer errado.</span>
+      </div>
+
+      <div class="painel">
+        <h3>Prova corrigida: quantas questões o aluno errou?</h3>
+        <p class="sub">Escolha um jeito de enxergar e ligue o padrão P1.</p>
+        <div class="seg" role="group" aria-label="Simular visão">
+          <button type="button" id="v-norm" data-f="" aria-pressed="true">Visão típica</button>
+          <button type="button" id="v-deut" data-f="f-deut" aria-pressed="false">Deuteranopia</button>
+          <button type="button" id="v-prot" data-f="f-prot" aria-pressed="false">Protanopia</button>
+          <button type="button" id="v-trit" data-f="f-trit" aria-pressed="false">Tritanopia</button>
+        </div>
+        <label class="chave" for="p1"><input type="checkbox" id="p1"> Aplicar P1: símbolo + textura</label>
+        <div id="prova-area" class="filtrado">
+          <div class="prova" id="prova" aria-label="Questões corrigidas"></div>
+          <div class="leg-cor"><span><i class="lc"></i>Certa<b class="sym"> ✓</b></span><span><i class="le"></i>Errada<b class="sym"> ✗</b></span></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button type="button" class="btn-sec" id="conferir">Conferir resposta</button>
+        </div>
+        <p class="resposta" id="resposta" aria-live="polite"></p>
+      </div>
+
+      <div class="painel" data-aud="prof">
+        <h3>O que relatam pessoas que convivem com o daltonismo</h3>
+        <p class="sub">Questionário com 90 respostas numa comunidade universitária.</p>
+        <div class="grafico" id="g-dalt"></div>
+        <p class="fonte">Fonte: Alves &amp; Alves (UniFOA, 2025).</p>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="modulo" id="m3">
+      <div class="mod-cab"><span class="mod-n">3/6</span><h2>Leitura Fácil em três níveis</h2></div>
+      <div class="texto" data-aud="prof">
+        <p>O padrão <span class="padrao-tag">P3</span> reescreve o texto em três níveis (Muñoz, 2012): no máximo 20 palavras por oração, uma oração por linha, ordem direta. O objetivo de aprendizagem não muda. As medidas abaixo são calculadas ao vivo sobre o texto exibido.</p>
+      </div>
+      <div class="texto" data-aud="fam">
+        <p>Um texto difícil pode esconder um conteúdo simples. A Leitura Fácil reescreve o mesmo assunto com frases curtas e palavras do dia a dia. Seu filho ou filha aprende a mesma coisa que a turma.</p>
+      </div>
+      <div class="texto lf" data-aud="est">
+        <span>Este texto fala do ciclo da água.</span>
+        <span>Escolha um nível.</span>
+        <span>O nível I tem menos palavras e mais desenhos.</span>
+      </div>
+      <div class="painel">
+        <div class="seg" role="group" aria-label="Nível do texto">
+          <button type="button" id="n-orig" data-n="orig" aria-pressed="true">Original</button>
+          <button type="button" id="n-3" data-n="3" aria-pressed="false">Nível III</button>
+          <button type="button" id="n-2" data-n="2" aria-pressed="false">Nível II</button>
+          <button type="button" id="n-1" data-n="1" aria-pressed="false">Nível I</button>
+        </div>
+        <div class="lf-caixa" id="lf-texto" aria-live="polite"></div>
+        <div class="medidas">
+          <div><b id="md-pal">0</b><span>palavras</span></div>
+          <div id="md-max-box"><b id="md-max">0</b><span>palavras na frase mais longa</span></div>
+          <div><b id="md-fr">0</b><span>frases</span></div>
+        </div>
+        <p class="fonte">Texto original criado pelo time, no estilo de um livro do 6º ano.</p>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="modulo" id="m4">
+      <div class="mod-cab"><span class="mod-n">4/6</span><h2>Página limpa</h2></div>
+      <div class="texto" data-aud="prof">
+        <p>O padrão <span class="padrao-tag">P2</span> fixa contraste mínimo de 4,5:1, no máximo 60 caracteres por linha, fonte de alta legibilidade e um assunto por página. Compare as medidas reais da amostra antes e depois.</p>
+      </div>
+      <div class="texto" data-aud="fam">
+        <p>Letras pequenas, cinza claro e páginas cheias cansam qualquer leitor. Para algumas crianças, impedem a leitura. Veja a diferença.</p>
+      </div>
+      <div class="texto lf" data-aud="est">
+        <span>Letra grande e escura é mais fácil de ler.</span>
+        <span>Veja o antes e o depois.</span>
+      </div>
+      <div class="painel">
+        <div class="seg" role="group" aria-label="Versão da página">
+          <button type="button" id="pg-antes" data-p="antes" aria-pressed="true">Antes</button>
+          <button type="button" id="pg-depois" data-p="depois" aria-pressed="false">Depois (P2)</button>
+        </div>
+        <div class="amostra antes" id="amostra">
+          <span class="longo">Instruções: leia atentamente o texto do capítulo 4 e, utilizando os conhecimentos adquiridos nas aulas anteriores sobre os estados físicos da matéria, responda às questões 1 a 6, justificando cada resposta com base no texto e entregando a atividade até sexta-feira, sem esquecer de identificar a folha com nome, número e turma, conforme combinado.</span>
+          <span class="curto">Hoje vamos:<br>1. Ler o capítulo 4.<br>2. Responder às questões 1 a 6.<br>3. Explicar cada resposta com uma frase do texto.<br>Entrega: sexta-feira.</span>
+        </div>
+        <div class="medidas">
+          <div id="md-c-box"><b id="md-c">0</b><span>contraste do texto (mínimo 4,5:1)</span></div>
+          <div id="md-cpl-box"><b id="md-cpl">0</b><span>caracteres por linha (máximo 60)</span></div>
+          <div><b id="md-fs">0</b><span>tamanho da letra</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="modulo" id="m5">
+      <div class="mod-cab"><span class="mod-n">5/6</span><h2>Como a plataforma funciona</h2></div>
+      <div class="texto" data-aud="prof">
+        <p>Você envia o material uma vez. A plataforma propõe as versões e você aprova cada uma <span class="padrao-tag">P7</span>. O aluno escolhe a versão sem rótulo: as opções dizem como ele prefere estudar, nunca qual é a sua deficiência.</p>
+      </div>
+      <div class="texto" data-aud="fam">
+        <p>O professor envia o material da aula. A plataforma prepara versões diferentes e o professor confere todas. Depois, o material aparece para a turma como no exemplo abaixo.</p>
+      </div>
+      <div class="texto lf" data-aud="est">
+        <span>Assim aparece um material para você.</span>
+        <span>Toque nos botões para escolher o jeito de estudar.</span>
+      </div>
+      <ol class="fluxo" data-aud="prof fam">
+        <li><span class="n">1</span><b>Enviar</b><span>O professor envia o material e marca as necessidades da turma.</span></li>
+        <li><span class="n">2</span><b>Analisar</b><span>A plataforma encontra barreiras: cor sozinha, frases longas, página cheia, imagem sem descrição.</span></li>
+        <li><span class="n">3</span><b>Transformar</b><span>Aplica os padrões P1 a P6 e gera as versões.</span></li>
+        <li><span class="n">4</span><b>Revisar</b><span>O professor confere, edita e aprova. Nada é publicado sem ele.</span></li>
+        <li><span class="n">5</span><b>Publicar</b><span>O material vai para a biblioteca da turma.</span></li>
+      </ol>
+      <div class="painel material">
+        <div class="material-cab"><h3>O ciclo da água</h3><span class="meta">Ciências · 6º ano A · exemplo</span></div>
+        <div class="versoes" role="group" aria-label="Como você quer estudar">
+          <button type="button" id="vs-uni" data-v="uni" aria-pressed="true">Padrão</button>
+          <button type="button" id="vs-amp" data-v="amp" aria-pressed="false">Letras grandes</button>
+          <button type="button" id="vs-lf2" data-v="lf2" aria-pressed="false">Texto mais direto</button>
+          <button type="button" id="vs-lf1" data-v="lf1" aria-pressed="false">Pouco texto e desenhos</button>
+          <button type="button" id="vs-aud" data-v="aud" aria-pressed="false">Ouvir</button>
+        </div>
+        <div class="previa" id="previa" aria-live="polite"></div>
+        <div class="aplicados" id="aplicados"></div>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="modulo" id="m6">
+      <div class="mod-cab"><span class="mod-n">6/6</span><h2>Mini-check</h2></div>
+      <div class="texto" data-aud="prof fam"><p>Três perguntas rápidas para fechar. A resposta aparece na hora.</p></div>
+      <div class="texto lf" data-aud="est"><span>Responda três perguntas.</span><span>A resposta aparece na hora.</span></div>
+      <div class="painel" id="quiz"></div>
+    </section>
+
+    <footer class="rodape">Protótipo do time Carcará 3301 · Hackathon LEP 2026. Números de fontes públicas citadas em cada gráfico; o material "O ciclo da água" é um exemplo criado pelo time.</footer>
+  </div>
+</main>
+
+<main id="vista-manual" hidden>
+  <div class="wrap">
+    <section class="manual-cab">
+      <p class="eyebrow">Manual · versão 0.1</p>
+      <h1>Os 7 padrões de transformação</h1>
+      <p class="lead" style="color:var(--muted);max-width:56ch">Cada material que a plataforma gera segue estes padrões. Abra um padrão para ver o que a plataforma faz, como conferir e em que pesquisas ele se apoia.</p>
+      <div class="chaves-ev"><span><span class="tag dados">● Dados</span> estudo com dados</span><span><span class="tag">◆ Prática</span> relato ou revisão</span><span><span class="tag norma">■ Norma</span> norma ou lei</span><span><span class="tag projeto">○ Projeto</span> decisão do time, a validar</span></div>
+    </section>
+    <div class="lista-padroes" id="lista-padroes"></div>
+  </div>
+</main>
+
+<script>
+const PADROES = [
+ {id:"P1",nome:"Cor nunca sozinha",regra:"Toda informação passada por cor também aparece em texto, símbolo ou padrão de preenchimento.",faz:["Encontra trechos que dependem de cor e acrescenta um símbolo ou palavra","Troca preenchimentos coloridos de gráficos e tabelas por cor + padrão","Não recolore fotos automaticamente: oferece uma versão com mais contraste como opção"],conferir:"Veja o material em escala de cinza. Toda a informação continua compreensível?",ajuda:"Cópias em preto e branco, projetores fracos e telas de celular ao sol.",ev:[["dados","Cerca de 8% dos homens e 0,5% das mulheres têm alguma deficiência na visão de cores.","American Optometric Association, citada por Alves & Alves (UniFOA, 2025)"],["dados","Em 90 respostas, 22,1% relataram dificuldade com cores em gráficos, mapas ou tabelas; 25,6% tiveram obstáculos em provas; 30,2% precisaram pedir ajuda.","Alves & Alves (UniFOA, 2025)"],["dados","Pessoas com tritanomalia preferiram as ilustrações originais (66,7%); com deuteranomalia e protanomalia, versões com mais contraste.","Bacelar (UFMA, 2024)"],["pratica","A recoloração de imagens não é 100% efetiva.","Costa et al. (2017)"],["norma","A cor não pode ser o único meio visual de transmitir informação.","WCAG 2.2, critério 1.4.1"]]},
+ {id:"P2",nome:"Página limpa e legível",regra:"Texto com contraste alto, fonte de alta legibilidade, linhas curtas, margens largas e um assunto por página.",faz:["Reformata o material numa fonte sem serifa de alta legibilidade","Quebra páginas densas em páginas menores","Gera uma versão ampliada com contraste reforçado"],conferir:"Meça o contraste (mínimo 4,5:1) e conte os caracteres de uma linha cheia (máximo 60).",ajuda:"Quem lê no celular, quem está cansado, quem tem dificuldade de atenção.",ev:[["pratica","A legibilidade depende de contraste, tamanho, estilo e cor da fonte e das margens.","Pires & Machado (2021)"],["pratica","Página limpa, margens largas e no máximo 60 caracteres por linha.","Muñoz (2012), em Pires & Machado (2021)"],["norma","Contraste mínimo de 4,5:1 (AA) e 7:1 (AAA).","WCAG 2.2, critérios 1.4.3 e 1.4.6"],["projeto","Tamanhos de 14 pt e 18 pt são escolha inicial e precisam ser testados.","Carcará 3301"]]},
+ {id:"P3",nome:"Leitura Fácil em três níveis",regra:"Cada texto pode sair em três níveis de complexidade, sem perder o conteúdo nem o caráter de texto escrito.",faz:["A IA reescreve o texto nos níveis pedidos e monta um glossário","Mantém o mesmo objetivo de aprendizagem nos três níveis","O professor revisa e aprova antes de publicar"],conferir:"Conte as palavras das frases mais longas (máximo 20). O nível I ainda ensina o mesmo conceito?",ajuda:"Quem está se alfabetizando, estudantes estrangeiros, revisão rápida.",ev:[["pratica","Três níveis: I com muitas ilustrações e pouco texto; II com vocabulário cotidiano; III mais longo.","Muñoz (2012), em Souza, Campos & Carrizalez"],["pratica","No máximo 20 palavras por oração, uma oração por linha. Texto acessível não é simplista.","Muñoz (2012), em Pires & Machado (2021)"],["pratica","A Linguagem Simples rompe barreiras de comunicação com estudantes com deficiência intelectual.","Campos (UFRN, 2023)"]]},
+ {id:"P4",nome:"Imagem com propósito e descrita",regra:"Imagem só entra quando apoia uma palavra-chave. A mesma ideia usa o mesmo desenho, e toda imagem tem descrição em texto.",faz:["Escreve uma descrição para cada imagem","Gera áudio da descrição quando o professor pede","Avisa quando uma imagem parece só decorativa"],conferir:"Esconda as imagens. A descrição transmite o que a imagem ensinava?",ajuda:"Leitores de tela, internet lenta e quem estuda ouvindo.",ev:[["pratica","A imagem deve ser útil, não bonita. Mesmo desenho para a mesma ideia.","Muñoz (2012), em Pires & Machado (2021)"],["norma","Todo conteúdo não textual precisa de alternativa em texto.","WCAG 2.2, 1.1.1; Lei 13.146/2015"]]},
+ {id:"P5",nome:"Mais de um caminho",regra:"Cada material sai em pelo menos dois formatos, e cada atividade aceita mais de uma forma de resposta.",faz:["Gera texto e áudio de todo material","Sugere respostas por fala, desenho ou escolha de figuras","Marca quais caminhos estão disponíveis"],conferir:"Um aluno que não lê bem ainda consegue acessar e responder?",ajuda:"A turma inteira.",ev:[["pratica","O DUA pede múltiplos meios de engajamento, representação e expressão.","CAST; Tsuchiya (UNESP, 2022)"],["dados","Aulas com DUA e Comunicação Alternativa engajaram toda a turma de 1º ano: o essencial para um aluno foi benéfico para todos.","Domaredzki, Hummel & Costa (2026)"],["pratica","DUA com tecnologia assistiva e IA generativa ampliou acesso e autonomia de estudantes com TEA.","Alonso & Souza (2026)"]]},
+ {id:"P6",nome:"Estrutura previsível",regra:"O material abre dizendo o que vai acontecer, dá instruções numeradas com uma ação por passo e usa linguagem literal.",faz:["Insere um quadro \"Hoje vamos\" com as etapas","Quebra enunciados longos em passos numerados","Sinaliza expressões figuradas para o professor revisar"],conferir:"Cada passo pede uma única ação? Há expressão com duplo sentido?",ajuda:"Alunos ansiosos, turmas grandes, qualquer tarefa nova.",ev:[["pratica","O DUA reduz barreiras pedagógicas para estudantes com TEA.","Tsuchiya (UNESP, 2022)"],["dados","Apoio visual e Comunicação Alternativa amenizaram barreiras de comunicação de um aluno com TEA.","Domaredzki, Hummel & Costa (2026)"],["projeto","Quadro \"Hoje vamos\" e sinalização de linguagem figurada são propostas a validar com o AEE.","Carcará 3301"]]},
+ {id:"P7",nome:"Professor no comando",regra:"Nada chega ao aluno sem aprovação do professor. A plataforma registra necessidades, nunca diagnósticos, e explica cada transformação.",faz:["Fila de revisão: aprovar, editar ou descartar cada versão","Perfil por necessidades, sem campo de diagnóstico","Cada material mostra os padrões aplicados, o que ajuda no PEI"],conferir:"O professor consegue explicar a uma família por que cada mudança foi feita?",ajuda:"A escola ganha registro; a família entende o porquê.",ev:[["pratica","Dos 16 artigos nacionais sobre o PEI analisados, nenhum explica com clareza como elaborá-lo.","Silva & Camargo (2021)"],["pratica","Sem formação continuada, professoras se sentem inseguras para elaborar o PEI.","Carvalho et al. (2026)"],["pratica","Falta de tempo para planejar adaptações é a principal queixa dos professores.","Marques & Duarte (2013)"],["norma","Dados de saúde de crianças são dados sensíveis.","Lei 13.709/2018 (LGPD)"]]}
+];
+const SIMB={dados:"● Dados",pratica:"◆ Prática",norma:"■ Norma",projeto:"○ Projeto"};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const guarda={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs={},pai){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(pai)pai.appendChild(e);return e}
+const virg=v=>String(v).replace(".",",");
+
+/* ---------- trilha ---------- */
+function trilha(t){document.body.dataset.trilha=t;$$(".trilhas button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));guarda.set("carcara-trilha",t);montaQuiz()}
+$$(".trilhas button").forEach(b=>b.addEventListener("click",()=>trilha(b.dataset.t)));
+
+/* ---------- abas por hash ---------- */
+function rota(){const m=location.hash==="#manual";$("#vista-curso").hidden=m;$("#vista-manual").hidden=!m;$("#aba-curso").toggleAttribute("aria-current",!m);$("#aba-manual").toggleAttribute("aria-current",m);if(!m)$("#aba-curso").setAttribute("aria-current","page");else $("#aba-manual").setAttribute("aria-current","page");progresso()}
+addEventListener("hashchange",()=>{rota();scrollTo(0,0)});
+
+/* ---------- progresso ---------- */
+function progresso(){const h=document.documentElement;const max=h.scrollHeight-h.clientHeight;$("#barra").style.width=(max>0?Math.min(100,scrollY/max*100):0)+"%"}
+addEventListener("scroll",progresso,{passive:true});
+
+/* ---------- dica (tooltip) ---------- */
+function dica(box){const d=document.createElement("div");d.className="dica";box.appendChild(d);return{mostra(x,y,t){d.textContent=t;d.style.left=x+"px";d.style.top=y+"px";d.classList.add("on")},esconde(){d.classList.remove("on")}}}
+function alvo(svg,box,dc,cx,cy,r,texto){const a=el("circle",{cx,cy,r,class:"alvo",tabindex:0,"aria-label":texto},svg);const mostra=()=>{const s=svg.getBoundingClientRect(),b=box.getBoundingClientRect(),k=s.width/svg.viewBox.baseVal.width;dc.mostra(s.left-b.left+cx*k,s.top-b.top+cy*k,texto)};a.addEventListener("pointerenter",mostra);a.addEventListener("focus",mostra);a.addEventListener("pointerleave",dc.esconde);a.addEventListener("blur",dc.esconde);a.addEventListener("click",mostra)}
+
+/* ---------- gráfico de inclinação ---------- */
+(function(){const box=$("#g-perfil");const W=560,H=260,x0=90,x1=330,t=20,b=210;const y=v=>b-(b-t)*v/80;const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Autismo passou de 5,6% para 44,2% das matrículas e deficiência intelectual de 69,3% para 48,5%, entre 2015 e 2024"},box);const dc=dica(box);
+[0,20,40,60,80].forEach(v=>el("line",{x1:x0-40,x2:x1+40,y1:y(v),y2:y(v),class:"grade"},svg));
+[["2015",x0],["2024",x1]].forEach(([a,x])=>{const tx=el("text",{x,y:H-16,"text-anchor":"middle","font-weight":700,"font-size":14},svg);tx.textContent=a});
+const S=[["Deficiência intelectual",69.3,48.5,2,"5 4",-7],["Autismo (TEA)",5.6,44.2,1,"",17]];
+S.forEach(([n,a,v,c,tr,dy])=>{const l=el("line",{x1:x0,y1:y(a),x2:x1,y2:y(v),class:"l"+c,"stroke-width":2.5,"stroke-linecap":"round"},svg);if(tr)l.setAttribute("stroke-dasharray",tr);
+ [[x0,a,"2015"],[x1,v,"2024"]].forEach(([x,val,ano])=>{el("circle",{cx:x,cy:y(val),r:6,class:"m"+c+" anel"},svg);alvo(svg,box,dc,x,y(val),16,`${n}, ${ano}: ${virg(val)}%`)});
+ const e=el("text",{x:x0-14,y:y(a)+5,"text-anchor":"end","font-size":13},svg);e.textContent=virg(a)+"%";
+ const d=el("text",{x:x1+14,y:y(v)+dy,"font-size":13,"font-weight":700},svg);d.textContent=`${virg(v)}% · ${n}`})})();
+
+/* ---------- barras horizontais ---------- */
+function barras(id,dados,rotulo){const box=$(id);const W=560,lin=46,esq=150,util=W-esq-60,H=lin*dados.length+30;const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":rotulo},box);const dc=dica(box);
+[0,25,50,75,100].forEach(v=>{const x=esq+util*v/100;el("line",{x1:x,x2:x,y1:4,y2:H-24,class:"grade"},svg);const tx=el("text",{x,y:H-6,"text-anchor":"middle",class:"eixo"},svg);tx.textContent=v+"%"});
+dados.forEach(([r,v],i)=>{const yy=10+i*lin,w=util*v/100;const t=el("text",{x:esq-12,y:yy+17,"text-anchor":"end","font-size":14},svg);t.textContent=r;
+ el("path",{d:`M${esq},${yy} h${w-4} a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-${w-4} z`,class:"m1"},svg);
+ const vt=el("text",{x:esq+w+8,y:yy+17,"font-size":14,"font-weight":700},svg);vt.textContent=virg(v)+"%";
+ const a=el("rect",{x:esq,y:yy-8,width:util,height:40,class:"alvo",tabindex:0,"aria-label":`${r}: ${virg(v)}%`},svg);
+ const mostra=()=>{const s=svg.getBoundingClientRect(),b=box.getBoundingClientRect(),k=s.width/W;dc.mostra(s.left-b.left+(esq+w)*k,s.top-b.top+yy*k,`${r}: ${virg(v)}%`)};
+ a.addEventListener("pointerenter",mostra);a.addEventListener("focus",mostra);a.addEventListener("pointerleave",dc.esconde);a.addEventListener("blur",dc.esconde)})}
+barras("#g-escola",[["6 a 14 anos",95],["15 a 17 anos",84],["18 a 24 anos",24]],"Frequência escolar de pessoas com deficiência: 95% de 6 a 14 anos, 84% de 15 a 17, 24% de 18 a 24");
+barras("#g-dalt",[["Pediram ajuda",30.2],["Obstáculo em prova",25.6],["Dificuldade em gráfico",22.1]],"Daltonismo: 30,2% pediram ajuda, 25,6% tiveram obstáculos em provas, 22,1% dificuldade em gráficos");
+
+/* ---------- simulador de daltonismo ---------- */
+const GAB=[1,1,0,1,0,1,1,1,0,1];
+const prova=$("#prova");GAB.forEach((c,i)=>{const d=document.createElement("div");d.className="q "+(c?"certa":"errada");d.innerHTML=`<span>${i+1}</span><small>${c?"✓ certa":"✗ errada"}</small>`;d.setAttribute("aria-label",`Questão ${i+1}, ${c?"certa":"errada"}`);prova.appendChild(d)});
+$$("#m2 .seg button").forEach(b=>b.addEventListener("click",()=>{$$("#m2 .seg button").forEach(x=>x.setAttribute("aria-pressed",x===b));$("#prova-area").style.filter=b.dataset.f?`url(#${b.dataset.f})`:"none";$("#resposta").textContent=""}));
+$("#p1").addEventListener("change",e=>{$("#prova-area").classList.toggle("p1-on",e.target.checked);$("#resposta").textContent=""});
+$("#conferir").addEventListener("click",()=>{const p1=$("#p1").checked;$("#resposta").textContent=`Foram 3 erros: questões 3, 5 e 9. ${p1?"Com o P1, o símbolo e a textura dão a resposta em qualquer simulação.":"Sem o P1, em deuteranopia e protanopia o verde e o vermelho ficam quase iguais. Ligue o P1 e compare."}`});
+
+/* ---------- leitura fácil ---------- */
+const ICO={sol:'<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="8" fill="var(--s2)"/><g stroke="var(--s2)" stroke-width="3" stroke-linecap="round"><path d="M20 3v6M20 31v6M3 20h6M31 20h6M8 8l4 4M28 28l4 4M8 32l4-4M28 12l4-4"/></g></svg>',nuvem:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 30h17a7 7 0 0 0 0-14 10 10 0 0 0-19 3 6 6 0 0 0 2 11z" fill="var(--muted)"/></svg>',chuva:'<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 22h17a7 7 0 0 0 0-14 10 10 0 0 0-19 3 6 6 0 0 0 2 11z" fill="var(--muted)"/><g stroke="var(--s1)" stroke-width="3" stroke-linecap="round"><path d="M14 27l-2 6M21 27l-2 6M28 27l-2 6"/></g></svg>',ciclo:'<svg viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="var(--s1)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M31 15a12 12 0 0 0-22 0"/><path d="M9 25a12 12 0 0 0 22 0"/><path d="M31 8v8h-8M9 32v-8h8"/></g></svg>'};
+const TX={
+ orig:{html:"O ciclo hidrológico consiste na circulação contínua da água entre a superfície terrestre e a atmosfera, impulsionada pela energia solar. Ao ser aquecida, a água de oceanos, rios e lagos sofre evaporação; o vapor, ao ascender e resfriar-se, condensa-se formando nuvens, que, saturadas, originam a precipitação."},
+ 3:{html:"O ciclo da água é a circulação contínua da água entre a superfície da Terra e a atmosfera. A energia do Sol movimenta esse ciclo. O calor faz a água de oceanos, rios e lagos <b>evaporar</b>. O vapor sobe, esfria e se <b>condensa</b>: assim se formam as nuvens. Quando as nuvens ficam carregadas, a água cai. Isso se chama <b>precipitação</b>.<p class='glos'><b>evaporar</b>: virar vapor · <b>condensar</b>: o vapor voltar a ser gotinhas · <b>precipitação</b>: chuva, neve ou granizo</p>"},
+ 2:{linhas:["A água da Terra está sempre em movimento.","O Sol esquenta a água dos rios e do mar.","A água vira vapor e sobe para o céu.","Lá em cima, o vapor esfria e forma as nuvens.","As nuvens ficam pesadas de água.","Então a água cai. É a chuva.","Depois, tudo começa de novo."]},
+ 1:{icones:[["sol","O Sol esquenta a água."],["nuvem","A água sobe e vira nuvem."],["chuva","A nuvem solta a chuva."],["ciclo","E tudo começa de novo."]]}};
+function htmlTexto(t){if(t.html)return t.html;if(t.linhas)return t.linhas.map(l=>`<span style="display:block">${l}</span>`).join("");return t.icones.map(([k,l])=>`<div class="lf1">${ICO[k]}<span>${l}</span></div>`).join("")}
+function textoPlano(t){if(t.html){const d=document.createElement("div");d.innerHTML=t.html;d.querySelectorAll(".glos").forEach(g=>g.remove());return d.textContent}return(t.linhas||t.icones.map(x=>x[1])).join(" ")}
+function medir(txt){const frases=txt.split(/(?<=[.;:!?])\s+/).map(s=>s.trim()).filter(Boolean);const pal=s=>s.split(/\s+/).filter(w=>/[A-Za-zÀ-ú]/.test(w)).length;return{pal:pal(txt),fr:frases.length,max:Math.max(...frases.map(pal))}}
+function nivel(n){$$("#m3 .seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.n==n));const t=TX[n];$("#lf-texto").innerHTML=htmlTexto(t);const m=medir(textoPlano(t));$("#md-pal").textContent=m.pal;$("#md-fr").textContent=m.fr;$("#md-max").textContent=m.max;$("#md-max-box").classList.toggle("alerta",m.max>20)}
+$$("#m3 .seg button").forEach(b=>b.addEventListener("click",()=>nivel(b.dataset.n)));nivel("orig");
+
+/* ---------- página limpa: medidas reais ---------- */
+function lum(rgb){const c=rgb.match(/\d+(\.\d+)?/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function fundo(e){while(e){const b=getComputedStyle(e).backgroundColor;if(b&&!/rgba\(0, 0, 0, 0\)|transparent/.test(b))return b;e=e.parentElement}return"rgb(255,255,255)"}
+function medePagina(){const a=$("#amostra"),cs=getComputedStyle(a);const L1=lum(cs.color),L2=lum(fundo(a));const c=(Math.max(L1,L2)+.05)/(Math.min(L1,L2)+.05);
+ const cv=document.createElement("canvas").getContext("2d");cv.font=`${cs.fontSize} ${cs.fontFamily}`;const amostraTxt="O ciclo da água é a circulação contínua da água entre a superfície e o ar.";const w=cv.measureText(amostraTxt).width/amostraTxt.length;
+ const larg=a.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);const cpl=Math.round(larg/w);
+ $("#md-c").textContent=virg(c.toFixed(1))+":1";$("#md-c-box").classList.toggle("alerta",c<4.5);$("#md-cpl").textContent=cpl;$("#md-cpl-box").classList.toggle("alerta",cpl>60);$("#md-fs").textContent=Math.round(parseFloat(cs.fontSize))+" px"}
+$$("#m4 .seg button").forEach(b=>b.addEventListener("click",()=>{$$("#m4 .seg button").forEach(x=>x.setAttribute("aria-pressed",x===b));$("#amostra").className="amostra "+b.dataset.p;medePagina()}));
+addEventListener("resize",medePagina);
+
+/* ---------- biblioteca do aluno ---------- */
+const VERS={uni:{p:["P1","P2","P4","P5","P6"],h:()=>"<p style='font-family:var(--display);font-weight:600;margin-bottom:6px'>Hoje vamos: 1. ler · 2. ver o desenho · 3. responder</p>"+TX[3].html},
+ amp:{p:["P2"],h:()=>TX[3].html,cls:"ampliada"},lf2:{p:["P3","P4"],h:()=>htmlTexto(TX[2])},lf1:{p:["P3","P4"],h:()=>htmlTexto(TX[1])},
+ aud:{p:["P5"],h:()=>"<p style='margin-bottom:10px'>O texto é lido em voz alta, em português.</p><button type='button' class='btn' id='ouvir'>▶ Ouvir o texto</button> <button type='button' class='btn-sec' id='parar'>Parar</button><p class='fonte' id='voz-status'></p>"}};
+function versao(v){$$(".versoes button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v));const V=VERS[v];const pr=$("#previa");pr.className="previa "+(V.cls||"");pr.innerHTML=V.h();$("#aplicados").innerHTML="Padrões aplicados: "+V.p.map(x=>`<span class="padrao-tag">${x}</span>`).join(" ");
+ if(v==="aud"){$("#ouvir").addEventListener("click",()=>{try{const u=new SpeechSynthesisUtterance(TX[2].linhas.join(" "));u.lang="pt-BR";speechSynthesis.cancel();speechSynthesis.speak(u);$("#voz-status").textContent="Tocando. Se não ouvir nada, o navegador não tem voz em português instalada."}catch(e){$("#voz-status").textContent="Este navegador não permite leitura em voz alta aqui. Na plataforma, o áudio virá pronto."}});$("#parar").addEventListener("click",()=>{try{speechSynthesis.cancel()}catch(e){}})}}
+$$(".versoes button").forEach(b=>b.addEventListener("click",()=>versao(b.dataset.v)));versao("uni");
+
+/* ---------- quiz por trilha ---------- */
+const QUIZ={
+ prof:[["Um gráfico usa verde para \"acima da meta\" e vermelho para \"abaixo\". O que o P1 pede?",["Trocar por azul e laranja","Acrescentar rótulo, símbolo ou textura","Usar tons mais fortes"],1,"Trocar cores não serve a todos os tipos de daltonismo (Bacelar, 2024). O símbolo funciona em qualquer caso."],
+  ["Na Leitura Fácil, qual o limite de palavras por oração?",["10","20","30"],1,"Muñoz (2012) recomenda no máximo 20 palavras por oração e uma oração por linha."],
+  ["O que a plataforma registra no perfil do aluno?",["O diagnóstico","Necessidades de aprendizagem","O laudo médico"],1,"A plataforma registra o que ajuda o aluno a aprender. Diagnóstico é papel de profissionais de saúde (P7)."]],
+ fam:[["Quem escolhe a versão do material?",["A plataforma, sozinha","O estudante, com apoio do professor","Só a família"],1,"Cada estudante escolhe o jeito que funciona melhor e pode trocar quando quiser."],
+  ["A plataforma pode dizer se uma criança tem autismo?",["Sim","Não, isso é papel de um profissional de saúde"],1,"A plataforma nunca faz diagnóstico. Se tiver dúvidas, converse com a escola e procure um profissional."],
+  ["A versão em Leitura Fácil ensina o mesmo conteúdo?",["Sim, de um jeito mais direto","Não, ensina menos"],0,"O objetivo da aula é o mesmo. Muda só a forma de escrever."]],
+ est:[["Você pode trocar de versão?",["Sim, quando quiser","Não"],0,"Isso. Você escolhe o jeito que é melhor para você."],
+  ["Qual destes é um jeito de estudar no site?",["Ouvir o texto","Ler só letras pequenas"],0,"Isso. Você pode ouvir o texto."],
+  ["Se algo estiver difícil, o que fazer?",["Falar com o professor","Ficar quieto"],0,"Isso. O professor está aqui para ajudar."]]};
+function montaQuiz(){const t=document.body.dataset.trilha||"prof";const q=$("#quiz");q.innerHTML="";let feitos=0,acertos=0;const placar=document.createElement("p");placar.className="placar";placar.setAttribute("aria-live","polite");
+ QUIZ[t].forEach(([perg,ops,certa,exp],i)=>{const d=document.createElement("div");d.className="pergunta";d.innerHTML=`<p>${i+1}. ${perg}</p>`;const os=document.createElement("div");os.className="opcoes";const ex=document.createElement("p");ex.className="explica";
+  ops.forEach((o,j)=>{const b=document.createElement("button");b.type="button";b.id=`q-${t}-${i}-${j}`;b.textContent=o;b.addEventListener("click",()=>{if(d.dataset.feito)return;d.dataset.feito=1;feitos++;if(j===certa)acertos++;b.classList.add(j===certa?"certo":"errado");os.children[certa].classList.add("certo");ex.textContent=exp;if(feitos===QUIZ[t].length)placar.textContent=`Você acertou ${acertos} de ${feitos}.`});os.appendChild(b)});
+  d.append(os,ex);q.appendChild(d)});q.appendChild(placar)}
+
+/* ---------- manual ---------- */
+$("#lista-padroes").innerHTML=PADROES.map((p,i)=>`<details${i===0?" open":""}><summary><span class="cod">${p.id}</span><b>${p.nome}</b><span>${p.regra}</span></summary><div class="corpo-padrao"><div><h4>O que a plataforma faz</h4><ul>${p.faz.map(x=>`<li>${x}</li>`).join("")}</ul></div><div><h4>Como conferir</h4><p>${p.conferir}</p></div><div><h4>Também ajuda</h4><p>${p.ajuda}</p></div><div><h4>Em que se baseia</h4><ul class="ev">${p.ev.map(([t,x,f])=>`<li><span><span class="tag ${t==="pratica"?"":t}">${SIMB[t]}</span></span><span>${x}<cite>${f}</cite></span></li>`).join("")}</ul></div></div></details>`).join("");
+
+/* ---------- início ---------- */
+trilha(guarda.get("carcara-trilha")||"prof");rota();
+document.fonts&&document.fonts.ready.then(medePagina);medePagina();
+</script>

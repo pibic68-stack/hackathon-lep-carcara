@@ -7,7 +7,11 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
 - Fluxo: perfil de necessidades → material da aula → adaptações (regras do Manual) → guia para professor e família → mini-check para medir de novo.
 - O Manual de Acessibilidade é a base de regras da ferramenta (`docs/manual/regras.json`), não um documento solto.
 - Princípios: identificar barreiras, nunca diagnosticar; o professor aprova o que a IA gera; mesmo conteúdo para todos; alunos fictícios (LGPD); interface acessível.
-- Divisão do time em 4 frentes: `docs/divisao-tarefas.md`.
+- Divisão do time em 4 frentes: `docs/divisao-tarefas.md`. Adler é o responsável pela pesquisa.
+- Plataforma: o professor envia o material → a plataforma transforma → o professor aprova → o material fica salvo e listado numa biblioteca que os alunos acessam. As versões servem para todos, não só para alunos PCD.
+- Manual v0.1 (30/10): 7 padrões de transformação P1 a P7. A fonte única é `docs/manual/padroes.json`; `build_manual.py` gera o PDF. O manual também vai ser uma aba do site, com um mini curso interativo em 3 trilhas (professor/técnica, família/orientadora, estudante/Leitura Fácil). Protótipo em `web/minicurso/index.html`, aguardando o sinal verde do Adler.
+- Identidade visual: Lexend (títulos), Atkinson Hyperlegible (texto), IBM Plex Mono (códigos); azul #1F5FBF e âmbar #C26A00, validados para daltonismo.
+- Fontes lidas e lacunas: `docs/pesquisa/fontes.md` e `docs/pesquisa/lacunas.md`.
 
 ## Regras para o Claude
 - Responder em português.
