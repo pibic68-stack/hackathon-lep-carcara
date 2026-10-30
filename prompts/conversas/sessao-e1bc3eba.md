@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 15:48
-- **Mensagens do time:** 7
-- **Exportado em:** 30/10/2026 17:18
+- **Mensagens do time:** 8
+- **Exportado em:** 30/10/2026 17:27
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -456,3 +456,73 @@ Hooks configurados no meio da sessão podem só começar a funcionar numa sessã
 **Para os seus colegas**
 - **Quem usar Claude Code dentro do repositório**: os hooks já vêm configurados. O Claude Code pede aprovação na primeira vez.
 - **Quem usar o Claude no chat (claude.ai ou app)**: não existe hook ali. A pessoa compartilha a conversa e cola o link em `prompts/links-conversas.md`.
+
+
+---
+
+## 🧑 Time · 30/10 17:27
+
+preciso que meus amigos tenham acesso ao github de forma que possam conectar em conectores nos claudes deles tambem, como faço? a ideia disso é pra que tenham constantemente acesso á nossa ocnversa e ao que é colocado la
+
+
+## 🤖 Claude · 30/10 17:27
+
+Antes de responder, vou conferir se o salvamento automático rodou sozinho depois da última resposta, e como funciona o conector do GitHub para os seus colegas.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Check whether the auto-export hook ran
+- 🔧 `WebSearch`: support.claude.com GitHub integration connect repository private repo collaborator
+
+</details>
+
+
+## 🤖 Claude · 30/10 17:27
+
+O salvamento automático funcionou sozinho depois da última resposta (commit das 17:18). Agora vou ler o artigo oficial sobre o conector.
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `WebFetch`: https://support.claude.com/en/articles/10167454-using-the-github-integration
+
+</details>
+
+
+## 🤖 Claude · 30/10 17:27
+
+O salvamento automático já funciona sozinho: depois da minha última resposta, o hook gerou o commit "Atualiza registro da conversa com IA" (17:18) sem eu fazer nada.
+
+Para cada colega ter acesso, são dois passos.
+
+## 1. Você convida cada colega para o repositório (feito só uma vez)
+
+1. No GitHub, abra **pibic68-stack/hackathon-lep-carcara → Settings → Collaborators → Add people**.
+2. Digite o username de cada um e escolha **Write**, para eles poderem editar.
+3. Cada colega aceita o convite pelo e-mail ou em github.com/notifications.
+
+O app do Claude já está instalado nesse repositório, porque é por ele que eu acesso. Como o repositório é da sua conta, só você precisava fazer essa instalação.
+
+## 2. Cada colega conecta o GitHub no próprio Claude
+
+**Opção A: Projeto no claude.ai (melhor para acompanhar a conversa)**
+1. Cada um cria um Projeto, por exemplo "Carcará 3301".
+2. Em **Conhecimento do projeto**, clica em **+ → GitHub** e cola a URL do repositório.
+3. Na primeira vez, o Claude manda para o GitHub fazer login e autorizar o app.
+4. Selecionam só **`CLAUDE.md`, `docs/` e `prompts/conversas/`**. O repositório inteiro pode não caber no contexto.
+
+**Opção B: Em uma conversa avulsa**
+Clicar em **+ → Add from GitHub** e escolher os arquivos.
+
+**Opção C: Claude Code**
+Para quem for programar. Os hooks já vêm configurados, então a conversa dessa pessoa também é salva sozinha em `prompts/conversas/`, num arquivo separado com o código da sessão dela. Assim não há conflito entre os registros.
+
+## O que eles precisam saber
+
+- **A sincronização não é automática.** O Claude deles pega uma cópia dos arquivos e só atualiza quando a pessoa clica em **Sync now** no projeto. Combinem de sincronizar antes de cada nova pergunta importante.
+- **Para só ler**, o mais rápido é abrir `prompts/conversas/sessao-e1bc3eba.md` direto no GitHub, que está sempre atualizado.
+- O Claude deles vê **os arquivos**, não o histórico de commits.
+
+Se algum colega não conseguir ver o repositório no Claude depois de aceitar o convite, me avise. A solução é criar uma **organização no GitHub** para o time e transferir o repositório para ela. Eu te guio nisso.
+
+Sources:
+- [Using the GitHub integration (Claude Help Center)](https://support.claude.com/en/articles/10167454-using-the-github-integration)
