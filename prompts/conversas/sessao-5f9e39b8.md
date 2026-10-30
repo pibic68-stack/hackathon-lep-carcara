@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `5f9e39b8`
 
 - **Início:** 30/10 19:41
-- **Mensagens do time:** 2
-- **Exportado em:** 30/10/2026 20:41
+- **Mensagens do time:** 3
+- **Exportado em:** 30/10/2026 20:43
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -857,3 +857,47 @@ O site segue a linha pixel art, com as fontes Pixelify Sans, Atkinson e Departur
 **Detalhe menor:** na animação do notebook, a sombra ficou levemente alaranjada.
 
 Nada foi commitado ainda; quando quiser, faço o commit e abro o PR.
+
+
+---
+
+## 🧑 Time · 30/10 20:42
+
+mude o limite de contexto para 1M ao invés de 400k
+
+
+## 🤖 Claude · 30/10 20:43
+
+Vou procurar onde esse limite de 400k está configurado.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Search settings files for context limit
+- 🔧 `Read`: C:\Users\Ricardo Coelho\.claude\settings.json
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:43
+
+Encontrei: o limite fica nas suas configurações globais, valendo para o Opus 5.5. Vou trocar 400000 por 1000000.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Edit`: C:\Users\Ricardo Coelho\.claude\settings.json
+- 🔧 `ccd_turn / wrap_up`
+
+</details>
+
+
+## 🤖 Claude · 30/10 20:43
+
+Troquei o limite de contexto de 400k para 1M. A mudança está em `C:\Users\Ricardo Coelho\.claude\settings.json`, na configuração do Opus 5.5:
+
+```json
+"claude-opus-5-5": { "autoCompactWindow": 1000000 }
+```
+
+Com isso, a conversa só é resumida automaticamente perto de 1 milhão de tokens. A mudança pode valer só a partir da próxima sessão; se não pegar, abra uma sessão nova.
+
+Esse arquivo também define `"model": "sonnet"` como modelo padrão, e o limite novo vale só para o Opus 5.5. Se quiser o mesmo limite para o Sonnet, é só pedir que eu adiciono.
