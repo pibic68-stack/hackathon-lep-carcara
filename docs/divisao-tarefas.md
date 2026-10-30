@@ -36,7 +36,7 @@ Para trabalharem em paralelo, todos precisam concordar em **dois formatos**:
 
 - [ ] Completar `docs/pesquisa/matriz-barreiras.md` (o rascunho já está lá)
 - [ ] **Entregar primeiro as 3 necessidades da demo** (sugestão: baixa visão, daltonismo, TEA), depois as outras
-- [ ] Converter cada adaptação em uma regra no formato acima → `docs/manual/regras.json`
+- [ ] Converter cada adaptação em uma regra no formato acima → `docs/manual/padroes.json` (feito na v1.0)
 - [ ] Separar 5 a 8 dados de impacto com fonte para o pitch → `docs/pesquisa/dados-pitch.md`
 - [ ] Se possível: conversar com 1 professor ou profissional do AEE e anotar as dores reais
 
@@ -47,7 +47,7 @@ Para trabalharem em paralelo, todos precisam concordar em **dois formatos**:
 - [ ] Implementar as **regras determinísticas** primeiro (não precisa de IA e sempre funciona):
   fonte ampliada, alto contraste, cor + símbolo, quebrar instruções em etapas
 - [ ] Depois, usar a IA para: simplificar o texto, descrever imagens, gerar o roteiro de áudio
-- [ ] Ler as regras de `docs/manual/regras.json` em vez de deixar tudo fixo no código
+- [ ] Ler os critérios de `docs/manual/padroes.json` em vez de deixar tudo fixo no código
 - [ ] Ter **saída em cache** para a demo não depender da internet ao vivo
 
 ## 👤 Pessoa 3: Frontend e Acessibilidade (HTML)

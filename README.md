@@ -1,4 +1,8 @@
-# Carcará 3301 · Hackathon LEP (Educação)
+# PRISMA · Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis
+
+> **Uma aula entra e várias versões saem.** A Sala de Materiais é a biblioteca que os alunos acessam.
+
+Time **Carcará 3301** · Hackathon LEP (Educação)
 
 > Time de alunos do IME no hackathon da Liga de Empreendedorismo da Praia Vermelha.
 > **Trilhas:** 1 (Inclusão e acessibilidade) + 4 (Aprendizagem individualizada).
@@ -41,12 +45,15 @@ que a ferramenta aplica. Cada regra do manual vira uma automação no código.
 
 | Pasta | Conteúdo | Responsável |
 |---|---|---|
-| `docs/pesquisa/` | Matriz de barreiras, fontes, dados para o pitch | Pesquisa |
-| `docs/manual/` | Manual de acessibilidade (regras de adaptação) | Pesquisa + todos |
-| `backend/` | Python: leitura do material, adaptações, IA | IA/Backend |
-| `web/` | HTML/CSS/JS: telas do professor | Frontend |
-| `relatorios/` | Modelo do guia/relatório (LaTeX → PDF) e perfis fictícios | Dados/Relatórios |
+| `docs/manual/padroes.json` | **Fonte única**: 10 padrões, 51 critérios, necessidades, dados, glossário e referências | Pesquisa |
+| `docs/manual/manual-prisma-v1.pdf` | Manual em PDF (gerado por `build_manual.py`) | Pesquisa |
+| `docs/pesquisa/` | Catálogo de fontes, lacunas e matriz de barreiras | Pesquisa |
+| `web/prisma-instrucoes/` | Aba **Instruções** do site: mini curso + manual + PDF. Ver o `LEIA-ME.md` da pasta | Pesquisa → Frontend |
+| `backend/` | Python: leitura do material, critérios, IA | IA/Backend |
+| `web/` | Demais telas do site | Frontend |
+| `relatorios/` | Guia para família e perfis fictícios | Dados/Relatórios |
 | `pitch/` | Roteiro da demo e slides | Produto/Pitch |
+| `prompts/` | Registro das conversas com IA para os avaliadores | Todos (automático) |
 
 Divisão detalhada: [`docs/divisao-tarefas.md`](docs/divisao-tarefas.md)
 
