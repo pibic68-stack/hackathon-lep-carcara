@@ -403,7 +403,7 @@ preciso que crie uma pasta chamada prompts no projeto pra guardar tudo que ja fo
 
 Vou criar a pasta `prompts/`, um script que converte esta conversa em Markdown legível e hooks que exportam a conversa sozinhos ao fim de cada resposta e antes de cada compactação.
 
-<details><summary>Ações executadas pelo Claude (10)</summary>
+<details><summary>Ações executadas pelo Claude (12)</summary>
 
 - 🔧 `TaskCreate`: Script que lê o transcript JSONL e gera Markdown em prompts/, sem dados internos
 - 🔧 `TaskCreate`: Exportar + commit + push a cada resposta e antes da compactação
@@ -415,5 +415,7 @@ Vou criar a pasta `prompts/`, um script que converte esta conversa em Markdown l
 - 🔧 `Write`: /home/claude/hackathon-lep-carcara/prompts/README.md
 - 🔧 `Write`: /home/claude/hackathon-lep-carcara/prompts/links-conversas.md
 - 🔧 `Bash`: Write hook settings and test the exporter
+- 🔧 `Bash`: Review exported user turns and tool lines
+- 🔧 `Bash`: Commit, push, and test the hook end to end
 
 </details>
