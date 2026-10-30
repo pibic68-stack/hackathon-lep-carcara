@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 15:48
-- **Mensagens do time:** 8
-- **Exportado em:** 30/10/2026 17:27
+- **Mensagens do time:** 9
+- **Exportado em:** 30/10/2026 17:40
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -526,3 +526,113 @@ Se algum colega não conseguir ver o repositório no Claude depois de aceitar o 
 
 Sources:
 - [Using the GitHub integration (Claude Help Center)](https://support.claude.com/en/articles/10167454-using-the-github-integration)
+
+
+---
+
+## 🧑 Time · 30/10 17:40
+
+certo, eles estao dando o jeito deles nisso. pelo que vi voce separou nas partes do print. eu sou o responsavel pela pesquisa e vou cuidar da matriz de barreiras agora. preciso abastecer sua fonte de dados de alguma forma. me de recomendaçoes de como abastecer, seja pesquisando determinadas coisas no google school etc. a principio meu objetivo aqui é te abastecer pra que me devolva dados uteis pros meus colegas saberem em que topicos focar na montagem do manual e das ends
+
+
+## 🤖 Claude · 30/10 17:40
+
+Vou já pesquisar os números mais recentes do Censo Escolar sobre alunos com deficiência, para você ter uma primeira resposta além das recomendações.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `WebSearch`: Censo Escolar 2025 matrículas educação especial alunos com deficiência autismo TEA deficiência intelectual baixa visão INEP
+- 🔧 `WebSearch`: INEP Censo Escolar educação especial inclusão classes comuns professores formação AEE sala de recursos percentual
+
+</details>
+
+
+## 🤖 Claude · 30/10 17:40
+
+Achei duas fontes boas. Vou ler os números reais nelas.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `WebFetch`: https://www.gov.br/inep/pt-br/assuntos/noticias/censo-escolar/matriculas-na-educacao-especial-chegam-a-mais-de-1-7-milhao
+- 🔧 `WebFetch`: https://institutorodrigomendes.org.br/panorama-educacao-especial-2025/
+
+</details>
+
+
+## 🤖 Claude · 30/10 17:40
+
+A página do INEP falhou. Vou tentar a nota estatística oficial do Censo 2025 para confirmar os números mais recentes.
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `WebFetch`: https://download.inep.gov.br/publicacoes/institucionais/estatisticas_e_indicadores/notas_estatisticas_censo_escolar_da_educacao_basica_2025.pdf
+
+</details>
+
+
+## 🤖 Claude · 30/10 17:40
+
+Fiz uma primeira busca para você já ter uma base, e ela muda uma coisa que eu tinha sugerido.
+
+## O que já encontrei
+
+Os dados abaixo vêm do [Panorama da Educação Especial 2025](https://institutorodrigomendes.org.br/panorama-educacao-especial-2025/), do Instituto Rodrigo Mendes, que analisa o Censo Escolar de 2015 a 2024:
+
+- As matrículas passaram de **930 mil (2015) para 2,07 milhões (2024)**.
+- **92,6%** estão em classes comuns.
+- O **autismo (TEA)** passou de 5,6% para **44,2%** das matrículas, e a **deficiência intelectual** foi de 69,3% para **48,5%**.
+- Só **6,4%** dos professores regentes têm formação continuada em educação especial.
+- Mais de **20%** das escolas não têm nenhum item de acessibilidade física registrado.
+
+Esses números combinam com o que a palestra disse sobre "estudam juntos, mas não aprendem juntos".
+
+**O que isso muda:** TEA e deficiência intelectual somam quase todo o perfil dos alunos. Eu tinha sugerido baixa visão, daltonismo e TEA para a demo. Agora recomendo que o **núcleo seja TEA + deficiência intelectual** (texto simplificado, instruções em etapas, linguagem literal, apoio visual), com **daltonismo ou baixa visão como terceiro caso**, porque é barato de programar e muito fácil de mostrar ao vivo.
+
+**O que ainda não está confirmado:**
+- Esses números são de um resumo secundário, e o site do INEP bloqueou o meu acesso. Vocês precisam conferir no INEP antes de levar ao pitch.
+- A busca também mostrou uma manchete do INEP de "1,7 milhão de matrículas". Provavelmente é de um ano anterior ou de outra forma de contar. Confirmem o ano de cada número.
+
+## Como me abastecer (3 formas)
+
+1. **Anexar no chat** PDFs, planilhas CSV ou prints de tabelas. Funciona melhor com os microdados e relatórios do INEP, que eu não consigo baixar.
+2. **Colar links** de páginas públicas, que eu leio. Isso vale para artigos, relatórios de ONGs e leis.
+3. **Guardar no repositório** em `docs/pesquisa/fontes/`. Assim os colegas veem a fonte e eu a releio em qualquer sessão. Dê um nome que diga o conteúdo e o ano, por exemplo `inep-censo-2025-educacao-especial.pdf`.
+
+## Onde buscar
+
+| Fonte | O que procurar |
+|---|---|
+| **INEP**: Censo Escolar, "Sinopse Estatística" e "Notas Estatísticas" | Matrículas por tipo de deficiência, por etapa e em classes comuns |
+| **Instituto Rodrigo Mendes** (Panorama da Educação Especial) | Séries históricas e análise |
+| **IBGE**: Censo 2022, pessoas com deficiência | Quantas pessoas, em que faixa etária |
+| **TIC Educação** (Cetic.br) | Que tecnologia as escolas e professores usam hoje |
+| **Todos pela Educação** e **QEdu** | Dados por escola e por região |
+| **Google Scholar** e **SciELO** | Estudos sobre o que funciona na sala de aula |
+| **Lei 13.146/2015** (LBI) e **Lei 12.764/2012** (autismo) | Direitos e obrigações da escola |
+
+**Termos para o Google Scholar e o SciELO:**
+- `"desenho universal para a aprendizagem" "ensino fundamental" TEA`
+- `"adaptação curricular" "deficiência intelectual" "sala comum"`
+- `"plano educacional individualizado" PEI professores dificuldades`
+- `"formação docente" "educação inclusiva" barreiras professores regentes`
+- `"leitura fácil" OR "linguagem simples" alunos deficiência intelectual`
+- `"daltonismo" materiais didáticos acessibilidade`
+
+Em cada artigo, anotem o **ano, a amostra e o que o professor achou difícil**. Prefiram estudos de **2018 em diante**.
+
+## Perguntas para a pesquisa responder (para os colegas saberem onde focar)
+
+1. Quais adaptações **mais ajudam alunos com TEA e deficiência intelectual** em sala comum, e quais têm evidência?
+2. O que o professor **diz que lhe falta**: tempo, material pronto, formação ou apoio?
+3. Quanto tempo o professor gasta **adaptando material** por semana hoje?
+4. O que a **família** precisa receber e em que formato?
+5. O que a **lei exige** do professor e da escola em termos de plano individual (PEI)?
+
+A resposta 2 é a mais valiosa para o pitch, porque diz exatamente o que a ferramenta precisa resolver.
+
+Não entendi o que você quis dizer com "ends" no final da mensagem. Assumi que se refere às automações da ferramenta. Se for outra coisa, me corrija.
+
+Quer que eu coloque esses achados e as buscas em `docs/pesquisa/` no repositório, para os outros 3 já abrirem a matriz com a prioridade TEA + deficiência intelectual?
+
+Sources:
+- [Panorama da Educação Especial 2025 (Instituto Rodrigo Mendes)](https://institutorodrigomendes.org.br/panorama-educacao-especial-2025/)
