@@ -235,3 +235,18 @@ class TestAcompanhar(Base if Base else unittest.TestCase):
         teste = c.get("/api/ia/teste").json()        # nos testes a IA está desligada
         self.assertFalse(teste["ok"])
         self.assertIn("chave", teste["erro"])
+
+
+@unittest.skipIf(Base is None, "fastapi/httpx não instalados")
+class TestCompartilhar(Base if Base else unittest.TestCase):
+    def test_contas_de_demo_so_no_proprio_computador(self):
+        from adaptador import api, demo
+        with mock.patch.object(demo, "ARQUIVO", Path(self.tmp.name) / "demo.json"), \
+                mock.patch.object(api, "_do_proprio_computador", return_value=True):
+            d = self.cliente().get("/api/compartilhar").json()
+        self.assertTrue(d["local"])
+        self.assertEqual(d["demo"]["professora"]["email"], demo.EMAIL_PROF)
+        self.assertEqual(len(d["demo"]["turmas"][0]["alunos"]), 3)
+        de_fora = self.cliente().get("/api/compartilhar", headers={"X-Forwarded-For": "1.2.3.4"}).json()
+        self.assertFalse(de_fora["local"])
+        self.assertIsNone(de_fora["demo"])

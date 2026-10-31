@@ -27,6 +27,16 @@ LOCAL = "http://127.0.0.1:8000"
 URL = re.compile(r"https://[a-z0-9-]+\.trycloudflare\.com")
 RAIZ = Path(__file__).resolve().parents[2]
 ARQUIVO_LINK = RAIZ / "link.txt"
+ARQUIVO_COMPARTILHAR = RAIZ / "compartilhar.json"      # lido pela página compartilhar.html (QR code)
+
+
+def anunciar(estado: str, link: str | None, rede: str | None) -> None:
+    try:
+        import json
+        ARQUIVO_COMPARTILHAR.write_text(json.dumps({"estado": estado, "link": link, "rede": rede,
+                                                    "quando": time.strftime("%H:%M")}), encoding="utf-8")
+    except OSError:
+        pass
 
 
 def ip_na_rede() -> str | None:
@@ -160,6 +170,13 @@ def main() -> int:
         print("  [ERRO] O servidor do PRISMA não está respondendo. Abra o publicar.bat de novo.")
         return 1
     testar_ia()
+    try:
+        from . import demo
+        demo.main()
+    except Exception as erro:
+        print(f"  (contas de demonstração: {erro})")
+    anunciar("criando", None, na_rede)
+    print("  A página com o QR code está aberta no navegador: " + LOCAL + "/compartilhar.html")
 
     tentativas = 0
     while True:
@@ -173,12 +190,14 @@ def main() -> int:
             if na_rede:
                 linhas.append("        3) outro aparelho no MESMO Wi-Fi: " + na_rede)
             caixa(linhas)
+            anunciar("bloqueado", None, na_rede)
             if tentativas >= 3:
                 return 1
             print("  Tentando de novo em 20 segundos (Ctrl+C para parar)...")
             time.sleep(20)
             continue
 
+        anunciar("pronto", t.url, na_rede)
         copiou = copiar(t.url)
         try:
             ARQUIVO_LINK.write_text(t.url + "\n", encoding="utf-8")
@@ -206,6 +225,7 @@ def main() -> int:
             if falhas >= 3:
                 break
         t.parar()
+        anunciar("caiu", None, na_rede)
         print()
         print("  O LINK CAIU. Criando um novo... (o endereço vai MUDAR: mande o novo para quem for abrir)")
 

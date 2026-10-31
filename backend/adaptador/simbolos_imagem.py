@@ -169,14 +169,29 @@ def marcar_cores(origem: Path, destino: Path) -> list[str]:
 
     passo = w / COLUNAS                              # lado do quadrado da grade (imagem reduzida)
     raio_grade = passo / escala * 0.26               # raio do símbolo na imagem original
-    raio_min = max(10.0, W / 75)
+    raio_min = max(9.0, W / 110)
     marcas: list[tuple[str, float, float, float]] = []
     ordem: list[str] = []
 
+    aceitas: set[str] = set()                       # cores já marcadas (maior área primeiro)
     for cor, _ in total.most_common():
         if len(ordem) >= MAX_CORES:
             break
         mascara = [[n == cor for n in linha] for linha in nomes]
+
+        def encostada(pontos) -> float:
+            """Fração da região que fica ENTRE uma cor já marcada e outra coisa (fundo, outra cor): é a
+            borda borrada de uma forma (o rosa na beira de uma seta vermelha), não uma região de verdade.
+            Bolinha dentro de outra cor (água azul sobre o chão amarelo) só encosta numa cor: fica."""
+            if not aceitas:
+                return 0.0
+            n = 0
+            for x, y in pontos:
+                vizinhos = {nomes[ny][nx] for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))
+                            if 0 <= nx < w and 0 <= ny < h} - {cor}
+                if vizinhos & aceitas and len(vizinhos) >= 2:
+                    n += 1
+            return n / max(1, len(pontos))
         achou = False
         for pontos, dil in _componentes(mascara, w, h, folga=2):
             reais = sum(1 for x, y in pontos if mascara[y][x])
@@ -185,8 +200,11 @@ def marcar_cores(origem: Path, destino: Path) -> list[str]:
             xs, ys = [x for x, _ in pontos], [y for _, y in pontos]
             bw, bh = max(xs) - min(xs) + 1, max(ys) - min(ys) + 1
             densidade = reais / (bw * bh)
-            if min(bw, bh) < ESPESSURA_MINIMA or densidade < 0.07:
+            if min(bw, bh) < ESPESSURA_MINIMA or densidade < 0.03 or (densidade < 0.07 and reais < 40):
                 continue                     # faixa fina (borda de slide, contorno) ou pontos soltos de ruído
+            reais_pts = [p for p in pontos if mascara[p[1]][p[0]]]
+            if encostada(reais_pts) > 0.4:
+                continue                     # borda borrada de uma forma de outra cor
             if (bw >= 0.8 * w or bh >= 0.8 * h) and densidade < 0.3:
                 continue                     # degradê espalhado pela imagem toda (fundo), não é região
             # 1) regiões grandes: símbolos numa grade em xadrez, onde o quadrado é quase todo desta cor
@@ -212,6 +230,7 @@ def marcar_cores(origem: Path, destino: Path) -> list[str]:
             achou = True
         if achou:
             ordem.append(cor)
+            aceitas.add(cor)
 
     if not marcas:
         return []

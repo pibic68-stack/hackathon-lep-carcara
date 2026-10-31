@@ -112,7 +112,7 @@ goto :espera
 
 :no_ar
 echo  Servidor no ar: http://127.0.0.1:8000  ^(pasta: %~dp0^)
-start "" http://127.0.0.1:8000/
+start "" http://127.0.0.1:8000/compartilhar.html
 
 if not defined CF (
   echo.

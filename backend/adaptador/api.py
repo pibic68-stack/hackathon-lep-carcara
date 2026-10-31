@@ -224,6 +224,36 @@ def saude() -> dict:
             "formatos": sorted(EXTENSOES)}
 
 
+ARQUIVO_COMPARTILHAR = Path(__file__).resolve().parents[2] / "compartilhar.json"   # escrito pelo tunel.py
+
+
+def _do_proprio_computador(request: Request) -> bool:
+    """Pedido feito no computador que roda o PRISMA (não pelo link público nem por outro aparelho do Wi-Fi).
+    O túnel da Cloudflare chega como 127.0.0.1, mas sempre traz os cabeçalhos do visitante."""
+    if any(h in request.headers for h in ("cf-connecting-ip", "x-forwarded-for", "cf-ray")):
+        return False
+    return bool(request.client) and request.client.host in ("127.0.0.1", "::1", "localhost")
+
+
+@app.get("/api/compartilhar")
+def compartilhar(request: Request) -> dict:
+    """Link público, endereço no Wi-Fi e (só no próprio computador) as contas de demonstração."""
+    try:
+        info = json.loads(ARQUIVO_COMPARTILHAR.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        info = {}
+    local = _do_proprio_computador(request)
+    saida = {"link": info.get("link"), "rede": info.get("rede"), "estado": info.get("estado", "sem túnel"),
+             "local": local, "demo": None}
+    if local:
+        from . import demo
+        try:
+            saida["demo"] = demo.garantir()
+        except Exception as erro:              # banco travado etc.: a página segue sem as contas
+            saida["demo"] = {"erro": str(erro)}
+    return saida
+
+
 @app.get("/api/opcoes")
 def opcoes() -> dict:
     """Necessidades (lista fechada, P10.2) e figurinhas, para montar os formulários."""

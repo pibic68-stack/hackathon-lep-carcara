@@ -21,7 +21,9 @@ Configuração em `backend/.env` (modelo em `backend/.env.exemplo`, que nunca le
 - `GEMINI_API_KEY`: chave da IA. Sem ela tudo funciona, só a Leitura Fácil e a descrição automática ficam pendentes.
 - `PRISMA_CODIGO_ESCOLA`: código que o professor digita para criar conta. Sem ele, o cadastro fica fechado.
 
-**Link público para a banca:** rode `publicar.bat` (Windows). Ele liga o servidor e cria um endereço
+**Materiais de teste e preparo da apresentação:** veja `materiais-teste/LEIA-ME.md`.
+
+**Link público para a banca:** rode `publicar.bat` (Windows). Ele abre a página Compartilhar, com QR code e contas de demonstração. Ele liga o servidor e cria um endereço
 `https://...trycloudflare.com` que qualquer pessoa abre. O link só aparece depois de testado pela internet,
 já vem copiado (Ctrl+V) e fica em `link.txt`. Muda a cada vez e só funciona enquanto este computador
 e a janela estiverem ligados. Se a rede bloquear o túnel, use o celular como roteador; no mesmo Wi-Fi,

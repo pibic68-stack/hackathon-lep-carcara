@@ -190,7 +190,7 @@ class Gemini:
                     if esperas:
                         espera = esperas.pop(0)
                         try:
-                            espera = min(max(espera, float(erro.headers.get("Retry-After") or 0)), 30)
+                            espera = min(max(espera, float(erro.headers.get("Retry-After") or 0)), 10)
                         except (TypeError, ValueError, AttributeError):
                             pass
                         progresso.tentativa_extra_ia()

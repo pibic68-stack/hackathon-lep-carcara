@@ -51,6 +51,12 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
   - **Acompanhar a produção** (`backend/adaptador/progresso.py`): o site manda `X-Prisma-Acompanhar` e lê `GET /api/progresso/{codigo}` a cada segundo; o painel do professor mostra etapa, barra, tempo, pedidos à IA, novas tentativas, modelo e um diário. Botão "Testar a IA agora" (`GET /api/ia/teste`); o `publicar.bat` também testa a IA ao abrir.
   - **PDF acadêmico** (`transformacoes.arrumar_estrutura`): sumário sai, "2.1 Título" vira subtítulo, "•" vira lista, parágrafo cortado pela troca de página é juntado, setas de reação do LaTeX viram ⇌ e →. O título do material é o maior dos 10 primeiros blocos (capa com nome da instituição). Imagens limitadas a 70% da altura da tela.
 
+- Decisões de 31/10, 8h40 (perguntas respondidas pelo Adler):
+  - **IA: só Gemini por enquanto** (o Claude aguentaria, mas a API é paga). O 503 não é tamanho do PDF (cada pedido leva no máximo 6 trechos ou 1 imagem); é o Google sem capacidade no plano gratuito. Espera máxima entre tentativas: 10 s.
+  - **Materiais de teste** em `materiais-teste/` (ciclo da água, 5º ano, feitos pelo time): `1-texto-leitura-facil.pdf`, `2-imagem-cores.pdf` (legenda só de cor), `3-audio-aula.wav` e `4-video-aula.mp4` gerados no Windows por `gerar-audio-e-video.bat` (voz pt-BR do Windows + ffmpeg do imageio-ffmpeg). `gerar_materiais.py` refaz PDFs e slides.
+  - **Preparar a apresentação**: `materiais-teste/preparar-para-apresentacao.bat` (`python -m adaptador.preparar_demo`) passa os materiais pela IA com paciência (até 20 min) e guarda as respostas em `backend/cache/`; na hora, o mesmo arquivo sai em segundos.
+  - **Compartilhar**: o `publicar.bat` abre `compartilhar.html` com QR code do link (ou do endereço no Wi-Fi), botão copiar e as **contas de demonstração** (`adaptador/demo.py`: escola, professora, turma "5º ano A (demonstração)" com Bia/cores, Caio/texto direto+ouvir, Duda/letra grande; senhas sorteadas em `backend/dados/demo.json`, fora do Git). As contas só aparecem no próprio computador (pedido sem cabeçalho de proxy). QR: `web/vendor/qrcode.js` (MIT).
+
 ## Regras para o Claude
 - Responder em português.
 - Depois de uma compactação, ou se faltar contexto, reler `prompts/conversas/` e `docs/` antes de responder.

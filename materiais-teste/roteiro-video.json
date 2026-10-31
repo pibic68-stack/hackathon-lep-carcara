@@ -1,0 +1,18 @@
+[
+  {
+    "imagem": "slides/slide-1.png",
+    "fala": "Olá! Neste vídeo vamos ver o ciclo da água. A água do planeta muda de lugar e de estado o tempo todo."
+  },
+  {
+    "imagem": "slides/slide-2.png",
+    "fala": "Primeiro vem a evaporação. O Sol aquece os rios, os lagos e o mar, e uma parte da água vira vapor e sobe."
+  },
+  {
+    "imagem": "slides/slide-3.png",
+    "fala": "Depois vem a condensação. Lá no alto o ar é frio, e o vapor vira gotinhas que formam as nuvens."
+  },
+  {
+    "imagem": "slides/slide-4.png",
+    "fala": "Por fim, a precipitação. Quando as gotinhas ficam pesadas, elas caem como chuva. E o ciclo recomeça."
+  }
+]
