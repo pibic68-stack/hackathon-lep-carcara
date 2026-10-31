@@ -64,6 +64,8 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
 
 - Decisão de 31/10, 10h15: o Railway estava fora do ar; **site público na Vercel** (`app.py` + `requirements.txt` + `vercel.json` na raiz). Lá: dados em `/tmp` (zeram), sem tarefa de fundo; o primeiro "Experimentar sem cadastro" publica os 2 PDFs de teste sem IA (`demo.semear_rapido`); áudio e vídeo a professora envia (limite de 4,5 MB por envio; `maxDuration` 300 s). `render.yaml` como plano B (mesmo Dockerfile).
 
+- Plano de negócio (31/10): `pitch/plano-negocio/` (PDF gerado por `gerar_pdf.py` a partir de `modelo.py`; nunca editar o PDF à mão). Escola particular paga por tamanho: Essencial até 200 alunos R$ 9.000/ano, Escola 201 a 500 R$ 21.000, Ampliado 501 a 1.000 R$ 45.000 (âncora R$ 60/aluno/ano); semestral +10%; teste grátis de 14 dias; redes públicas a partir de 2029; R$ 500 mil de investidor-anjo (cenário base: lucro mensal em ago/2029, 310 escolas e R$ 5,4 mi de receita anual recorrente em dez/2029).
+
 ## Regras para o Claude
 - Responder em português.
 - Depois de uma compactação, ou se faltar contexto, reler `prompts/conversas/` e `docs/` antes de responder.

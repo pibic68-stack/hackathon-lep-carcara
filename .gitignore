@@ -264,3 +264,6 @@ ferramentas/
 link.txt
 web/certificado/exemplos/
 compartilhar.json
+
+# plano de negócio: o HTML é só o passo intermediário do PDF
+pitch/plano-negocio/*.html
