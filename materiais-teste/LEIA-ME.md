@@ -12,8 +12,9 @@ e para a apresentação.
 
 ## Antes da apresentação (uma vez, no computador do time)
 
-1. **Áudio e vídeo:** dois cliques em `gerar-audio-e-video.bat`. Ele usa a voz em português do Windows
-   e cria o `3-audio-aula.wav` e o `4-video-aula.mp4` (na primeira vez baixa o ffmpeg, uns 30 MB).
+1. **Áudio e vídeo:** já vêm prontos, com uma voz sintética (espeak-ng, bem robótica). Para uma voz mais natural,
+   dois cliques em `gerar-audio-e-video.bat`: ele refaz os dois com a voz em português do Windows
+   (na primeira vez baixa o ffmpeg, uns 30 MB). Refez? Rode o passo 2 de novo.
 2. **Deixar a IA pronta:** dois cliques em `preparar-para-apresentacao.bat`. Ele passa os 4 materiais pela IA
    com paciência (até 20 minutos, tentando de novo quando o Google está ocupado) e guarda as respostas.
    Na apresentação, enviar estes mesmos arquivos faz as versões saírem em segundos, sem depender do Google.

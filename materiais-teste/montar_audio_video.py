@@ -41,8 +41,12 @@ def falar(texto: str, saida: Path) -> None:
         subprocess.run([ffmpeg(), "-y", "-loglevel", "error", "-f", "lavfi", "-i",
                         f"sine=frequency=440:duration={segundos:.1f}", str(saida)], check=True)
         return
+    espeak = os.environ.get("PRISMA_ESPEAK") or (shutil.which("espeak-ng") if os.name != "nt" else None)
+    if espeak:                                        # Linux/Mac: voz do espeak-ng (mais robótica que a do Windows)
+        subprocess.run([espeak, "-v", "pt-br+f3", "-s", "150", "-p", "45", "-w", str(saida), texto], check=True)
+        return
     if os.name != "nt":
-        sys.exit("Este script usa a voz do Windows. Rode no computador do time (Windows).")
+        sys.exit("Este script usa a voz do Windows (ou o espeak-ng no Linux). Rode no computador do time.")
     with tempfile.TemporaryDirectory() as tmp:
         arquivo = Path(tmp) / "texto.txt"
         arquivo.write_text(texto, encoding="utf-8")
