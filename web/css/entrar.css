@@ -113,3 +113,8 @@
 .form-titulo { font-size: max(var(--letra-min), 1.6rem); margin: 0; }
 /* a escola usa a ilustração da escola (larga): recorta no quadrado sem distorcer */
 .perfil img, .form-cab img { object-fit: cover; }
+
+/* site público: experimentar sem cadastro */
+.demo-publica { display: grid; gap: 12px; margin: 0 0 24px; }
+.demo-publica h2 { margin: 0; }
+.demo-botoes { display: flex; flex-wrap: wrap; gap: 10px; }

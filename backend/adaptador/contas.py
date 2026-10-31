@@ -26,7 +26,9 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
 # PRISMA_BANCO permite um banco separado (testes, demonstração)
-BANCO = Path(os.environ.get("PRISMA_BANCO") or RAIZ / "dados" / "prisma.db")
+# PRISMA_DADOS: pasta de dados (na nuvem, o volume persistente; ex.: /data)
+BANCO = Path(os.environ.get("PRISMA_BANCO")
+             or (Path(os.environ["PRISMA_DADOS"]) / "prisma.db" if os.environ.get("PRISMA_DADOS") else RAIZ / "dados" / "prisma.db"))
 
 FIGURAS = ["coracao", "sol", "lua", "raio", "trofeu", "livro", "lampada", "carinha", "casa"]
 PALAVRAS_TURMA = ["SOL", "LUA", "MAR", "RIO", "IPE", "ARARA", "ONCA", "CAJU", "PITANGA", "SABIA", "TUCANO", "BOTO"]

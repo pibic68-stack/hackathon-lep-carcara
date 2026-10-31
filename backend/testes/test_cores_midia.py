@@ -250,3 +250,20 @@ class TestCompartilhar(Base if Base else unittest.TestCase):
         de_fora = self.cliente().get("/api/compartilhar", headers={"X-Forwarded-For": "1.2.3.4"}).json()
         self.assertFalse(de_fora["local"])
         self.assertIsNone(de_fora["demo"])
+
+
+@unittest.skipIf(Base is None, "fastapi/httpx não instalados")
+class TestDemoPublica(Base if Base else unittest.TestCase):
+    def test_entrar_sem_senha_so_no_modo_publico(self):
+        from adaptador import api, demo
+        with mock.patch.object(demo, "ARQUIVO", Path(self.tmp.name) / "demo.json"):
+            self.assertEqual(self.cliente().post("/api/demo/entrar", json={"perfil": "professor"}).status_code, 404)
+            with mock.patch.object(api, "DEMO_PUBLICA", True):
+                for perfil, destino in (("professor", "painel/professor.html"), ("aluno", "painel/aluno.html"),
+                                        ("familia", "painel/familia.html"), ("escola", "painel/escola.html")):
+                    c = self.cliente()
+                    r = c.post("/api/demo/entrar", json={"perfil": perfil, "aluno": 1})
+                    self.assertEqual(r.status_code, 200, r.text)
+                    self.assertEqual(r.json()["destino"], destino)
+                    self.assertEqual(c.get("/api/eu").json()["perfil"], perfil)
+                self.assertTrue(self.cliente().get("/api/saude").json()["demo_publica"])

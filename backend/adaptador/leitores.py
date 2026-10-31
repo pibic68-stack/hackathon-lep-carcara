@@ -328,6 +328,13 @@ def _texto_pptx_com_cor(paragrafo, cores: list[str]) -> str:
 
 # ---------- vídeo e áudio ----------
 
+def _titulo_do_arquivo(caminho: Path) -> str:
+    """"3-audio-aula" -> "Audio aula"; "Aula-falada-sobre-a-água" -> "Aula falada sobre a água"."""
+    nome = re.sub(r"^\d+[-_ .]*", "", caminho.stem)
+    nome = re.sub(r"[-_]+", " ", nome).strip() or caminho.stem
+    return nome[:1].upper() + nome[1:]
+
+
 def _ler_midia(caminho: Path, modelo: str, ia=None) -> Documento:
     """Transcreve o áudio. 1º faster-whisper (local, sem internet depois de baixar o modelo);
     se não estiver instalado, a IA (Gemini) ouve o arquivo; sem os dois, explica o que fazer."""
@@ -355,7 +362,7 @@ def _ler_midia(caminho: Path, modelo: str, ia=None) -> Documento:
     if atual:
         paragrafos.append(" ".join(atual))
 
-    doc = Documento(caminho.stem, [Bloco("paragrafo", texto=p) for p in paragrafos])
+    doc = Documento(_titulo_do_arquivo(caminho), [Bloco("paragrafo", texto=p) for p in paragrafos])
     _pendencia_transcricao(doc)
     return doc
 
@@ -371,7 +378,7 @@ def _ler_midia_pela_ia(caminho: Path, ia) -> Documento:
     blocos = [Bloco("paragrafo", texto=p) for p in dados["paragrafos"]]
     if dados["na_tela"]:
         blocos += [Bloco("titulo", texto="O que aparece na tela", nivel=2), Bloco("lista", itens=dados["na_tela"])]
-    doc = Documento(caminho.stem, blocos)
+    doc = Documento(_titulo_do_arquivo(caminho), blocos)
     _pendencia_transcricao(doc, pela_ia=True)
     return doc
 

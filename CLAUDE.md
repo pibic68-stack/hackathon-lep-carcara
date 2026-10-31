@@ -57,6 +57,11 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
   - **Preparar a apresentação**: `materiais-teste/preparar-para-apresentacao.bat` (`python -m adaptador.preparar_demo`) passa os materiais pela IA com paciência (até 20 min) e guarda as respostas em `backend/cache/`; na hora, o mesmo arquivo sai em segundos.
   - **Compartilhar**: o `publicar.bat` abre `compartilhar.html` com QR code do link (ou do endereço no Wi-Fi), botão copiar e as **contas de demonstração** (`adaptador/demo.py`: escola, professora, turma "5º ano A (demonstração)" com Bia/cores, Caio/texto direto+ouvir, Duda/letra grande; senhas sorteadas em `backend/dados/demo.json`, fora do Git). As contas só aparecem no próprio computador (pedido sem cabeçalho de proxy). QR: `web/vendor/qrcode.js` (MIT).
 
+- Decisões de 31/10, 10h (entrega até 13h: deploy fixo sem senha):
+  - **Duas cópias, mesmo código**: o PC (`publicar.bat`) é o da apresentação e do controle; a **nuvem no Railway** é o site público fixo para a banca. O Railway se liga ao repositório do GitHub e cada push na `main` atualiza a nuvem. Guia: `DEPLOY.md` (`Dockerfile`, `railway.json`, `backend/requirements-nuvem.txt`; volume em `/data`; variável `GEMINI_API_KEY`, de preferência outra chave para não dividir a cota com o PC).
+  - **Modo público** (`PRISMA_DEMO_PUBLICA=1`, só no Dockerfile): em Entrar aparece "Experimentar sem cadastro" (professora, alunos Bia/Caio/Duda, família, escola), entrando sem senha e sem o limite de tentativas (`POST /api/demo/entrar`). Na subida, uma tarefa em segundo plano publica os 4 materiais de teste para a turma de demonstração, tentando de novo a cada 90 s se a IA estiver ocupada (`demo.semear`); a imagem usa descrição escrita pelo time.
+  - Pastas de dados configuráveis com `PRISMA_DADOS` (banco, cache, saida, envios); porta pela variável `PORT`; `PRISMA_PROXY_CONFIAVEL=*` na nuvem.
+
 ## Regras para o Claude
 - Responder em português.
 - Depois de uma compactação, ou se faltar contexto, reler `prompts/conversas/` e `docs/` antes de responder.

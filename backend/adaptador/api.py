@@ -39,8 +39,12 @@ from . import contas, ia, pipeline, regras
 from .leitores import EXT_MIDIA, EXT_PDF, EXT_PPT, EXT_TEXTO
 
 RAIZ = Path(__file__).resolve().parents[1]
-SAIDA = RAIZ / "saida"
-ENVIOS = RAIZ / "envios"
+_DADOS = Path(os.environ["PRISMA_DADOS"]) if os.environ.get("PRISMA_DADOS") else None   # volume na nuvem
+SAIDA = (_DADOS or RAIZ) / "saida"
+ENVIOS = (_DADOS or RAIZ) / "envios"
+# Nuvem (Railway): PRISMA_DEMO_PUBLICA=1 mostra "Entrar sem senha" com as contas de demonstração
+# e publica sozinha os materiais de teste. A banca abre o site e usa, sem cadastro.
+DEMO_PUBLICA = os.environ.get("PRISMA_DEMO_PUBLICA", "").strip() in ("1", "sim", "true")
 SITE = RAIZ.parent / "web"
 
 LIMITE_BYTES = 300 * 1024 * 1024   # 300 MB (vídeos grandes devem ser comprimidos antes)
@@ -221,7 +225,7 @@ def _limitar_envios(professor_id: int) -> None:
 @app.get("/api/saude")
 def saude() -> dict:
     return {"ok": True, "ia_ligada": ia.configurada(), "cadastro_aberto": bool(contas.codigo_escola()) or contas.ha_escolas(),
-            "formatos": sorted(EXTENSOES)}
+            "formatos": sorted(EXTENSOES), "demo_publica": DEMO_PUBLICA}
 
 
 ARQUIVO_COMPARTILHAR = Path(__file__).resolve().parents[2] / "compartilhar.json"   # escrito pelo tunel.py
@@ -252,6 +256,30 @@ def compartilhar(request: Request) -> dict:
         except Exception as erro:              # banco travado etc.: a página segue sem as contas
             saida["demo"] = {"erro": str(erro)}
     return saida
+
+
+class EntradaDemo(BaseModel):
+    perfil: str                 # professor, escola, aluno, familia
+    aluno: int = 0              # qual aluno da turma de demonstração (0, 1, 2)
+
+
+@app.post("/api/demo/entrar")
+def entrar_demo(corpo: EntradaDemo, request: Request, resposta: Response) -> dict:
+    """Só no site público (PRISMA_DEMO_PUBLICA=1): entra com uma conta fictícia, sem senha."""
+    if not DEMO_PUBLICA:
+        raise HTTPException(404, "Não encontrado.")
+    if corpo.perfil not in ("professor", "escola", "aluno", "familia"):
+        raise HTTPException(422, "Perfil desconhecido.")
+    from . import demo
+    token, duracao, info = demo.abrir_sessao(corpo.perfil, corpo.aluno)
+    return _abrir_sessao(request, resposta, token, duracao, False, info)
+
+
+@app.on_event("startup")
+def _semear_demo() -> None:
+    if DEMO_PUBLICA:
+        from . import demo
+        demo.semear_em_segundo_plano()
 
 
 @app.get("/api/opcoes")
@@ -394,7 +422,13 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
         "preferencias": sorted(set(perfil_turma["preferencias"]) | set(extra.get("preferencias") or [])),
     }
     _limitar_envios(prof["id"])
+    return criar_material(prof["id"], turma_id, perfil_turma, perfil_final, nome, arquivo.file, request)
 
+
+def criar_material(prof_id: int, turma_id: int, perfil_turma: dict, perfil_final: dict, nome: str, origem,
+                   request: Request | None = None) -> dict:
+    """Guarda o arquivo, gera as versões e cria o rascunho. `origem` é um arquivo aberto (bytes)."""
+    ext = Path(nome).suffix.lower()
     id_ = uuid.uuid4().hex[:12]
     pasta_envio = ENVIOS / id_
     pasta_envio.mkdir(parents=True)
@@ -403,7 +437,7 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
 
     total = 0
     with caminho.open("wb") as saida:
-        while bloco := arquivo.file.read(1024 * 1024):
+        while bloco := origem.read(1024 * 1024):
             total += len(bloco)
             if total > LIMITE_BYTES:
                 saida.close()
@@ -412,7 +446,7 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
             saida.write(bloco)
 
     try:
-        _processar(id_, caminho, perfil_final, None, request, prof["id"])
+        _processar(id_, caminho, perfil_final, None, request, prof_id)
     except HTTPException:
         shutil.rmtree(pasta_envio, ignore_errors=True)
         shutil.rmtree(SAIDA / id_, ignore_errors=True)
@@ -421,7 +455,7 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
     _gravar(pasta, "estado.json", {
         "estado": "rascunho", "criado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "envio": f"{id_}/{caminho.name}", "perfil": perfil_final,
-        "professor_id": prof["id"], "turma_id": turma_id, "turma_nome": perfil_turma["turma"],
+        "professor_id": prof_id, "turma_id": turma_id, "turma_nome": perfil_turma["turma"],
     })
     return _detalhe(id_, pasta)
 
@@ -664,5 +698,6 @@ if __name__ == "__main__":
     import uvicorn
     # 0.0.0.0: outro aparelho no mesmo Wi-Fi também abre (http://IP-do-computador:8000). O Windows pode
     # perguntar sobre o firewall na primeira vez: "Permitir". PRISMA_HOST=127.0.0.1 deixa só neste computador.
-    uvicorn.run(app, host=os.environ.get("PRISMA_HOST", "0.0.0.0"), port=8000,
-                proxy_headers=True, forwarded_allow_ips="127.0.0.1")
+    uvicorn.run(app, host=os.environ.get("PRISMA_HOST", "0.0.0.0"), port=int(os.environ.get("PORT", "8000")),
+                # na nuvem, o proxy do serviço (Railway) traz o IP de quem acessa: PRISMA_PROXY_CONFIAVEL=*
+                proxy_headers=True, forwarded_allow_ips=os.environ.get("PRISMA_PROXY_CONFIAVEL", "127.0.0.1"))
