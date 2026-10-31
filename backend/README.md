@@ -36,7 +36,7 @@ arquivo ──► leitores.py ──► Documento (blocos) ──► transformac
 ## O que já está feito e o que falta
 
 - [x] Ler `.txt` · [x] critérios P1.1, P6.1 a P6.3 e P4.1 · [x] HTML padrão e ampliado · [x] fila de revisão · [x] cache
-- [ ] Testar PDF e PowerPoint com materiais reais (código escrito, **ainda não executado**)
+- [x] Ler PDF e PowerPoint (testado com arquivos criados nos testes) · [ ] testar com **PDFs e PowerPoints reais** de aula (layouts complicados, colunas, escaneados)
 - [ ] Testar vídeo (precisa `faster-whisper`)
 - [ ] API para o site enviar arquivos (FastAPI)
 - [ ] IA: simplificar texto (Leitura Fácil), descrever imagens, roteiro de áudio

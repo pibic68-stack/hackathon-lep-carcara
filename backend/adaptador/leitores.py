@@ -18,6 +18,7 @@ EXT_MIDIA = {".mp4", ".mkv", ".mov", ".webm", ".mp3", ".wav", ".m4a", ".ogg"}
 
 MARCA_LISTA = re.compile(r"^\s*(?:[-•–*▪●○◦])\s+(.*)$")
 MARCA_NUMERO = re.compile(r"^\s*(?:\d{1,2}|[a-z])[.)]\s+(.*)$", re.I)
+NOME_DE_ARQUIVO = re.compile(r".*\.(png|jpe?g|gif|bmp|tiff?|svg|emf|wmf|webp)$", re.I)
 
 
 def ler(caminho: Path, pasta_trabalho: Path, modelo_audio: str = "small") -> Documento:
@@ -96,7 +97,7 @@ def _ler_texto(caminho: Path) -> Documento:
 
 def _ler_pdf(caminho: Path, pasta_trabalho: Path) -> Documento:
     try:
-        import fitz  # PyMuPDF
+        import pymupdf as fitz  # PyMuPDF
     except ImportError as erro:
         raise RuntimeError("Para ler PDF instale: pip install pymupdf") from erro
 
@@ -185,6 +186,8 @@ def _ler_pptx(caminho: Path, pasta_trabalho: Path) -> Documento:
                 nome = f"img-{n_img:03d}.{forma.image.ext}"
                 (pasta_img / nome).write_bytes(forma.image.blob)
                 alt = forma._element.xpath(".//p:cNvPr")[0].get("descr") or None
+                if alt and NOME_DE_ARQUIVO.match(alt.strip()):
+                    alt = None  # o PowerPoint às vezes grava o nome do arquivo como "descrição"
                 blocos.append(Bloco("imagem", arquivo=f"imagens/{nome}", alt=alt))
             elif getattr(forma, "has_table", False) and forma.has_table:
                 linhas = [" — ".join(c.text.strip() for c in l.cells) for l in forma.table.rows]
@@ -194,7 +197,9 @@ def _ler_pptx(caminho: Path, pasta_trabalho: Path) -> Documento:
                 if len(paragrafos) == 1:
                     blocos.append(Bloco("paragrafo", texto=paragrafos[0]))
                 elif paragrafos:
-                    blocos.append(_bloco_de_linhas(paragrafos) or Bloco("lista", itens=paragrafos))
+                    b = _bloco_de_linhas(paragrafos)
+                    # vários parágrafos no mesmo quadro de slide são tópicos, mesmo sem marcador
+                    blocos.append(b if b and b.tipo != "paragrafo" else Bloco("lista", itens=paragrafos))
     primeiro = apresentacao.core_properties.title or caminho.stem
     return Documento(primeiro, blocos)
 
