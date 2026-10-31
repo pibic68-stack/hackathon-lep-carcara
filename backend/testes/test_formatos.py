@@ -3,6 +3,7 @@
 Só rodam se pymupdf / python-pptx estiverem instalados (pip install -r requirements.txt).
 """
 import sys
+import io
 import tempfile
 import unittest
 from pathlib import Path
@@ -68,7 +69,7 @@ class TestPDF(unittest.TestCase):
             cache.PASTA = antigo
         self.assertFalse(r["pode_publicar"])           # imagem sem descrição (P4.1)
         html = (Path(r["pasta"]) / "ampliada.html").read_text(encoding="utf-8")
-        self.assertIn("azul (■)", html)
+        self.assertNotIn("(■)", html)        # texto preto que só fala de cor não ganha legenda (decisão de 31/10)
         self.assertTrue((Path(r["pasta"]) / "imagens").exists())
 
     def test_cabecalho_pequeno_nao_gruda_no_titulo(self):
@@ -140,3 +141,60 @@ class TestPPTX(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+try:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas as rl_canvas
+except ImportError:  # pragma: no cover
+    rl_canvas = None
+
+
+@unittest.skipIf(rl_canvas is None, "reportlab não instalado (só para criar PDFs de teste)")
+class TestPDFQualquerLeitor(unittest.TestCase):
+    """Os mesmos casos de PDF, criados com reportlab: valem para o leitor com PyMuPDF e para o plano B (pdfminer)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _png(self):
+        from PIL import Image
+        im, b = Image.new("RGB", (120, 90), (180, 180, 180)), io.BytesIO()
+        im.save(b, "PNG")
+        b.seek(0)
+        return ImageReader(b)
+
+    def test_titulos_paragrafo_imagem_e_numero_de_pagina(self):
+        H, f = A4[1], self.dir / "aula.pdf"
+        c = rl_canvas.Canvas(str(f), pagesize=A4)
+        c.setFont("Helvetica", 26); c.drawString(72, H - 80, "O ciclo da água")
+        c.setFont("Helvetica", 18); c.drawString(72, H - 130, "As etapas")
+        c.setFont("Helvetica", 11)
+        c.drawString(72, H - 160, "A água da Terra muda de lugar e de forma o tempo todo. Ela evapora, forma nuvens,")
+        c.drawString(72, H - 174, "cai como chuva e volta aos rios e ao mar.")
+        c.drawImage(self._png(), 72, H - 450, 120, 90)
+        c.setFont("Helvetica", 10); c.drawString(300, H - 800, "1")
+        c.showPage(); c.save()
+        doc = leitores.ler(f, self.dir / "trab")
+        self.assertEqual(doc.titulo, "O ciclo da água")
+        self.assertEqual([b.tipo for b in doc.blocos], ["titulo", "paragrafo", "imagem"])
+        self.assertTrue((self.dir / "trab" / doc.blocos[2].arquivo).exists())
+
+    def test_texto_colorido_ganha_simbolo(self):
+        H, f = A4[1], self.dir / "cor.pdf"
+        c = rl_canvas.Canvas(str(f), pagesize=A4)
+        c.setFont("Helvetica", 22); c.drawString(72, H - 80, "Gráfico da turma")
+        c.setFont("Helvetica", 12)
+        c.drawString(72, H - 120, "As barras em")
+        c.setFillColorRGB(0.85, 0.1, 0.1); c.drawString(150, H - 120, "vermelho")
+        c.setFillColorRGB(0, 0, 0); c.drawString(205, H - 120, "são as meninas. Pinte de azul a sua.")
+        c.showPage(); c.save()
+        doc = leitores.ler(f, self.dir / "trab")
+        self.assertEqual(doc.cores, ["vermelho"])
+        self.assertIn("vermelho (▲)", doc.blocos[0].texto)
+        self.assertNotIn("azul (", doc.blocos[0].texto)        # "azul" escrito em preto não é cor de verdade

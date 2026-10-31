@@ -196,7 +196,8 @@
     var titulo = el("h3", { tabindex: "-1", texto: m.titulo || m.material });
     var versoes = Object.keys(m.versoes).map(function (k) {
       var v = m.versoes[k];
-      if (v.status === "pendente_ia") return el("li", {}, [el("strong", { texto: v.nome + ": " }), "precisa da IA, que está desligada."]);
+      if (v.status === "pendente_ia") return el("li", {}, [el("strong", { texto: v.nome + ": " }),
+        "precisa da IA, e a chave do Gemini não foi colocada neste computador. Feche o PRISMA, abra o publicar.bat, cole a chave quando ele pedir e use \"Gerar as versões de novo\"."]);
       if (v.status === "falhou") return el("li", {}, [el("strong", { texto: v.nome + ": " }), "não saiu. " + (v.motivo || "")]);
       return el("li", {}, [el("a", { href: Prisma.api.url(v.url), target: "_blank", rel: "noopener", texto: "Abrir a versão " + v.nome }), " (abre em outra aba)"]);
     });
@@ -219,6 +220,17 @@
     if (imagens.length && m.estado !== "publicado") partes.push(formularioImagens(m, imagens));
     var acoes = el("div", { classe: "acoes-material" });
     if (m.estado !== "publicado") acoes.appendChild(botaoAprovar(m));
+    var faltou = Object.keys(m.versoes).some(function (k) { return m.versoes[k].status === "pendente_ia" || m.versoes[k].status === "falhou"; });
+    if (faltou && m.estado !== "publicado") {
+      var refazer = el("button", { type: "button", classe: "botao botao--secundario botao--pequeno" }, [icone("reload"), " Gerar as versões de novo"]);
+      refazer.addEventListener("click", function () {
+        refazer.disabled = true;
+        avisar("Gerando as versões de novo. Pode levar um minuto.");
+        Prisma.api.refazer(m.id).then(function () { avisar("Versões geradas de novo."); return recarregar(m.id); })
+          .catch(function (e) { avisar(e.message, "erro"); refazer.disabled = false; });
+      });
+      acoes.appendChild(refazer);
+    }
     var apagar = el("button", { type: "button", classe: "botao botao--fantasma botao--pequeno", texto: "Apagar material" });
     apagar.addEventListener("click", function () {
       if (!confirm("Apagar " + (m.titulo || m.material) + "? A turma deixa de ver este material.")) return;
@@ -288,6 +300,52 @@
     }).catch(function (e) { avisar(e.message, "erro"); });
   }
 
+  /* ---------------- feedbacks dos alunos ---------------- */
+
+  function estrelasTexto(media) {
+    var cheias = Math.round(media || 0), s = "";
+    for (var i = 1; i <= 5; i++) s += i <= cheias ? "★" : "☆";
+    return s;
+  }
+
+  function montarFeedbacks(area) {
+    var lista = el("ul", { classe: "lista-feedbacks" });
+    var estado = el("div", { role: "status", "aria-live": "polite" });
+    var atualizar = el("button", { type: "button", classe: "botao botao--secundario botao--pequeno" }, [icone("reload"), " Atualizar"]);
+    area.appendChild(el("div", { classe: "painel-cab" }, [el("h2", { texto: "Feedbacks dos alunos" }), atualizar]));
+    area.appendChild(el("p", { classe: "dica", texto: "Cada aluno pode dar de 1 a 5 estrelas e deixar uma sugestão. As duas são opcionais. Quem pulou não aparece." }));
+    area.appendChild(estado);
+    area.appendChild(lista);
+    function carregar() {
+      estado.textContent = "";
+      return Prisma.api.feedbacks().then(function (mats) {
+        lista.textContent = "";
+        var publicados = mats.filter(function (m) { return m.estado === "publicado"; });
+        if (!publicados.length) { lista.appendChild(el("li", { classe: "dica", texto: "Quando você publicar um material, as avaliações da turma aparecem aqui." })); return; }
+        publicados.forEach(function (m) {
+          var corpo = m.total
+            ? el("ul", { classe: "avaliacoes-alunos" }, m.avaliacoes.map(function (a) {
+                return el("li", {}, [
+                  el("span", { classe: "quem", texto: a.aluno }),
+                  a.estrelas ? el("span", { classe: "media-estrelas", "aria-label": a.estrelas + " de 5 estrelas" }, [" " + estrelasTexto(a.estrelas)]) : el("span", { classe: "dica", texto: " sem estrelas" }),
+                  a.sugestao ? el("blockquote", { texto: a.sugestao }) : null
+                ]);
+              }))
+            : el("p", { classe: "dica", texto: "Ninguém avaliou ainda." });
+          lista.appendChild(el("li", { classe: "cartao" }, [
+            el("h3", { texto: m.titulo }),
+            el("p", { classe: "dica", texto: (m.turma ? "Turma " + m.turma + ". " : "") + m.total + (m.total === 1 ? " avaliação." : " avaliações.") }),
+            m.media ? el("p", { classe: "media-estrelas", "aria-label": "Média " + String(m.media).replace(".", ",") + " de 5" },
+              [estrelasTexto(m.media), el("strong", { texto: "média " + String(m.media).replace(".", ",") + " de 5" })]) : null,
+            corpo
+          ]));
+        });
+      }).catch(function (e) { estado.appendChild(el("p", { classe: "erro", texto: e.message })); });
+    }
+    atualizar.addEventListener("click", carregar);
+    carregar();
+  }
+
   document.addEventListener("prisma:painel", function (ev) {
     if (ev.detail.perfil !== "professor") return;
     var areaTurmas = document.getElementById("area-turmas");
@@ -299,6 +357,7 @@
     area.appendChild(el("h2", { texto: "Seus materiais" }));
     area.appendChild(listaMateriais);
     document.getElementById("painel").insertBefore(aviso, areaTurmas);
+    montarFeedbacks(document.getElementById("area-feedbacks"));
 
     Prisma.api.opcoes().then(function (o) {
       opcoes = o;

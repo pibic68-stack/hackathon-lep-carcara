@@ -26,7 +26,8 @@
 .leg-item { display: inline-flex; align-items: center; gap: 4px; }
 .leg-item i { width: 10px; height: 10px; display: inline-block; }
 .ficha-legenda--lista { list-style: none; padding: 0; display: grid; gap: 4px; }
-.ficha-legenda--lista li { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.ficha-legenda--lista { grid-template-columns: minmax(0, 1fr); }
+.ficha-legenda--lista li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
 .ficha-legenda--lista .suave { font-weight: 400; color: var(--f-suave); }
 .ficha-perguntas { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
 .bolinhas { display: inline-flex; gap: 8px; margin-left: 6px; vertical-align: middle; }
