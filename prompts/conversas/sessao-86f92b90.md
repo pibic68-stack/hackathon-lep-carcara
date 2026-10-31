@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `86f92b90`
 
 - **Início:** 31/10 00:10
-- **Mensagens do time:** 2
-- **Exportado em:** 31/10/2026 00:23
+- **Mensagens do time:** 3
+- **Exportado em:** 31/10/2026 00:31
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -229,3 +229,129 @@ Refiz o certificado do zero: a logo da PRISMA está no centro e o mascote da tri
 Testei com um nome de oito palavras. Ele quebra em duas linhas e não encosta no resto.
 
 O jeito de ligar no site não mudou: `PrismaCertificado.abrir({ papel, nome })`, ou o `gerar_pdf.py` pelo backend. Atualizei o [LEIA-ME.md](web/certificado/LEIA-ME.md) e a linha da decisão no `CLAUDE.md`.
+
+
+---
+
+## 🧑 Time · 31/10 00:27
+
+Pode tirar o uma aula entra, várias versões saem. Deixe os raios de luz de saida menos paralelos eles podem se espalhar mais, fora isso, está excelente. Após gerar isso, gere também uma explicação pro meu amigo szpigel de como implementar isso no site
+
+
+## 🤖 Claude · 31/10 00:28
+
+Vou tirar as legendas e abrir os raios em leque. Para os raios de cima terem espaço, preciso mover o mascote para o canto de cima à esquerda; o resto fica igual.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `ccd_turn / update_plan`
+- 🔧 `Bash`: Fan out rays, remove labels, move mascot, regenerate
+- 🔧 `Read`: C:\Users\RICARD~1\AppData\Local\Temp\claude\C--Users-Ricardo-Coelho-Desktop-Hackaton-hackathon-lep-carcara--claude-worktrees-minicurso-completion-certificates-fbe1c8\86f92b90-47ea-48cc-b1da-9d55aa2642f4\scratchpad\v4-certificado-professor.pdf.png
+- 🔧 `Read`: C:\Users\RICARD~1\AppData\Local\Temp\claude\C--Users-Ricardo-Coelho-Desktop-Hackaton-hackathon-lep-carcara--claude-worktrees-minicurso-completion-certificates-fbe1c8\86f92b90-47ea-48cc-b1da-9d55aa2642f4\scratchpad\v4-longo.pdf.png
+
+</details>
+
+
+## 🤖 Claude · 31/10 00:28
+
+Leque ficou bom. Só corrijo um tiquinho de pixel solto no fim de cada raio, junto à moldura.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Fix ray end ticks and regenerate PDFs
+- 🔧 `Read`: C:\Users\RICARD~1\AppData\Local\Temp\claude\C--Users-Ricardo-Coelho-Desktop-Hackaton-hackathon-lep-carcara--claude-worktrees-minicurso-completion-certificates-fbe1c8\86f92b90-47ea-48cc-b1da-9d55aa2642f4\scratchpad\v5.png
+
+</details>
+
+
+## 🤖 Claude · 31/10 00:28
+
+Certificado pronto. Agora vejo como o mini curso e o login funcionam, para o guia do Szpigel apontar os lugares certos.
+
+<details><summary>Ações executadas pelo Claude (7)</summary>
+
+- 🔧 `ccd_turn / update_plan`
+- 🔧 `Bash`: Inspect instruções build, quiz, API and auth
+- 🔧 `Bash`: Read session endpoint, auth helpers, build details
+- 🔧 `Bash`: Read session data shape and build base path
+- 🔧 `Bash`: Check course progress tracking and build
+- 🔧 `Bash`: Find site button and input classes
+- 🔧 `Bash`: Locate .btn and .campo styles
+
+</details>
+
+
+## 🤖 Claude · 31/10 00:29
+
+Escrevendo o guia do Szpigel. Depois vou testar o código do guia numa cópia temporária da aba Instruções e desfazer em seguida, para garantir que ele funciona.
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `Write`: C:\Users\Ricardo Coelho\Desktop\Hackaton\hackathon-lep-carcara\.claude\worktrees\minicurso-completion-certificates-fbe1c8\docs\certificado-como-implementar.md
+
+</details>
+
+
+## 🤖 Claude · 31/10 00:30
+
+Agora testo o código do guia de verdade: aplico numa cópia temporária, gero a página, clico no fluxo e desfaço tudo depois.
+
+<details><summary>Ações executadas pelo Claude (10)</summary>
+
+- 🔧 `Bash`: Check api imports and instruções status
+- 🔧 `Bash`: Temporarily apply guide code and rebuild
+- 🔧 `Claude_Browser / preview_start`
+- 🔧 `Claude_Browser / navigate`: http://localhost:8765/prisma-instrucoes/index.html#curso
+- 🔧 `Claude_Browser / javascript_tool`
+- 🔧 `Claude_Browser / read_console_messages`
+- 🔧 `Claude_Browser / browser_batch`
+- 🔧 `Claude_Browser / browser_batch`
+- 🔧 `Claude_Browser / browser_batch`
+- 🔧 `Claude_Browser / browser_batch`
+
+</details>
+
+
+## 🤖 Claude · 31/10 00:30
+
+Ficou certo e no estilo do site. Desfaço a mudança temporária na aba Instruções.
+
+<details><summary>Ações executadas pelo Claude (5)</summary>
+
+- 🔧 `Bash`: Revert temporary test changes to the site
+- 🔧 `Claude_Browser / preview_stop`
+- 🔧 `Bash`: Rebuild clean page, update guide and notes
+- 🔧 `SendUserFile`
+- 🔧 `ccd_turn / wrap_up`
+
+</details>
+
+
+## 🤖 Claude · 31/10 00:31
+
+Tirei as legendas, os raios agora se abrem em leque, e o guia para o Szpigel está pronto.
+
+**O que mudou no certificado:**
+- As frases "uma aula entra" e "várias versões saem" saíram.
+- Os seis raios agora se espalham bem mais. Na saída da logo eles ocupam uns 4 cm de altura; na moldura, uns 10 cm. Cada raio continua o ângulo do raio da própria logo e sobe ou desce em degraus de pixel.
+- **Mudei o mascote de lugar:** ele foi para o canto de cima à **esquerda**. À direita, o raio vermelho de cima ia passar por cima dele. Se preferir o mascote à direita, dá para fazer, mas o leque de cima teria que ficar mais fechado.
+
+**O guia do Szpigel:** [docs/certificado-como-implementar.md](docs/certificado-como-implementar.md). Ele explica, com o código pronto para colar:
+- onde mexer: só na fonte da aba Instruções, rodando o gerador da página depois;
+- como mostrar a caixa "Você concluiu o mini curso" com o campo do nome e o botão "Baixar certificado" quando a pessoa termina o mini-check;
+- como deixar o nome já preenchido quando a pessoa está logada;
+- como testar, passo a passo;
+- a opção de baixar o PDF direto pelo backend, sem a janela do navegador;
+- os cuidados.
+
+**Dois cuidados que estão no guia:**
+- O login da família guarda "Família de Lia", não o nome da pessoa. Por isso, para a família, o campo do nome vem vazio.
+- O certificado diz "concluiu os dez passos", mas hoje o site só sabe se o mini-check terminou. Para exigir os dez passos, alguém precisa programar isso.
+
+Para garantir que o guia funciona, apliquei o código dele no site e testei o fluxo inteiro:
+- a caixa aparece quando o mini-check termina;
+- sem nome, aparece um aviso;
+- com nome, abre o certificado certo;
+- ao trocar de trilha, a caixa some.
+
+Depois desfiz tudo: o site está igual ao que estava.
