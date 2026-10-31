@@ -1,6 +1,6 @@
 # Plano de negócio do PRISMA
 
-O PDF para a banca é `plano-de-negocio-prisma.pdf` (13 páginas). Ele é **gerado**: não edite o PDF à mão.
+O PDF para a banca é `plano-de-negocio-prisma.pdf`: 27 slides em 16:9. Ele é **gerado**: não edite o PDF à mão.
 
 | Arquivo | Para que serve |
 |---|---|
