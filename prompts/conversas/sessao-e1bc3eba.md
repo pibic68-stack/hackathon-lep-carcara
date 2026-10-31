@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 12
-- **Exportado em:** 31/10/2026 10:01
+- **Mensagens do time:** 13
+- **Exportado em:** 31/10/2026 10:04
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -904,3 +904,34 @@ Se o deploy falhar, me mandem um print do erro em **Deployments › Build Logs**
 Sources:
 - [Vercel: Python runtime](https://vercel.com/docs/functions/runtimes/python?from=graph)
 - [Vercel: limites das funções](https://vercel.com/docs/functions/limitations?from=graph)
+
+
+---
+
+## 🧑 Time · 31/10 10:04
+
+Error: [FASTAPI_ENTRYPOINT_NOT_FOUND] No FastAPI entrypoint found in default locations, but found potential entrypoints:
+  adaptador/api.py (variable: app)
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `Bash`: Confirm app.py is on GitHub main
+
+</details>
+
+
+## 🤖 Claude · 31/10 10:04
+
+O `app.py` está na raiz do repositório, no GitHub. Pelo caminho que a Vercel mostrou (`adaptador/api.py`, sem `backend/` na frente), ela está olhando só dentro da pasta `backend`. Isso acontece quando o **Root Directory** do projeto ficou como `backend`, e aí ela não acha a entrada `app.py` nem as pastas `web` e `materiais-teste`.
+
+Para corrigir:
+1. No projeto da Vercel, abra **Settings › Build and Deployment** (em alguns painéis o nome é **General**) e procure **Root Directory**.
+2. Deixe o campo vazio, ou com `./` (a raiz do repositório), e salve.
+3. Em **Framework Preset**, escolha **FastAPI** ou **Other**.
+4. Em **Deployments**, abra os três pontinhos do último deploy, clique em **Redeploy** e desmarque "Use existing Build Cache".
+
+Se o projeto foi criado antes da minha atualização das 10h, o redeploy já pega a versão nova, com o `app.py`. Para conferir, o deploy deve mostrar o commit `4a7db38` ou mais novo.
+
+Se a opção do Root Directory não aparecer, apague o projeto na Vercel e importe de novo. Na tela de importação, deixe o Root Directory em `./` antes de clicar em Deploy.
+
+Se der outro erro, me mande o texto do erro e eu ajusto o repositório.
