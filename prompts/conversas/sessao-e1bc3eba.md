@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 2
-- **Exportado em:** 31/10/2026 02:05
+- **Mensagens do time:** 3
+- **Exportado em:** 31/10/2026 02:08
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -182,3 +182,36 @@ O novo `.bat`:
 - **Erro de servidor:** ele manda olhar a janela "PRISMA servidor", que fica na barra de tarefas e mostra o erro.
 
 Extraia o zip inteiro e abra o `publicar.bat` da pasta extraída, não de dentro do zip. Se ainda assim der problema, mande um print do texto que aparecer na janela. Se o Python não estiver instalado, será preciso instalar, marcando "Add python.exe to PATH". Já subi o `.bat` novo para o GitHub, com o `ferramentas/` fora do Git, e anotei a mudança no `CLAUDE.md`.
+
+
+---
+
+## 🧑 Time · 31/10 02:08
+
+nao ta funcionando. esse é o jeito mais funcional msm?
+
+<details><summary>Ações executadas pelo Claude (3)</summary>
+
+- 🔧 `Bash`: Add automatic Python install via winget
+- 🔧 `Bash`: Quote python path, commit, push
+- 🔧 `SendUserFile`
+
+</details>
+
+
+## 🤖 Claude · 31/10 02:08
+
+Não é o jeito mais prático, e o erro no print é só o Python não estar instalado no seu PC. O `.bat` funcionou como devia: avisou o que faltava, em vez de fechar.
+
+**O que fiz agora:** mandei um `publicar.bat` novo, que tenta instalar o Python sozinho pelo Windows (comando `winget`). Basta trocar o arquivo antigo por este, na pasta extraída, e abrir de novo. Ele instala o Python, depois as bibliotecas, depois baixa o `cloudflared`, liga o servidor e abre o site. Só a primeira vez demora uns 5 minutos; nas seguintes abre em segundos.
+
+Eu não tenho Windows aqui, então não testei esse `.bat`. Se o `winget` não existir no seu Windows, ele cai na mensagem pedindo para instalar o Python à mão, em python.org. Nesse caso, marque "Add python.exe to PATH" na primeira tela. Se der erro de novo, me mande um print.
+
+**Sobre ser o melhor jeito:** para a demo do hackathon, não. Rodar do PC tem três problemas:
+- o link muda toda vez;
+- o site cai se o computador dormir ou a rede da escola bloquear;
+- cada colega precisa repetir essa instalação.
+
+O mais prático seria hospedar o backend em um serviço de nuvem (Render ou Railway, por exemplo). Aí o site teria um endereço fixo, sempre no ar, sem instalar nada. Isso exige conta no serviço e a chave do Gemini colocada lá, o que vocês precisam fazer. Eu preparo os arquivos de deploy e um passo a passo. Um cuidado: no plano gratuito desses serviços o banco e os arquivos podem se perder quando reinicia, então seria só para demonstração.
+
+Quer que eu prepare isso agora?
