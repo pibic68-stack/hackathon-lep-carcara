@@ -226,7 +226,9 @@ def _limitar_envios(professor_id: int) -> None:
 @app.get("/api/saude")
 def saude() -> dict:
     return {"ok": True, "ia_ligada": ia.configurada(), "cadastro_aberto": bool(contas.codigo_escola()) or contas.ha_escolas(),
-            "formatos": sorted(EXTENSOES), "demo_publica": DEMO_PUBLICA}
+            "formatos": sorted(EXTENSOES), "demo_publica": DEMO_PUBLICA,
+            # a Vercel recusa pedidos acima de 4,5 MB antes de chegarem ao PRISMA (erro 413)
+            "limite_envio_mb": 4.5 if NA_VERCEL else LIMITE_BYTES // (1024 * 1024)}
 
 
 ARQUIVO_COMPARTILHAR = Path(__file__).resolve().parents[2] / "compartilhar.json"   # escrito pelo tunel.py

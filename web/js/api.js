@@ -17,6 +17,7 @@ Prisma.api = (function () {
     if (typeof d === "string") return d;
     if (d && d.erro) return d.erro + (d.bloqueios ? " " + d.bloqueios.join(" ") : "");
     if (resposta.status === 429) return "Muitos pedidos seguidos. Espere um pouco e tente de novo.";
+    if (resposta.status === 413) return "O arquivo é grande demais para o site público (até 4,5 MB). Envie um arquivo menor, corte o vídeo, ou use o PRISMA no computador do time.";
     if (Array.isArray(d) && d[0] && d[0].msg) return "Dados inválidos: " + d[0].msg;
     return "Algo deu errado (código " + resposta.status + ").";
   }

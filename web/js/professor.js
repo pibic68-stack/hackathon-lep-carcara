@@ -11,7 +11,12 @@
   var ESTADOS = { rascunho: ["etiqueta--sol", "Esperando a sua aprovação"], publicado: ["etiqueta--ok", "Publicado para a turma"] };
   var opcoes = { necessidades: {}, preferencias: {} };
   var turmas = [];
-  var aviso, listaTurmas, listaMateriais, seletorTurma, estaOcupado = false;
+  var aviso, listaTurmas, listaMateriais, seletorTurma, estaOcupado = false, limiteMb = 0;
+  Prisma.api.saude().then(function (s) {
+    limiteMb = s.limite_envio_mb || 0;
+    var dica = document.getElementById("dica-arquivo");
+    if (dica && limiteMb && limiteMb < 10) dica.textContent += " Neste site público, cada arquivo pode ter até " + String(limiteMb).replace(".", ",") + " MB.";
+  }).catch(function () { /* sem limite conhecido */ });
 
   function el(tag, attrs, filhos) {
     var n = document.createElement(tag);
@@ -223,8 +228,9 @@
     }, function (e) {
       ativo = false;
       return Prisma.api.progresso(codigo).catch(function () { return null; }).then(function (p) {
-        if (p && p.terminou) desenharProducao(p);
-        else desenharProducao({ etapa: "Deu errado: " + e.message, terminou: true, segundos: (Date.now() - inicio) / 1000, diario: [], ia: {} });
+        if (p && p.terminou && p.erro) desenharProducao(p);
+        else desenharProducao({ etapa: "Deu errado: " + e.message, terminou: true, erro: e.message,
+                                segundos: (Date.now() - inicio) / 1000, diario: (p && p.diario) || [], ia: (p && p.ia) || {} });
         throw e;
       });
     });
@@ -269,6 +275,12 @@
       if (estaOcupado) return;
       if (!arq.files.length) { avisar("Escolha o arquivo da aula primeiro.", "erro"); arq.focus(); return; }
       if (!seletorTurma.value) { avisar("Crie uma turma antes de enviar o material.", "erro"); return; }
+      var mb = arq.files[0].size / (1024 * 1024);
+      if (limiteMb && mb > limiteMb) {
+        avisar("Este arquivo tem " + mb.toFixed(1).replace(".", ",") + " MB e o limite aqui é de " + String(limiteMb).replace(".", ",") +
+          " MB. Envie um arquivo menor (um trecho do vídeo, por exemplo) ou use o PRISMA no computador do time.", "erro");
+        return;
+      }
       ocupar(botao, true, "Adaptando… Acompanhe logo abaixo cada etapa e o tempo da IA.");
       acompanhar("Acompanhar a produção: " + arq.files[0].name, function (codigo) {
         return Prisma.api.adaptar(arq.files[0], seletorTurma.value, null, codigo);

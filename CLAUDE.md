@@ -71,6 +71,8 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
   - **Login na Vercel voltava para Entrar**: cada pedido cai numa cópia diferente do servidor, cada uma com seu `/tmp`. Correção: `backend/adaptador/estado_nuvem.py` guarda a pasta de dados (banco, materiais, cache) como .tar.gz num Postgres (Neon, em Storage da Vercel; variável `DATABASE_URL`) e cada cópia baixa a versão mais nova antes do pedido e sobe depois de mudar algo. Ligado em `app.py`. Sem `DATABASE_URL`, nada muda.
   - **Cadastro da escola com pagamento**: plano (Essencial até 200 alunos, Escola até 500, Ampliado até 1.000), assinatura (semestral R$ 4.950 / 11.550 / 24.750; anual R$ 9.000 / 21.000 / 45.000, do plano de negócio) e forma de pagamento (Pix ou cartão). Botão "Confirmar e criar a conta da escola"; depois aparece "Conta da escola criada!" com o resumo e "Pagamento: em breve" (nenhum dado de Pix ou cartão é pedido). O painel da escola mostra a assinatura. Guardado nas colunas `plano`, `periodo`, `pagamento` de `escolas`.
 
+- 31/10, 12h: o erro 413 na Vercel era o limite de 4,5 MB por envio (vídeo do WhatsApp), não a IA. O painel agora avisa antes de enviar (`limite_envio_mb` em `/api/saude`) e traduz o 413; o quadro de produção mostra "Deu errado" quando o envio falha.
+
 ## Regras para o Claude
 - Responder em português.
 - Depois de uma compactação, ou se faltar contexto, reler `prompts/conversas/` e `docs/` antes de responder.
