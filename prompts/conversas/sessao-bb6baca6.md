@@ -1,7 +1,7 @@
 # Conversa com IA · sessão `bb6baca6`
 
 - **Início:** 30/10 20:09
-- **Mensagens do time:** 20
+- **Mensagens do time:** 21
 - **Exportado em:** 31/10/2026 11:28
 - **Ferramenta:** Claude (Anthropic)
 
@@ -2449,3 +2449,30 @@ Com 14 dias de teste grátis. Para convencer a banca, o PDF mostra três compara
 - **Fontes a conferir:** dislexia (5%) vem de uma citação da ABD em jornal, e o valor do Fundeb 2026 vem de uma portaria que não abri no original. Vale o Adler conferir as duas.
 - **Para mudar qualquer número:** edite `pitch/plano-negocio/modelo.py` e rode `gerar_pdf.py`. O PDF se refaz sozinho.
 - **Pasta `backend/cache/`:** apareceu sem dono no repositório. Não é deste trabalho, então deixei de fora do commit.
+
+
+---
+
+## 🧑 Time · 31/10 11:28
+
+Sim, enviar
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Commit the business plan and push to main
+- 🔧 `ccd_turn / wrap_up`
+
+</details>
+
+
+## 🤖 Claude · 31/10 11:28
+
+Enviado. O plano de negócio está na `main` do GitHub (commit `3598e92`), na pasta `pitch/plano-negocio/`:
+- **`plano-de-negocio-prisma.pdf`:** o documento para a banca.
+- **`modelo.py`:** todos os números e hipóteses.
+- **`gerar_pdf.py`:** refaz o PDF depois de mudar um número.
+- **`README.md`:** como mudar um número e as decisões que vocês tomaram.
+
+As decisões também ficaram registradas no `CLAUDE.md`. A pasta `backend/cache/` ficou de fora do commit.
+
+Antes de apresentar, vale o Adler conferir duas fontes: a prevalência de dislexia (5%, que veio de uma citação da ABD em jornal) e o valor do Fundeb 2026.
