@@ -43,7 +43,8 @@
 .form-cab { display: flex; gap: 16px; align-items: center; margin-bottom: 20px; }
 .form-cab img { width: 80px; height: 80px; box-shadow: 0 0 0 3px var(--cor-borda), 5px 5px 0 3px var(--cor-sombra); }
 .form-cab .rotulo { margin-bottom: .25rem; }
-.form-cab h1 { margin: 0; }
+.form-cab h1 { margin: 0; overflow-wrap: anywhere; }
+.form-cab > div { min-width: 0; }
 
 .form { display: grid; gap: 18px; margin-bottom: 20px; }
 .campo { display: grid; gap: 6px; border: 0; padding: 0; margin: 0; min-width: 0; }
@@ -97,7 +98,8 @@
 .painel { padding-block: clamp(32px, 6vw, 72px) 96px; }
 .painel-cab { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 32px; }
 .painel-cab img { width: 96px; height: 96px; object-fit: cover; box-shadow: 0 0 0 3px var(--cor-borda), 5px 5px 0 3px var(--cor-sombra); }
-.painel-cab h1 { margin: 0; }
+.painel-cab h1 { margin: 0; overflow-wrap: anywhere; }
+.painel-cab > div { min-width: 0; flex: 1 1 12rem; }
 .painel-cab .botao { margin-left: auto; }
 .painel-grade { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
 .painel-grade .cartao { display: grid; gap: 8px; align-content: start; min-height: 170px; }

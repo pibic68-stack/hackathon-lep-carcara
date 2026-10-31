@@ -2,7 +2,7 @@
 
 > **Uma aula entra e várias versões saem.** A Sala de Materiais é a biblioteca que os alunos acessam.
 
-Time **Carcará 3301** · Hackathon LEP (Educação)
+Time **Carcará 3301** · Hackathon LEPV (Educação)
 
 > Time de alunos do IME no hackathon da Liga de Empreendedorismo da Praia Vermelha.
 > **Trilhas:** 1 (Inclusão e acessibilidade) + 4 (Aprendizagem individualizada).

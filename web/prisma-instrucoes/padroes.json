@@ -2,8 +2,8 @@
   "plataforma": "PRISMA",
   "sigla": "Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis",
   "lema": "Uma aula entra e várias versões saem. A Sala de Materiais é a biblioteca que os alunos acessam.",
-  "versao": "1.0",
-  "atualizado": "2026-10-30",
+  "versao": "1.1",
+  "atualizado": "2026-10-31",
   "niveis_de_evidencia": {
     "dados": "Estudo com dados coletados: questionário, experimento, estatística oficial.",
     "pratica": "Relato de prática, revisão de literatura ou estudo qualitativo.",
@@ -94,7 +94,7 @@
     },
     {
       "etapa": "Acompanhar",
-      "texto": "O mini-check mostra se a turma aprendeu. Quando vai mal, a plataforma sugere um ajuste e o ciclo recomeça.",
+      "texto": "Cada aluno pode avaliar a aula com 1 a 5 estrelas e deixar uma sugestão. O professor lê os feedbacks e ajusta a próxima versão. O ciclo recomeça.",
       "padroes": [
         "P9"
       ]
@@ -186,8 +186,8 @@
       ]
     },
     {
-      "nome": "Mini-check",
-      "texto": "Três perguntas curtas para conferir se a turma aprendeu, em todas as versões.",
+      "nome": "Feedbacks dos alunos",
+      "texto": "Estrelas de 1 a 5 e sugestões de cada aluno, por material, com a média da turma.",
       "padroes": [
         "P9"
       ]
@@ -213,22 +213,22 @@
         "Números positivos e negativos com sinal + e −, mesmo quando pintados de cores diferentes"
       ],
       "como_a_plataforma_aplica": [
-        "Procura no texto frases que dependem de cor (\"marque em vermelho\", \"a parte verde\") e acrescenta um símbolo ou palavra",
+        "Lê a cor de verdade do material (texto colorido, imagem ou desenho colorido) e acrescenta um símbolo ao trecho colorido, com legenda no topo. A palavra \"vermelho\" escrita no texto, sozinha, não muda nada",
         "Troca preenchimentos coloridos de gráficos e tabelas por cor + textura + rótulo",
         "Não recolore fotos automaticamente: oferece uma versão com mais contraste como opção"
       ],
       "criterios": [
         {
           "id": "P1.1",
-          "criterio": "Frases que mandam usar ou procurar uma cor recebem também um símbolo ou palavra.",
-          "como_medir": "Busca no texto por nomes de cores perto de verbos como marcar, pintar, ver, observar, circular.",
-          "limite": "0 ocorrências sem símbolo",
+          "criterio": "Trecho de texto colorido no original recebe também um símbolo, explicado numa legenda.",
+          "como_medir": "O leitor do arquivo compara a cor de cada letra com preto, branco e cinza. Título colorido é estilo e fica de fora.",
+          "limite": "0 trechos coloridos sem símbolo",
           "automacao": "automatico"
         },
         {
           "id": "P1.2",
           "criterio": "Gráficos e tabelas não usam legenda só de cor.",
-          "como_medir": "Cada série tem rótulo de texto direto ou padrão de preenchimento.",
+          "como_medir": "Imagem ou desenho colorido vira aviso para o professor: a descrição precisa dizer o que cada cor representa.",
           "limite": "100% das séries rotuladas",
           "automacao": "ia_revisao"
         },
@@ -463,7 +463,7 @@
         {
           "id": "P3.8",
           "criterio": "O texto é testado com o público.",
-          "como_medir": "Resultado do mini-check por versão (ver P9).",
+          "como_medir": "Avaliação dos alunos (estrelas e sugestões) por versão (ver P9).",
           "limite": "Ver P9.4",
           "automacao": "automatico"
         }
@@ -863,30 +863,30 @@
     {
       "id": "P9",
       "nome": "Material vivo",
-      "regra": "O material se ajusta durante o ensino. Cada versão tem um mini-check, o professor acompanha o resultado e a plataforma sugere ajustes.",
+      "regra": "O material se ajusta durante o ensino. Cada aluno pode avaliar a aula com estrelas e uma sugestão; o professor lê os feedbacks e ajusta a próxima versão.",
       "em_palavras_simples": "Um material adaptado não nasce pronto. Ele vai sendo construído durante as aulas, conforme o professor vê o que funciona para cada aluno. A plataforma guarda esse histórico e ajuda a melhorar o material a cada uso.",
       "exemplos": [
-        "Três perguntas no fim de cada versão",
-        "\"Metade da turma errou a pergunta 2 na versão Padrão. Quer oferecer a atividade concreta?\"",
+        "De 1 a 5 estrelas ao lado de cada material, e uma sugestão de até 150 palavras",
+        "\"Média 2,6 estrelas na versão Padrão. Uma sugestão diz: não entendi a pergunta 2.\"",
         "Histórico com cada edição do material"
       ],
       "como_a_plataforma_aplica": [
-        "Gera um mini-check igual em todas as versões",
-        "Mostra ao professor os resultados por versão, sem expor o aluno",
-        "Sugere um ajuste quando o resultado fica abaixo do esperado",
+        "Mostra 5 estrelas e um campo de sugestão em cada material da biblioteca do aluno. As duas coisas são opcionais e dá para pular",
+        "Mostra ao professor, na área de feedbacks, a média e o que cada aluno escreveu",
+        "Aponta as versões com média baixa para o professor olhar primeiro",
         "Guarda o histórico de edições"
       ],
       "criterios": [
         {
           "id": "P9.1",
-          "criterio": "Cada material tem mini-check com as mesmas perguntas em todas as versões.",
-          "como_medir": "Perguntas cadastradas.",
-          "limite": "3 perguntas",
-          "automacao": "ia_revisao"
+          "criterio": "Cada material publicado aceita avaliação do aluno: 1 a 5 estrelas e sugestão, as duas opcionais.",
+          "como_medir": "Avaliação ligada ao material e ao aluno; o aluno pode pular.",
+          "limite": "Sugestão de até 150 palavras",
+          "automacao": "automatico"
         },
         {
           "id": "P9.2",
-          "criterio": "Registrar a versão escolhida e o acerto do mini-check, sem dados de saúde.",
+          "criterio": "Registrar só a nota e a sugestão, sem dados de saúde.",
           "como_medir": "Modelo de dados.",
           "limite": "Só dados pedagógicos",
           "automacao": "automatico"
@@ -900,9 +900,9 @@
         },
         {
           "id": "P9.4",
-          "criterio": "Alerta quando o acerto fica baixo.",
-          "como_medir": "Acerto médio da turma numa versão.",
-          "limite": "< 60% gera sugestão de ajuste (projeto)",
+          "criterio": "Alerta quando a avaliação fica baixa.",
+          "como_medir": "Média de estrelas da turma numa versão.",
+          "limite": "< 3 estrelas gera alerta ao professor (projeto)",
           "automacao": "automatico"
         }
       ],
@@ -922,7 +922,7 @@
         {
           "tipo": "pratica",
           "texto": "O ciclo diagnosticar, recomendar, agir e medir de novo foi apresentado como caminho na palestra de abertura do hackathon.",
-          "fonte": "Palestra LEP 2026"
+          "fonte": "Palestra LEPV 2026"
         },
         {
           "tipo": "pratica",

@@ -163,7 +163,7 @@ Uso: livro, lápis, olho, volume, usuário, usuários, cadeado, check, gráfico,
 7. **Princípios** (5 cartões com ícone): Identificar barreiras, nunca diagnosticar · O professor aprova ·
    Mesmo conteúdo para todos · Alunos fictícios (LGPD) · Interface acessível.
 8. **Chamada final**: "Comece pela sua turma" + botão Entrar.
-9. **Rodapé**: grama pixel, Time Carcará 3301 · IME · Hackathon LEP, link do GitHub.
+9. **Rodapé**: grama pixel, Time Carcará 3301 · IME · Hackathon LEPV, link do GitHub.
 
 Textos: tirados do README e da divisão de tarefas. **Nenhum número de estatística** entra antes de a
 pesquisa confirmar a fonte; onde precisar, fica `[dado a confirmar]`.

@@ -238,7 +238,7 @@ def documento(css_fontes):
     <li><b>Famílias</b><span>Parte 9, em linguagem simples.</span></li>
     <li><b>Estudantes</b><span>Parte 10, em Leitura Fácil.</span></li>
   </ul>
-  <p class="nota-capa">Este manual segue as próprias regras. O texto usa a Atkinson Hyperlegible Next, criada para leitores com baixa visão. Os títulos usam a Pixelify Sans, a fonte pixel do site, só em frases curtas. Os números ficam sempre na fonte do texto. O texto é alinhado à esquerda, e nenhuma informação passa só por cor. Time Carcará 3301, Hackathon LEP 2026.</p>
+  <p class="nota-capa">Este manual segue as próprias regras. O texto usa a Atkinson Hyperlegible Next, criada para leitores com baixa visão. Os títulos usam a Pixelify Sans, a fonte pixel do site, só em frases curtas. Os números ficam sempre na fonte do texto. O texto é alinhado à esquerda, e nenhuma informação passa só por cor. Time Carcará 3301, Hackathon LEPV 2026.</p>
 </section>
 
 <section class="parte">
@@ -331,7 +331,7 @@ def documento(css_fontes):
   <ul class="limites">
     <li><b>A PRISMA não faz diagnóstico.</b> Se a família ou a escola notar dificuldades persistentes, o caminho é procurar a equipe da escola. Também vale procurar um profissional de saúde.</li>
     <li><b>A IA pode errar.</b> Uma simplificação pode mudar o sentido de um conceito, e modelos de linguagem podem inventar informação. Por isso nenhuma versão é publicada sem revisão (P10) e os conceitos-chave são conferidos (P3.7).</li>
-    <li><b>Simplificar não garante compreensão.</b> As pesquisas com leitores reais têm resultados variados. Por isso existe o mini-check (P9).</li>
+    <li><b>Simplificar não garante compreensão.</b> As pesquisas com leitores reais têm resultados variados. Por isso existe a avaliação dos alunos, com estrelas e sugestão (P9).</li>
     <li><b>Não substitui pessoas.</b> AEE, intérprete de Libras, guia-intérprete, professor de apoio e transcrição profissional em braile continuam necessários. A PRISMA não gera Libras.</li>
     <li><b>Recolorir imagens não serve para todos</b> os tipos de daltonismo. A regra principal é acrescentar símbolos e rótulos.</li>
     <li><b>Muitas evidências vêm de estudos pequenos</b> e qualitativos. Os parâmetros marcados como ○ Projeto precisam ser testados.</li>

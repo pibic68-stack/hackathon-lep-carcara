@@ -282,8 +282,10 @@ def sair(request: Request, resposta: Response) -> dict:
 
 
 @app.get("/api/eu")
-def eu(request: Request) -> dict:
-    return exigir(request)
+def eu(request: Request) -> dict | None:
+    """Quem está logado, ou null. Sem 401 aqui: as páginas públicas perguntam isso o tempo todo
+    e um erro no console a cada visita assusta quem abre o F12."""
+    return usuario(request)
 
 
 # ---------- turmas e alunos (professor) ----------

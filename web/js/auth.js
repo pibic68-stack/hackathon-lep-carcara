@@ -88,7 +88,7 @@ Prisma.auth = (function () {
     },
 
     sessao: function () {
-      return pedir("/api/eu").then(function (r) { return r.ok ? r.json() : null; }, function () { return null; });
+      return pedir("/api/eu").then(function (r) { return r.ok ? r.json().catch(function () { return null; }) : null; }, function () { return null; });
     },
 
     exigir: function (perfil) {

@@ -180,7 +180,7 @@ svg.deco { position: absolute; inset: 0; width: 297mm; height: 210mm; }
 
   <p class="para centro">Conferido a</p>
   <p class="nome" id="c-nome-saida">Nome da pessoa</p>
-  <p class="motivo centro" id="c-motivo">por concluir os dez passos e o mini-check da trilha para professores</p>
+  <p class="motivo centro" id="c-motivo">por concluir os dez passos e o teste final da trilha para professores</p>
 
   <p class="emitido" id="c-emitido">Emitido em 31 de outubro de 2026</p>
   <p class="codigo">Código <b id="c-codigo">prisma-prof-0000-0000</b></p>
@@ -239,7 +239,7 @@ svg.deco { position: absolute; inset: 0; width: 297mm; height: 210mm; }
     document.body.dataset.papel = papel;
     $("c-mascote").src = P.mascote;
     $("c-trilha").textContent = P.canto;
-    $("c-motivo").textContent = "por concluir os dez passos e o mini-check da " + P.motivo;
+    $("c-motivo").textContent = "por concluir os dez passos e o teste final da " + P.motivo;
     $("c-nome-saida").textContent = nome;
     $("c-emitido").textContent = "Emitido em " + dataPorExtenso(data);
     $("c-codigo").textContent = codigo(papel, nome, data);

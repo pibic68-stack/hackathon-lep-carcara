@@ -206,3 +206,11 @@
   box-shadow: 0 0 0 2px var(--cor-borda);
 }
 .aviso .icone { margin-top: .15em; }
+
+/* menu recolhido também quando a letra está grande (o JS mede se cabe ao lado da logo) */
+.topo.menu-compacto .menu-botao { display: inline-flex; margin-left: auto; }
+.topo.menu-compacto .menu { position: absolute; left: 0; right: 0; top: 100%; display: none; flex-direction: column; align-items: stretch; padding: 12px var(--gutter) 20px; background: var(--cor-fundo); border-bottom: 3px solid var(--cor-borda); }
+.topo.menu-compacto .menu.aberto { display: flex; }
+.topo.menu-compacto .menu ul { flex-direction: column; }
+.topo.menu-compacto .menu a:not(.botao) { padding: .8rem .5rem; }
+.topo.menu-compacto .menu .botao { margin: .75rem var(--b) calc(var(--b) + var(--sombra)); }

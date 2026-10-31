@@ -30,7 +30,13 @@ Documentação interativa (testar pelo navegador): http://127.0.0.1:8000/docs
 | `GET /api/previa/{id}/{arquivo}` | professor | Abre qualquer versão para revisar, publicada ou não. |
 | `POST /api/materiais/{id}/descricoes` | professor | Escreve as descrições das imagens (`{"imagens": {"imagens/img-001.png": "texto"}}`). Gera as versões de novo. |
 | `POST /api/materiais/{id}/aprovar` | professor | Publica. Recusa (409) se ainda há imagem sem descrição (P4.1). |
-| `GET /api/biblioteca` · `GET /api/biblioteca/{id}/{arquivo}` | aluno e família | Só o que foi **publicado** (P10.1). Rascunho dá 404. |
+| `GET /api/biblioteca` · `GET /api/biblioteca/{id}/{arquivo}` | aluno e família | Só o que foi **publicado** (P10.1). Rascunho dá 404. Para o aluno, cada item traz a avaliação que ele já deu. |
+| `POST /api/biblioteca/{id}/avaliacao` | aluno | `{"estrelas": 1..5 ou null, "sugestao": "até 150 palavras", "pular": false}`. As duas coisas são opcionais; `pular: true` registra que o aluno pulou. |
+| `POST /api/biblioteca/{id}/ocultar` | família | `{"ocultar": true/false}`. Tira (ou devolve) o material só do painel do próprio aluno. A turma continua vendo. |
+| `GET /api/feedbacks` | professor | Para cada material: média de estrelas, total e a lista (apelido do aluno, estrelas, sugestão). |
+| `POST /api/contas/escola` | público | Cadastra a escola: nome, e-mail, senha do painel e o **código para os professores** (diferente da senha; guardado só como impressão digital). |
+| `GET /api/escola` | escola | Só leitura: professores (com turmas e alunos) e materiais da escola. |
+| `GET /api/eu` | todos | Quem está logado, ou `null` (sem erro 401). |
 
 Exemplo (o que o JavaScript do site faz):
 
@@ -45,6 +51,24 @@ const material = await r.json();   // material.versoes.universal.url -> abrir nu
 **Cuidados:** ainda **não há login**: qualquer um que alcance o servidor pode aprovar, então use só em rede local
 na demo. Arquivos enviados ficam em `backend/envios/` e resultados em `backend/saida/` (ambos fora do Git).
 Limite de 300 MB por arquivo. Vídeos longos podem levar minutos para transcrever (a requisição espera).
+
+## Matemática e cor no PDF (`leitor_pdf.py`)
+
+O texto "puro" de um PDF perde a posição das letras: x² vira "x2", uma fração empilhada vira "3 2 3 1".
+O leitor olha cada letra (tamanho e altura na linha) e os traços desenhados (barra de fração e de raiz) e remonta:
+
+| No PDF | Marcação interna | Na página | No Ouvir |
+|---|---|---|---|
+| x² | `x⟦^{2}⟧` | `<sup>` | "x ao quadrado" |
+| a₁ | `a⟦_{1}⟧` | `<sub>` | "a índice 1" |
+| 3 sobre 2 | `⟦\frac{3}{2}⟧` | MathML `<mfrac>` | "3 sobre 2" |
+| √(x²+y²) | `⟦\sqrt{x⟦^{2}⟧+y⟦^{2}⟧}⟧` | MathML `<msqrt>` | "raiz quadrada de…" |
+| F⃗ | `⟦\vec{F}⟧` | MathML `<mover>` | "vetor F" |
+| ∫ com C embaixo | `∫⟦_{C}⟧` | `<sub>` | "integral índice C" |
+
+Também separa "1-) … a) … b) … 2-) …" escritos na mesma linha em questões e itens, e marca o **texto colorido**
+com a forma da cor (P1.1) e as **imagens coloridas** (P1.2: a descrição precisa dizer o que cada cor representa).
+Usa PyMuPDF; sem ele, usa pdfminer.six (os testes rodam com qualquer um).
 
 ## Como funciona
 
@@ -104,7 +128,7 @@ que fica só neste computador, no arquivo `.env`, nunca no site nem no GitHub.
 | Tarefa | Critério | Como funciona |
 |---|---|---|
 | Descrever imagens | P4.2, P4.5 | A IA escreve; o professor **confere e corrige** no painel antes de aprovar. Se achar que é só enfeite, avisa. |
-| Leitura Fácil I e II | P3.1 a P3.5 | A IA reescreve com os limites do manual (palavras por frase vêm de `padroes.json`). Depois o **código confere** frases longas e abreviações e avisa o professor. Uma frase por linha e glossário de palavras difíceis. |
+| Leitura Fácil I e II | P3.1 a P3.5 | A IA reescreve com os limites do manual (palavras por frase vêm de `padroes.json`). Feito para o Gemini Flash Lite gratuito, que guarda pouco contexto: **lotes de até 6 trechos**, fórmulas trocadas por `[M1]` antes de ir para a IA, e **cada resposta é conferida** (fórmula perdida, frase longa, texto parecido demais com o original, nível I que não encurtou). O que voltou com problema vai de novo, **um trecho por vez**, com a instrução reforçada. Se ainda falhar, o trecho fica só com as frases divididas e o professor recebe um aviso: a versão nunca sai pela metade. |
 
 A versão **Ouvir** (P5) **não usa IA**: usa a voz do navegador (Chrome e Edge têm voz em português), sem internet.
 Ela lê o texto na tela e não gera arquivo de áudio.
