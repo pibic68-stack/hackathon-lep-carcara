@@ -45,6 +45,7 @@ ENVIOS = (_DADOS or RAIZ) / "envios"
 # Nuvem (Railway): PRISMA_DEMO_PUBLICA=1 mostra "Entrar sem senha" com as contas de demonstração
 # e publica sozinha os materiais de teste. A banca abre o site e usa, sem cadastro.
 DEMO_PUBLICA = os.environ.get("PRISMA_DEMO_PUBLICA", "").strip() in ("1", "sim", "true")
+NA_VERCEL = bool(os.environ.get("VERCEL"))          # funções sem servidor: sem disco fixo nem tarefa de fundo
 SITE = RAIZ.parent / "web"
 
 LIMITE_BYTES = 300 * 1024 * 1024   # 300 MB (vídeos grandes devem ser comprimidos antes)
@@ -171,13 +172,13 @@ def _detalhe(id_: str, pasta: Path) -> dict:
 
 
 def _processar(id_: str, arquivo: Path, perfil: dict | None, descricoes: dict | None,
-               request: Request | None = None, dono: int | None = None) -> dict:
+               request: Request | None = None, dono: int | None = None, usar_ia: bool = True) -> dict:
     # o site manda um código para acompanhar a produção ao vivo (GET /api/progresso/{codigo})
     codigo = request.headers.get("X-Prisma-Acompanhar") if request is not None else None
     progresso.comecar(codigo, dono)
     erro_final = None
     try:
-        return pipeline.adaptar(arquivo, perfil, SAIDA, ia.obter_provedor(),
+        return pipeline.adaptar(arquivo, perfil, SAIDA, ia.obter_provedor() if usar_ia else None,
                                 descricoes=descricoes, nome_pasta=id_)
     except ia.ErroIA as erro:                  # IA fora do ar, chave recusada, limite gratuito...
         erro_final = str(erro)
@@ -271,13 +272,15 @@ def entrar_demo(corpo: EntradaDemo, request: Request, resposta: Response) -> dic
     if corpo.perfil not in ("professor", "escola", "aluno", "familia"):
         raise HTTPException(422, "Perfil desconhecido.")
     from . import demo
+    if NA_VERCEL:
+        demo.semear_rapido()           # sem processo de fundo na Vercel: publica os PDFs de teste agora (segundos)
     token, duracao, info = demo.abrir_sessao(corpo.perfil, corpo.aluno)
     return _abrir_sessao(request, resposta, token, duracao, False, info)
 
 
 @app.on_event("startup")
 def _semear_demo() -> None:
-    if DEMO_PUBLICA:
+    if DEMO_PUBLICA and not NA_VERCEL:
         from . import demo
         demo.semear_em_segundo_plano()
 
@@ -426,7 +429,7 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
 
 
 def criar_material(prof_id: int, turma_id: int, perfil_turma: dict, perfil_final: dict, nome: str, origem,
-                   request: Request | None = None) -> dict:
+                   request: Request | None = None, usar_ia: bool = True) -> dict:
     """Guarda o arquivo, gera as versões e cria o rascunho. `origem` é um arquivo aberto (bytes)."""
     ext = Path(nome).suffix.lower()
     id_ = uuid.uuid4().hex[:12]
@@ -446,7 +449,7 @@ def criar_material(prof_id: int, turma_id: int, perfil_turma: dict, perfil_final
             saida.write(bloco)
 
     try:
-        _processar(id_, caminho, perfil_final, None, request, prof_id)
+        _processar(id_, caminho, perfil_final, None, request, prof_id, usar_ia)
     except HTTPException:
         shutil.rmtree(pasta_envio, ignore_errors=True)
         shutil.rmtree(SAIDA / id_, ignore_errors=True)

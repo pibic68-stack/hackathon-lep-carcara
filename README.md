@@ -9,7 +9,7 @@ Time **Carcará 3301** · Hackathon LEPV (Educação)
 
 ## Site no ar (a banca abre sem senha)
 
-**Link fixo:** `https://SEU-PROJETO.up.railway.app` (trocar pelo endereço gerado no Railway; guia em [`DEPLOY.md`](DEPLOY.md)).
+**Link fixo:** `https://SEU-PROJETO.vercel.app` (trocar pelo endereço gerado; guia em [`DEPLOY.md`](DEPLOY.md)).
 Em **Entrar**, a caixa **Experimentar sem cadastro** entra com um clique como professora, aluno, família ou escola
 (contas fictícias), e os materiais de teste já estão publicados.
 

@@ -1,4 +1,31 @@
-# Site público fixo no Railway
+# Site público fixo (Vercel, Railway ou Render)
+
+## Vercel (o mais rápido: uns 5 minutos)
+
+O repositório já tem `app.py`, `requirements.txt` e `vercel.json` na raiz.
+
+1. Em **vercel.com**, entre com o GitHub › **Add New… › Project** › importe `hackathon-lep-carcara`.
+2. Deixe tudo como a Vercel sugerir (ela reconhece o FastAPI sozinha). Em **Environment Variables**, crie
+   `GEMINI_API_KEY` (de preferência uma chave de outra conta do Google, para não dividir o limite com o PC).
+3. **Deploy**. O link fixo é o `…vercel.app` que aparece no fim. Coloque no `README.md` e no portal.
+4. Abra o link › **Entrar** › **Experimentar sem cadastro**.
+
+Como a Vercel funciona e o que muda lá:
+- Não há disco fixo: contas e materiais ficam numa pasta temporária que **zera de tempos em tempos**.
+  No primeiro clique em "Experimentar sem cadastro", o PRISMA recria as contas e publica os 2 PDFs de teste
+  (em segundos, sem IA): Padrão, Letras grandes, Ouvir e o desenho com símbolos.
+- Áudio e vídeo de teste: entre como Professora e envie `materiais-teste/3-audio-aula.wav` e `4-video-aula.mp4`
+  (a IA transcreve na hora). A Vercel aceita envios de **até 4,5 MB**; arquivos maiores, só no PC.
+- Cada pedido pode durar até 5 minutos (`maxDuration` no `vercel.json`): suficiente para a IA com as novas tentativas.
+- Cada `git push` na `main` atualiza a Vercel sozinho.
+
+## Railway ou Render (servidor de verdade, com o `Dockerfile`)
+
+Use se quiser disco fixo e materiais publicados sozinhos com IA (inclusive áudio e vídeo).
+No Render: **New › Blueprint** › este repositório (usa o `render.yaml`; plano grátis dorme após 15 min sem uso
+e zera os dados ao acordar). No Railway, siga abaixo.
+
+# Railway
 
 O site do PC (`publicar.bat`) continua igual: é o da apresentação, com controle total.
 Este guia cria **outra cópia, na nuvem, com endereço fixo**, para a banca e qualquer pessoa usarem sem senha.

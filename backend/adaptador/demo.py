@@ -127,7 +127,7 @@ def _guardar_registro(reg: dict) -> None:
     ARQUIVO.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def _publicar_um(arquivo: Path, tentativa: int) -> str | None:
+def _publicar_um(arquivo: Path, tentativa: int, usar_ia: bool = True) -> str | None:
     """Cria, descreve e publica um material de teste. Devolve o id publicado (ou None: tentar depois)."""
     from . import api
     garantir()
@@ -137,10 +137,10 @@ def _publicar_um(arquivo: Path, tentativa: int) -> str | None:
     perfil_final = {"necessidades": perfil["necessidades"], "preferencias": perfil["preferencias"]}
     nome = NOMES.get(arquivo.name, arquivo.name)
     with arquivo.open("rb") as f:
-        m = api.criar_material(pid, turma["id"], perfil, perfil_final, nome, f)
+        m = api.criar_material(pid, turma["id"], perfil, perfil_final, nome, f, usar_ia=usar_ia)
     pasta = api.SAIDA / m["id"]
     faltou_ia = [v for v in m["versoes"].values() if v["status"] in ("falhou", "pendente_ia")]
-    if faltou_ia and tentativa < 8:            # IA ocupada: tenta de novo mais tarde (o que deu certo fica guardado)
+    if usar_ia and faltou_ia and tentativa < 8:            # IA ocupada: tenta de novo mais tarde (o que deu certo fica guardado)
         api.shutil.rmtree(pasta, ignore_errors=True)
         api.shutil.rmtree(api.ENVIOS / m["id"], ignore_errors=True)
         return None
@@ -150,7 +150,7 @@ def _publicar_um(arquivo: Path, tentativa: int) -> str | None:
         descricoes = {k: texto for k in sem}
         api._gravar(pasta, "descricoes.json", descricoes)
         estado = api._ler(pasta, "estado.json")
-        api._processar(m["id"], api.ENVIOS / estado["envio"], estado.get("perfil"), descricoes)
+        api._processar(m["id"], api.ENVIOS / estado["envio"], estado.get("perfil"), descricoes, usar_ia=usar_ia)
     revisao = api._ler(pasta, "revisao.json")
     if not revisao["pode_publicar"]:
         return None
@@ -185,6 +185,26 @@ def semear() -> None:
                 except Exception as erro:          # nunca derruba o site
                     print(f"[demo] {arquivo.name}: {erro}", flush=True)
             time.sleep(90)
+
+
+def semear_rapido() -> None:
+    """Vercel (sem tarefa de fundo, disco que zera): publica só os PDFs de teste, sem IA, em poucos segundos.
+    Ficam Padrão, Letras grandes, Ouvir e o desenho com símbolos; áudio e vídeo a professora envia na hora."""
+    from . import api
+    with _trava:
+        reg = _registro()
+        for arquivo in sorted(MATERIAIS.glob("*.pdf")) if MATERIAIS.exists() else []:
+            if reg.get(arquivo.name) and (api.SAIDA / reg[arquivo.name]).exists():
+                continue
+            try:
+                novo = _publicar_um(arquivo, 0, usar_ia=False)
+            except Exception as erro:
+                print(f"[demo] {arquivo.name}: {erro}", flush=True)
+                continue
+            if novo:
+                reg = _registro()
+                reg[arquivo.name] = novo
+                _guardar_registro(reg)
 
 
 def semear_em_segundo_plano() -> None:

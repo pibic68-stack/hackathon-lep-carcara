@@ -62,6 +62,8 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
   - **Modo público** (`PRISMA_DEMO_PUBLICA=1`, só no Dockerfile): em Entrar aparece "Experimentar sem cadastro" (professora, alunos Bia/Caio/Duda, família, escola), entrando sem senha e sem o limite de tentativas (`POST /api/demo/entrar`). Na subida, uma tarefa em segundo plano publica os 4 materiais de teste para a turma de demonstração, tentando de novo a cada 90 s se a IA estiver ocupada (`demo.semear`); a imagem usa descrição escrita pelo time.
   - Pastas de dados configuráveis com `PRISMA_DADOS` (banco, cache, saida, envios); porta pela variável `PORT`; `PRISMA_PROXY_CONFIAVEL=*` na nuvem.
 
+- Decisão de 31/10, 10h15: o Railway estava fora do ar; **site público na Vercel** (`app.py` + `requirements.txt` + `vercel.json` na raiz). Lá: dados em `/tmp` (zeram), sem tarefa de fundo; o primeiro "Experimentar sem cadastro" publica os 2 PDFs de teste sem IA (`demo.semear_rapido`); áudio e vídeo a professora envia (limite de 4,5 MB por envio; `maxDuration` 300 s). `render.yaml` como plano B (mesmo Dockerfile).
+
 ## Regras para o Claude
 - Responder em português.
 - Depois de uma compactação, ou se faltar contexto, reler `prompts/conversas/` e `docs/` antes de responder.
