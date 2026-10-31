@@ -12,12 +12,12 @@ Trilhas 1 (inclusão e acessibilidade) e 4 (aprendizagem individualizada).
 |---|---|
 | 1. Vídeo demo (2 min 57 s) | [`pitch/video-demo/prisma-demo.mp4`](pitch/video-demo/prisma-demo.mp4) · roteiro em [`pitch/video-demo/roteiro.md`](pitch/video-demo/roteiro.md) |
 | 2. Plano de negócio | [slides 16:9](pitch/plano-negocio/plano-de-negocio-prisma.pdf) · [documento A4](pitch/plano-negocio/plano-de-negocio-prisma-A4.pdf) · números em [`modelo.py`](pitch/plano-negocio/modelo.py) |
-| 3. Site no ar, sem senha | **`https://SEU-PROJETO.vercel.app`** ← preencher · em **Entrar › Experimentar sem cadastro** |
+| 3. Site no ar, sem senha | **[hackathon-lep-carcara-backend.vercel.app](https://hackathon-lep-carcara-backend.vercel.app/)** · em **Entrar › Experimentar sem cadastro** |
 | 4. Repositório e sessões de IA | este repositório · conversas em [`prompts/`](prompts/) · decisões em [`CLAUDE.md`](CLAUDE.md) |
 
 ## Experimente em 1 minuto (site no ar)
 
-1. Abra o site › **Entrar** › **Experimentar sem cadastro**. Não precisa de conta: todas são fictícias.
+1. Abra [o site](https://hackathon-lep-carcara-backend.vercel.app/) › **Entrar** › **Experimentar sem cadastro**. Não precisa de conta: todas são fictícias.
 2. **Aluna Bia (cores)**: abre os materiais publicados e escolhe a versão (Padrão, Letras grandes, Ouvir).
    O desenho do ciclo da água tem um símbolo sobre cada cor, para quem não distingue cores. Avalie com estrelas.
 3. **Professora**: envie um arquivo de [`materiais-teste/`](materiais-teste/) (PDF, áudio ou vídeo), acompanhe a
