@@ -44,33 +44,31 @@ def _base(cor: str) -> str:
 
 
 def cor_com_simbolo(doc: Documento) -> Documento:
+    """P1.1 (decisão do time, 31/10): a legenda entra quando o material USA cor para passar informação,
+    não quando aparece a palavra "vermelho". O leitor já marcou cada trecho de texto colorido com a forma
+    da cor (ex.: "as barras em vermelho (▲)") e listou as figuras coloridas. Aqui entram a legenda e os avisos."""
     novo = copy.deepcopy(doc)
-    usadas: dict[str, str] = {}
-
-    def marcar(m: re.Match) -> str:
-        base = _base(m.group(1))
-        simbolo = SIMBOLOS.get(base)
-        if not simbolo:
-            return m.group(0)
-        usadas[base] = simbolo
-        return f"{m.group(0)} ({simbolo})"
-
-    for b in novo.blocos:
-        if b.tipo in ("paragrafo", "titulo"):
-            b.texto = COR.sub(marcar, b.texto)
-        elif b.tipo in ("lista", "etapas", "quadro"):
-            b.itens = [COR.sub(marcar, i) for i in b.itens]
-
-    if usadas:
+    if novo.cores:
         legenda = Bloco("quadro", "Legenda das cores",
-                        [f"{cor} = {simb}" for cor, simb in usadas.items()])
+                        [f"{SIMBOLOS.get(c, '■')} = trecho que no original estava em {c}" for c in novo.cores])
         novo.blocos.insert(0, legenda)
         novo.aplicados.append(
-            f"P1.1 Cor nunca sozinha: {len(usadas)} cor(es) ganharam símbolo e uma legenda no topo."
+            f"P1.1 Cor nunca sozinha: {len(novo.cores)} cor(es) de texto ganharam símbolo e uma legenda no topo."
         )
+    imagens = [f for f in novo.figuras_coloridas if f.startswith("imagens/")]
+    desenhos = [f for f in novo.figuras_coloridas if not f.startswith("imagens/")]
+    if imagens:
         novo.pendencias.append(
-            "P1.1: confira se as palavras de cor marcadas são mesmo cores. "
-            "Por exemplo, \"rosa\" pode ser a flor."
+            f"P1.2: {len(imagens)} imagem(ns) colorida(s). Na descrição de cada uma, diga o que cada cor representa "
+            "(por exemplo: \"barras vermelhas: meninas\"). É assim que o aluno daltônico e a versão Ouvir entendem o desenho."
+        )
+        for b in novo.blocos:
+            if b.tipo == "imagem" and b.arquivo in imagens:
+                b.colorida = True
+    if desenhos:
+        novo.pendencias.append(
+            "P1.2: o material tem desenho colorido feito no próprio arquivo (" + "; ".join(desenhos) + "). "
+            "Ele não vira imagem: confira se o texto explica o que cada cor significa."
         )
     return novo
 
@@ -110,7 +108,9 @@ def instrucoes_em_etapas(doc: Documento) -> Documento:
     saida: list[Bloco] = []
     convertidos = 0
     for b in novo.blocos:
-        if b.tipo == "paragrafo" and INICIA_COM_ORDEM.match(b.texto):
+        # conta e expressão não se dividem em passos: "mmc (20 ; 30)" tem ";" mas não é lista de ações
+        com_conta = "⟦" in b.texto or re.search(r"\([^)]*;[^)]*\)", b.texto)
+        if b.tipo == "paragrafo" and not com_conta and INICIA_COM_ORDEM.match(b.texto):
             passos = _passos(b.texto)
             if len(passos) >= 2:
                 saida.append(Bloco("etapas", itens=passos))
@@ -201,7 +201,8 @@ def _frases(texto: str) -> list[str]:
 
 
 def _palavras(frase: str) -> int:
-    return len(re.findall(r"\w+", frase))
+    # fórmula (⟦…⟧) conta como uma palavra só
+    return len(re.findall(r"\w+", re.sub(r"⟦(?:[^⟦⟧]|⟦[^⟧]*⟧)*⟧", " F ", frase)))
 
 
 def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> Documento:
@@ -216,12 +217,16 @@ def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> 
     if not alvos:
         return novo
 
-    textos, glossario = reescrever([a[2] for a in alvos])
+    resultado = reescrever([a[2] for a in alvos])
+    textos, glossario = resultado[0], resultado[1]
+    avisos = list(resultado[2]) if len(resultado) > 2 else []
 
     # P3.1: trecho com frase longa volta para a IA uma vez, com a instrução reforçada
     refazer = [k for k, t in enumerate(textos) if any(_palavras(f) > max_palavras for f in _frases(t))]
     if refazer:
-        novos, glos2 = reescrever([textos[k] for k in refazer], refazer=True)
+        segundo = reescrever([textos[k] for k in refazer], refazer=True)
+        novos, glos2 = segundo[0], segundo[1]
+        avisos += list(segundo[2]) if len(segundo) > 2 else []
         for k, t in zip(refazer, novos):
             antes = sum(_palavras(f) > max_palavras for f in _frases(textos[k]))
             if sum(_palavras(f) > max_palavras for f in _frases(t)) < antes:
@@ -253,8 +258,9 @@ def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> 
     todas = [f for b in novo.blocos if b.tipo in ("paragrafo", "lista", "etapas")
              for f in (_frases(b.texto) if b.tipo == "paragrafo" else b.itens)]
     longas = [f for f in todas if _palavras(f) > max_palavras]
-    sujas = [f for f in todas if ABREVIACAO.search(f)]
+    sujas = [f for f in todas if ABREVIACAO.search(re.sub(r"⟦(?:[^⟦⟧]|⟦[^⟧]*⟧)*⟧", " ", f))]
     rotulo = {"lf2": "Leitura Fácil II", "lf1": "Leitura Fácil I"}.get(nivel, nivel)
+    novo.pendencias.extend(avisos)
     novo.aplicados.append(f"P3 ({rotulo}): {len(textos)} texto(s) reescrito(s) por IA, uma frase por linha.")
     novo.pendencias.append(
         f"P3.7 ({rotulo}): a IA reescreveu o texto. Confira se todos os conceitos da aula foram conservados."

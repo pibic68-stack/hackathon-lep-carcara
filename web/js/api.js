@@ -68,6 +68,10 @@ Prisma.api = (function () {
     material: function (id) { return chamar("/api/materiais/" + id); },
     descrever: function (id, imagens) { return chamar("/api/materiais/" + id + "/descricoes", json("POST", { imagens: imagens })); },
     aprovar: function (id) { return chamar("/api/materiais/" + id + "/aprovar", { method: "POST" }); },
-    biblioteca: function () { return chamar("/api/biblioteca"); }
+    biblioteca: function () { return chamar("/api/biblioteca"); },
+    avaliar: function (id, dados) { return chamar("/api/biblioteca/" + id + "/avaliacao", json("POST", dados)); },
+    ocultar: function (id, sim) { return chamar("/api/biblioteca/" + id + "/ocultar", json("POST", { ocultar: sim })); },
+    feedbacks: function () { return chamar("/api/feedbacks"); },
+    escola: function () { return chamar("/api/escola"); }
   };
 })();

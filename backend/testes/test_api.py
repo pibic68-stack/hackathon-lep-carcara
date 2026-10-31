@@ -205,7 +205,7 @@ class TestMateriais(Base):
         self.assertFalse(lib[0]["versoes"]["universal"]["recomendada"])
         pagina = aluno.get(lib[0]["versoes"]["universal"]["url"])
         self.assertEqual(pagina.status_code, 200)
-        self.assertIn("azul (■)", pagina.text)
+        self.assertNotIn("(■)", pagina.text)          # palavra de cor sem cor de verdade não ganha legenda
 
     def test_outra_turma_e_outro_professor_nao_veem(self):
         c = self.professor("a@escola.br")

@@ -4,8 +4,10 @@ Rodar (de dentro de backend/):   python -m adaptador.api      -> http://127.0.0.
 Documentação interativa:         http://127.0.0.1:8000/docs
 
 Quem pode o quê:
-  - professor: cria turmas e alunos fictícios, envia materiais, revisa, descreve imagens e aprova;
-  - aluno e família: veem só os materiais PUBLICADOS da própria turma.
+  - escola: cadastra-se com o código que passa aos professores; só VÊ professores, turmas, alunos e materiais;
+  - professor: cria turmas e alunos fictícios, envia materiais, revisa, descreve imagens, aprova e lê os feedbacks;
+  - aluno: vê os materiais PUBLICADOS da própria turma e avalia (estrelas e sugestão, as duas opcionais);
+  - família: vê os mesmos materiais e pode tirar um material do painel do próprio aluno (não da turma).
 Ciclo de vida (critério P10.1: nada chega ao aluno sem aprovação):
     POST /api/adaptar -> "rascunho" -> POST .../aprovar -> "publicado"
 Imagem sem descrição bloqueia a aprovação (P4.1).
@@ -205,7 +207,7 @@ def _limitar_envios(professor_id: int) -> None:
 
 @app.get("/api/saude")
 def saude() -> dict:
-    return {"ok": True, "ia_ligada": ia.configurada(), "cadastro_aberto": bool(contas.codigo_escola()),
+    return {"ok": True, "ia_ligada": ia.configurada(), "cadastro_aberto": bool(contas.codigo_escola()) or contas.ha_escolas(),
             "formatos": sorted(EXTENSOES)}
 
 
@@ -222,6 +224,14 @@ class NovoProfessor(BaseModel):
     email: str
     senha: str
     codigo_escola: str
+    lembrar: bool = False
+
+
+class NovaEscola(BaseModel):
+    nome: str
+    email: str
+    senha: str
+    codigo: str
     lembrar: bool = False
 
 
@@ -242,11 +252,19 @@ def cadastrar_professor(corpo: NovoProfessor, request: Request, resposta: Respon
     return _abrir_sessao(request, resposta, token, duracao, corpo.lembrar, info)
 
 
+@app.post("/api/contas/escola", status_code=201)
+def cadastrar_escola(corpo: NovaEscola, request: Request, resposta: Response) -> dict:
+    token, duracao, info = contas.criar_escola(corpo.nome, corpo.email, corpo.senha, corpo.codigo, _ip(request), corpo.lembrar)
+    return _abrir_sessao(request, resposta, token, duracao, corpo.lembrar, info)
+
+
 @app.post("/api/entrar")
 def entrar(corpo: Entrada, request: Request, resposta: Response) -> dict:
     ip = _ip(request)
     if corpo.perfil == "professor":
         token, duracao, info = contas.entrar_professor(corpo.email, corpo.senha, ip, corpo.lembrar)
+    elif corpo.perfil == "escola":
+        token, duracao, info = contas.entrar_escola(corpo.email, corpo.senha, ip, corpo.lembrar)
     elif corpo.perfil == "aluno":
         token, duracao, info = contas.entrar_aluno(corpo.turma, corpo.figuras, ip, corpo.lembrar)
     elif corpo.perfil == "familia":
@@ -381,6 +399,7 @@ def apagar_material(id_: str, request: Request) -> dict:
     pasta = _do_professor(id_, exigir(request, "professor"))
     shutil.rmtree(pasta, ignore_errors=True)
     shutil.rmtree(ENVIOS / id_, ignore_errors=True)
+    contas.apagar_avaliacoes(id_)
     return {"ok": True}
 
 
@@ -421,6 +440,46 @@ def previa(id_: str, caminho: str, request: Request) -> FileResponse:
     return _servir(_do_professor(id_, exigir(request, "professor")), caminho)
 
 
+# ---------- feedbacks dos alunos (professor) ----------
+
+@app.get("/api/feedbacks")
+def feedbacks(request: Request) -> list[dict]:
+    """Para cada material do professor: média, quantos avaliaram e a lista (apelido, estrelas, sugestão)."""
+    prof = exigir(request, "professor")
+    saida = []
+    for id_, pasta in _todos_materiais():
+        estado = _ler(pasta, "estado.json")
+        if estado.get("professor_id") != prof["id"]:
+            continue
+        lista = contas.avaliacoes_do_material(id_)
+        notas = [a["estrelas"] for a in lista if a["estrelas"]]
+        saida.append({"id": id_, "titulo": _resumo(id_, pasta)["titulo"], "turma": estado.get("turma_nome"),
+                      "estado": estado["estado"], "publicado": estado.get("publicado"),
+                      "media": round(sum(notas) / len(notas), 1) if notas else None,
+                      "total": len(lista), "avaliacoes": lista})
+    return sorted(saida, key=lambda m: m.get("publicado") or "", reverse=True)
+
+
+# ---------- painel da escola (só leitura) ----------
+
+@app.get("/api/escola")
+def painel_escola(request: Request) -> dict:
+    escola = exigir(request, "escola")
+    dados = contas.resumo_da_escola(escola["id"])
+    nomes = {p["id"]: p["nome"] for p in dados["professores"]}
+    materiais = []
+    for id_, pasta in _todos_materiais():
+        estado = _ler(pasta, "estado.json")
+        if estado.get("professor_id") not in nomes:
+            continue
+        materiais.append({"titulo": _resumo(id_, pasta)["titulo"], "professor": nomes[estado["professor_id"]],
+                          "turma": estado.get("turma_nome"), "estado": estado["estado"],
+                          "criado": estado.get("criado"), "publicado": estado.get("publicado")})
+    dados["materiais"] = sorted(materiais, key=lambda m: m.get("criado") or "", reverse=True)
+    dados["escola"] = escola["nome"]
+    return dados
+
+
 # ---------- biblioteca (aluno e família) ----------
 
 def _recomendadas(u: dict) -> set[str]:
@@ -430,22 +489,65 @@ def _recomendadas(u: dict) -> set[str]:
 
 @app.get("/api/biblioteca")
 def biblioteca(request: Request) -> list[dict]:
-    """Só o que foi publicado para a turma de quem está logado."""
+    """Só o que foi publicado para a turma de quem está logado.
+    O aluno não vê o que a família tirou do painel dele; a família vê esses itens marcados como "oculto"
+    (para poder devolver). Para o aluno, cada item traz a avaliação que ele já deu."""
     u = exigir(request, "aluno", "familia")
     recomendadas = _recomendadas(u)
+    ocultos = contas.ocultos_do_aluno(u["aluno_id"])
+    avaliacoes = contas.avaliacoes_do_aluno(u["aluno_id"]) if u["perfil"] == "aluno" else {}
     saida = []
     for id_, pasta in _todos_materiais():
         estado = _ler(pasta, "estado.json")
         if estado["estado"] != "publicado" or estado.get("turma_id") != u["turma_id"]:
             continue
+        if id_ in ocultos and u["perfil"] == "aluno":
+            continue
         item = _resumo(id_, pasta)
         saida.append({
             "id": id_, "material": item["material"], "titulo": item["titulo"], "publicado": estado.get("publicado"),
+            "oculto": id_ in ocultos,
+            **({"avaliacao": avaliacoes.get(id_)} if u["perfil"] == "aluno" else {}),
             "versoes": {n: {"url": f"/api/biblioteca/{id_}/{v['arquivo']}", "rotulo": v["rotulo"],
                             "recomendada": n in recomendadas}
                         for n, v in item["versoes"].items() if v["status"] == "gerada"},
         })
     return sorted(saida, key=lambda i: i.get("publicado") or "", reverse=True)
+
+
+def _publicado_da_turma(id_: str, u: dict) -> Path:
+    pasta = _pasta(id_)
+    estado = _ler(pasta, "estado.json")
+    if estado["estado"] != "publicado" or estado.get("turma_id") != u.get("turma_id"):
+        raise HTTPException(404, "Material não encontrado.")
+    return pasta
+
+
+class Avaliacao(BaseModel):
+    estrelas: int | None = None
+    sugestao: str = ""
+    pular: bool = False
+
+
+@app.post("/api/biblioteca/{id_}/avaliacao")
+def avaliar(id_: str, corpo: Avaliacao, request: Request) -> dict:
+    """Só o aluno avalia. Estrelas (1 a 5) e sugestão (até 150 palavras) são opcionais; dá para pular."""
+    u = exigir(request, "aluno")
+    _publicado_da_turma(id_, u)
+    return contas.avaliar(u["aluno_id"], id_, corpo.estrelas, corpo.sugestao, corpo.pular)
+
+
+class Ocultar(BaseModel):
+    ocultar: bool = True
+
+
+@app.post("/api/biblioteca/{id_}/ocultar")
+def ocultar(id_: str, corpo: Ocultar, request: Request) -> dict:
+    """A família tira (ou devolve) um material do painel do próprio aluno. A turma continua vendo."""
+    u = exigir(request, "familia")
+    _publicado_da_turma(id_, u)
+    contas.ocultar(u["aluno_id"], id_, corpo.ocultar)
+    return {"ok": True, "oculto": corpo.ocultar}
 
 
 @app.get("/api/biblioteca/{id_}/{caminho:path}")

@@ -5,11 +5,14 @@ então dá para usar .txt sem instalar nada.
 """
 from __future__ import annotations
 
+import logging
 import re
 from collections import Counter
 from pathlib import Path
 
 from .modelo import Bloco, Documento
+
+logging.getLogger("pdfminer").setLevel(logging.ERROR)   # avisos de fonte do pdfminer não interessam ao professor
 
 EXT_TEXTO = {".txt", ".md"}
 EXT_PDF = {".pdf"}
@@ -98,71 +101,147 @@ def _ler_texto(caminho: Path) -> Documento:
 
 # ---------- PDF ----------
 
-def _ler_pdf(caminho: Path, pasta_trabalho: Path) -> Documento:
-    try:
-        import pymupdf as fitz  # PyMuPDF
-    except ImportError as erro:
-        raise RuntimeError("Para ler PDF instale: pip install pymupdf") from erro
+QUESTAO = re.compile(r"(?:(?<=\s)|^)(\d{1,2})\s*-?\s*\)\s*")
+ITEM_LETRA = re.compile(r"(?:(?<=\s)|^)\(?([a-h])\)\s*")
+COMECA_MARCA = re.compile(r"^\s*(?:\d{1,2}\s*-?\s*[).]|\(?[a-h]\)|[-•–*▪●○◦‣⁃■□➢✓]\s)", re.I)
 
-    pdf = fitz.open(caminho)
-    paginas = [p.get_text("dict")["blocks"] for p in pdf]
+
+def _cortes_em_sequencia(texto: str, padrao: re.Pattern, primeiro, proximo) -> list[int]:
+    """Posições onde começa cada marcador de uma sequência (1, 2, 3... ou a, b, c...).
+    Só conta se a sequência estiver em ordem: "(14 ; 5 )" não vira questão 5."""
+    cortes, esperado = [], None
+    for m in padrao.finditer(texto):
+        valor = m.group(1)
+        if esperado is None:
+            if valor != primeiro(valor) and m.start() > 0:
+                continue
+            esperado = valor
+        if valor == esperado:
+            cortes.append(m.start())
+            esperado = proximo(valor)
+    return cortes
+
+
+def dividir_questoes_e_itens(texto: str) -> list[Bloco]:
+    """Uma linha com "1-) … a) … b) … 2-) …" vira questões separadas, e os itens a), b) viram lista."""
+    blocos: list[Bloco] = []
+    q = _cortes_em_sequencia(texto, QUESTAO, lambda v: v, lambda v: str(int(v) + 1))
+    partes = [texto[a:b].strip() for a, b in zip([0] + q[1:], q[1:] + [len(texto)])] if len(q) >= 2 else [texto]
+    if q and q[0] > 0 and len(q) >= 2:
+        partes = [texto[:q[0]].strip()] + partes
+    for parte in (p for p in partes if p):
+        itens = _cortes_em_sequencia(parte, ITEM_LETRA, lambda v: "a", lambda v: chr(ord(v) + 1))
+        if len(itens) >= 2:
+            cabeca = parte[:itens[0]].strip()
+            if cabeca:
+                blocos.append(Bloco("paragrafo", texto=cabeca))
+            blocos.append(Bloco("lista", itens=[parte[a:b].strip() for a, b in zip(itens, itens[1:] + [len(parte)])]))
+        else:
+            blocos.append(Bloco("paragrafo", texto=parte))
+    return blocos
+
+
+def _juntar_itens_de_letra(blocos: list[Bloco]) -> list[Bloco]:
+    """Parágrafos seguidos que começam com (a), (b)... viram uma lista só."""
+    saida: list[Bloco] = []
+    for b in blocos:
+        m = ITEM_LETRA.match(b.texto) if b.tipo == "paragrafo" else None
+        if m and saida and saida[-1].tipo == "lista" and saida[-1].itens:
+            ultimo = ITEM_LETRA.match(saida[-1].itens[-1])
+            if ultimo and ord(m.group(1)) == ord(ultimo.group(1)) + 1:
+                saida[-1].itens.append(b.texto)
+                continue
+        if m and m.group(1) == "a" and b.tipo == "paragrafo":
+            saida.append(Bloco("lista", itens=[b.texto]))
+            continue
+        saida.append(b)
+    # lista de um item só volta a ser parágrafo
+    return [Bloco("paragrafo", texto=b.itens[0]) if b.tipo == "lista" and len(b.itens) == 1 and ITEM_LETRA.match(b.itens[0]) else b
+            for b in saida]
+
+
+def _ler_pdf(caminho: Path, pasta_trabalho: Path) -> Documento:
+    from . import leitor_pdf as lp
+
+    paginas = lp.ler_paginas(caminho)
+    linhas_pg = [lp.linhas_da_pagina(pg, n) for n, pg in enumerate(paginas)]
 
     # tamanho de letra mais comum = corpo do texto; maiores = títulos
     pesos: Counter = Counter()
-    for blocos_pg in paginas:
-        for b in blocos_pg:
-            for linha in b.get("lines", []):
-                for s in linha["spans"]:
-                    pesos[round(s["size"])] += len(s["text"].strip())
+    for linhas in linhas_pg:
+        for L in linhas:
+            pesos[round(L.tam)] += len(L.texto)
     corpo = pesos.most_common(1)[0][0] if pesos else 12
 
     pasta_img = pasta_trabalho / "imagens"
     n_img = 0
     blocos: list[Bloco] = []
-    for blocos_pg in paginas:
-        for b in blocos_pg:
-            if b["type"] == 1:  # imagem
-                if min(b["bbox"][2] - b["bbox"][0], b["bbox"][3] - b["bbox"][1]) < 40:
-                    continue  # ícones e enfeites minúsculos
+    cores: list[str] = []
+    figuras_coloridas: list[str] = []
+
+    for n, (pg, linhas) in enumerate(zip(paginas, linhas_pg)):
+        itens = [("linha", L.topo, L) for L in linhas]
+        for f in pg.imagens:
+            if min(f.x1 - f.x0, f.y1 - f.y0) < 40:
+                continue                      # ícones e enfeites minúsculos
+            itens.append(("imagem", f.y0, f))
+        itens.sort(key=lambda x: x[1])
+
+        grupo: list = []
+
+        def fechar_grupo():
+            if not grupo:
+                return
+            texto = " ".join(L.texto for L in grupo)
+            texto = re.sub(r"(\w)- (?=[a-zà-ú])", r"\1", texto)            # palavra quebrada no fim da linha
+            tam = max(L.tam for L in grupo)
+            negrito = all(L.negrito for L in grupo)
+            if re.fullmatch(r"\d{1,3}", texto.strip()):
+                pass                                                          # número de página
+            elif len(texto) <= 120 and tam >= corpo * 1.2:
+                blocos.append(Bloco("titulo", lp.para_texto_simples(texto).strip() if lp.tem_matematica(texto) else texto,
+                                    nivel=1 if tam >= corpo * 1.6 else 2))
+            elif len(texto) <= 80 and negrito and not texto.endswith(".") and not COMECA_MARCA.match(texto):
+                blocos.append(Bloco("titulo", texto, nivel=3))
+            else:
+                linhas_txt = [L.texto for L in grupo]
+                if len(linhas_txt) >= 2 and all(MARCA_LISTA.match(l) for l in linhas_txt):
+                    blocos.append(Bloco("lista", itens=[MARCA_LISTA.match(l).group(1) for l in linhas_txt]))
+                else:
+                    blocos.extend(dividir_questoes_e_itens(texto))
+            for L in grupo:
+                cores.extend(c for c in L.cores if c not in cores)
+            grupo.clear()
+
+        for tipo, _, x in itens:
+            if tipo == "imagem":
+                fechar_grupo()
                 n_img += 1
                 pasta_img.mkdir(parents=True, exist_ok=True)
-                nome = f"img-{n_img:03d}.{b.get('ext', 'png')}"
-                (pasta_img / nome).write_bytes(b["image"])
+                nome = f"img-{n_img:03d}.{x.ext}"
+                (pasta_img / nome).write_bytes(x.dados)
                 blocos.append(Bloco("imagem", arquivo=f"imagens/{nome}"))
+                if lp.imagem_colorida(x.dados):
+                    figuras_coloridas.append(f"imagens/{nome}")
                 continue
-            # o PDF às vezes junta num bloco linhas de tamanhos diferentes (ex.: cabeçalho pequeno + título grande);
-            # separa em grupos de linhas com o mesmo tamanho e o mesmo peso
-            grupos: list[list[tuple[str, float, bool]]] = []
-            for linha in b.get("lines", []):
-                t = "".join(s["text"] for s in linha["spans"]).strip()
-                if not t:
-                    continue
-                tam = max(s["size"] for s in linha["spans"])
-                negrito = all(s["flags"] & 16 or "bold" in s["font"].lower() for s in linha["spans"] if s["text"].strip())
-                if grupos and abs(grupos[-1][-1][1] - tam) <= 0.15 * tam and grupos[-1][-1][2] == negrito:
-                    grupos[-1].append((t, tam, negrito))
-                else:
-                    grupos.append([(t, tam, negrito)])
-            for grupo in grupos:
-                linhas = [g[0] for g in grupo]
-                if re.fullmatch(r"\d{1,3}", " ".join(linhas)):
-                    continue  # número de página
-                texto = " ".join(linhas)
-                tam = max(g[1] for g in grupo)
-                if len(texto) <= 120 and tam >= corpo * 1.2:
-                    blocos.append(Bloco("titulo", texto, nivel=1 if tam >= corpo * 1.6 else 2))
-                elif len(texto) <= 80 and all(g[2] for g in grupo) and not texto.endswith("."):
-                    blocos.append(Bloco("titulo", texto, nivel=3))
-                else:
-                    bloco = _bloco_de_linhas(linhas)
-                    if bloco:
-                        if bloco.tipo == "paragrafo":
-                            bloco.texto = re.sub(r"(\w)- (?=[a-zà-ú])", r"\1", bloco.texto)
-                        blocos.append(bloco)
+            L = x
+            if grupo:
+                ant = grupo[-1]
+                mesma = (L.topo - ant.fundo < 0.9 * L.tam and 0.85 <= L.tam / ant.tam <= 1.18
+                         and L.negrito == ant.negrito and not COMECA_MARCA.match(L.texto))
+                if not mesma:
+                    fechar_grupo()
+            grupo.append(L)
+        fechar_grupo()
+        # formas coloridas desenhadas no PDF (gráficos de barras, mapas feitos no Word)
+        nomes = {lp.nome_da_cor(c) for c in pg.desenhos_cor} - {None}
+        if len(nomes) >= 2:
+            figuras_coloridas.append(f"desenho na página {n + 1} ({', '.join(sorted(nomes))})")
 
+    blocos = _juntar_itens_de_letra(blocos)
     titulo, blocos = _tirar_titulo(blocos, caminho.stem)
-    doc = Documento(titulo, blocos)
-    if not any(b.tipo == "paragrafo" or b.tipo == "lista" for b in blocos):
+    doc = Documento(titulo, blocos, cores=cores, figuras_coloridas=figuras_coloridas)
+    if not any(b.tipo in ("paragrafo", "lista") for b in blocos):
         doc.pendencias.append(
             "Este PDF parece ser uma imagem escaneada (sem texto). É preciso aplicar OCR antes."
         )
@@ -182,6 +261,8 @@ def _ler_pptx(caminho: Path, pasta_trabalho: Path) -> Documento:
     pasta_img = pasta_trabalho / "imagens"
     n_img = 0
     blocos: list[Bloco] = []
+    cores: list[str] = []
+    figuras_coloridas: list[str] = []
     for slide in apresentacao.slides:
         titulo_slide = slide.shapes.title
         if titulo_slide is not None and titulo_slide.text_frame.text.strip():
@@ -195,6 +276,9 @@ def _ler_pptx(caminho: Path, pasta_trabalho: Path) -> Documento:
                 pasta_img.mkdir(parents=True, exist_ok=True)
                 nome = f"img-{n_img:03d}.{forma.image.ext}"
                 (pasta_img / nome).write_bytes(forma.image.blob)
+                from .leitor_pdf import imagem_colorida
+                if imagem_colorida(forma.image.blob):
+                    figuras_coloridas.append(f"imagens/{nome}")
                 alt = forma._element.xpath(".//p:cNvPr")[0].get("descr") or None
                 if alt and NOME_DE_ARQUIVO.match(alt.strip()):
                     alt = None  # o PowerPoint às vezes grava o nome do arquivo como "descrição"
@@ -203,7 +287,7 @@ def _ler_pptx(caminho: Path, pasta_trabalho: Path) -> Documento:
                 linhas = [" — ".join(c.text.strip() for c in l.cells) for l in forma.table.rows]
                 blocos.append(Bloco("lista", itens=[l for l in linhas if l.strip(" —")]))
             elif forma.has_text_frame:
-                paragrafos = [p.text.strip() for p in forma.text_frame.paragraphs if p.text.strip()]
+                paragrafos = [_texto_pptx_com_cor(p, cores) for p in forma.text_frame.paragraphs if p.text.strip()]
                 if len(paragrafos) == 1:
                     blocos.append(Bloco("paragrafo", texto=paragrafos[0]))
                 elif paragrafos:
@@ -211,7 +295,29 @@ def _ler_pptx(caminho: Path, pasta_trabalho: Path) -> Documento:
                     # vários parágrafos no mesmo quadro de slide são tópicos, mesmo sem marcador
                     blocos.append(b if b and b.tipo != "paragrafo" else Bloco("lista", itens=paragrafos))
     primeiro = apresentacao.core_properties.title or caminho.stem
-    return Documento(primeiro, blocos)
+    return Documento(primeiro, blocos, cores=cores, figuras_coloridas=figuras_coloridas)
+
+
+def _texto_pptx_com_cor(paragrafo, cores: list[str]) -> str:
+    """Trecho com cor própria (não preta nem cinza) ganha a forma da cor logo depois (P1)."""
+    from .leitor_pdf import nome_da_cor
+    from .transformacoes import SIMBOLOS
+    partes = []
+    for run in paragrafo.runs:
+        texto = run.text
+        nome = None
+        try:
+            if run.font.color is not None and run.font.color.type is not None and run.font.color.rgb is not None:
+                rgb = run.font.color.rgb
+                nome = nome_da_cor((rgb[0] / 255, rgb[1] / 255, rgb[2] / 255))
+        except (AttributeError, TypeError, ValueError):
+            nome = None
+        if nome and texto.strip():
+            if nome not in cores:
+                cores.append(nome)
+            texto = texto.rstrip() + f" ({SIMBOLOS.get(nome, '■')}) "
+        partes.append(texto)
+    return re.sub(r"\s+", " ", "".join(partes)).strip()
 
 
 # ---------- vídeo e áudio ----------

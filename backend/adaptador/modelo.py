@@ -22,6 +22,7 @@ class Bloco:
     arquivo: str = ""                    # imagem: caminho relativo ao HTML
     alt: Optional[str] = None            # imagem: descrição; None = ainda não existe
     origem_alt: str = ""                 # imagem: quem escreveu a descrição ("ia", "professor" ou "" = original)
+    colorida: bool = False               # imagem: tem cor que pode carregar informação (P1.2)
 
 
 @dataclass
@@ -31,6 +32,8 @@ class Documento:
     origem: str = ""                     # nome do arquivo original
     aplicados: list[str] = field(default_factory=list)   # o que foi mudado (para o professor)
     pendencias: list[str] = field(default_factory=list)  # o que exige revisão humana
+    cores: list[str] = field(default_factory=list)       # P1: cores de TEXTO colorido no original (já marcadas com símbolo)
+    figuras_coloridas: list[str] = field(default_factory=list)  # P1: imagens/desenhos coloridos (arquivo ou "desenho")
 
     def para_dict(self) -> dict:
         return asdict(self)
@@ -39,4 +42,5 @@ class Documento:
     def de_dict(cls, d: dict) -> "Documento":
         blocos = [Bloco(**b) for b in d.get("blocos", [])]
         return cls(d["titulo"], blocos, d.get("origem", ""),
-                   d.get("aplicados", []), d.get("pendencias", []))
+                   d.get("aplicados", []), d.get("pendencias", []),
+                   d.get("cores", []), d.get("figuras_coloridas", []))

@@ -1,5 +1,7 @@
 """Rodar (de dentro de backend/):  python -m unittest discover -s testes -v"""
 import json
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -14,27 +16,30 @@ EXEMPLOS = Path(__file__).resolve().parents[1] / "exemplos"
 
 
 class TestCorComSimbolo(unittest.TestCase):
-    def test_cor_ganha_simbolo_e_legenda(self):
+    """Decisão do time (31/10): a legenda entra quando o material USA cor, não quando aparece a palavra."""
+
+    def test_texto_colorido_ganha_legenda(self):
+        # o leitor já marcou o trecho colorido com a forma da cor
+        d = Documento("x", [Bloco("paragrafo", texto="As barras em vermelho (▲) são as meninas.")], cores=["vermelho"])
+        r = t.cor_com_simbolo(d)
+        self.assertEqual(r.blocos[0].tipo, "quadro")  # legenda no topo
+        self.assertEqual(r.blocos[0].itens, ["▲ = trecho que no original estava em vermelho"])
+
+    def test_palavra_de_cor_sem_cor_nao_ganha_legenda(self):
         d = Documento("x", [Bloco("paragrafo", texto="Pinte de azul e circule em vermelho.")])
         r = t.cor_com_simbolo(d)
-        self.assertIn("azul (■)", r.blocos[1].texto)
-        self.assertIn("vermelho (▲)", r.blocos[1].texto)
-        self.assertEqual(r.blocos[0].tipo, "quadro")  # legenda no topo
+        self.assertEqual(r.blocos, d.blocos)
+        self.assertNotIn("(■)", r.blocos[0].texto)
 
-    def test_nao_duplica_e_respeita_plural(self):
-        d = Documento("x", [Bloco("paragrafo", texto="As nuvens azuis e a cor azul (■).")])
-        txt = t.cor_com_simbolo(d).blocos[1].texto
-        self.assertIn("azuis (■)", txt)
-        self.assertEqual(txt.count("(■)"), 2)  # a segunda já tinha símbolo
+    def test_imagem_colorida_vira_pendencia(self):
+        d = Documento("x", [Bloco("imagem", arquivo="imagens/img-001.png")], figuras_coloridas=["imagens/img-001.png"])
+        r = t.cor_com_simbolo(d)
+        self.assertTrue(r.blocos[0].colorida)
+        self.assertTrue(any(p.startswith("P1.2") for p in r.pendencias))
 
     def test_sem_cor_nao_muda_nada(self):
         d = Documento("x", [Bloco("paragrafo", texto="A água evapora.")])
         self.assertEqual(t.cor_com_simbolo(d).blocos, d.blocos)
-
-    def test_nao_altera_o_original(self):
-        d = Documento("x", [Bloco("paragrafo", texto="Use o verde.")])
-        t.cor_com_simbolo(d)
-        self.assertEqual(d.blocos[0].texto, "Use o verde.")
 
 
 class TestEtapas(unittest.TestCase):
@@ -127,8 +132,9 @@ class TestPipeline(unittest.TestCase):
             self.assertTrue(r["pode_publicar"])
             pagina = (pasta / "ampliada.html").read_text(encoding="utf-8")
             self.assertIn('lang="pt-BR"', pagina)
-            self.assertIn("font-size:18.0pt", pagina)
-            self.assertIn("azul (■)", pagina)
+            self.assertIn("18.0pt", pagina)
+            self.assertIn('data-tema="amarelo"', pagina)       # Ampliada abre em amarelo no preto
+            self.assertNotIn("(■)", pagina)        # a palavra "azul" no texto não é cor de verdade
             self.assertIn('<ol class="etapas">', pagina)
             self.assertTrue((pasta / "revisao.json").exists())
 
@@ -147,3 +153,65 @@ class TestPipeline(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestMatematica(unittest.TestCase):
+    """Marcação de fórmulas (⟦…⟧) do leitor de PDF para HTML, MathML e fala."""
+
+    def test_expoente_e_indice_viram_sup_e_sub(self):
+        from adaptador import leitor_pdf as lp
+        self.assertEqual(lp.para_html("x⟦^{2}⟧ + a⟦_{1}⟧"), "x<sup>2</sup> + a<sub>1</sub>")
+
+    def test_fracao_raiz_e_vetor_viram_mathml(self):
+        from adaptador import leitor_pdf as lp
+        h = lp.para_html("z = ⟦\\sqrt{x⟦^{2}⟧+ y⟦^{2}⟧}⟧ e ⟦\\frac{3}{2}⟧ e ⟦\\vec{F}⟧")
+        self.assertIn("<msqrt>", h)
+        self.assertIn("<msup><mi>x</mi><mrow><mn>2</mn></mrow></msup>", h)
+        self.assertIn("<mfrac><mrow><mn>3</mn></mrow><mrow><mn>2</mn></mrow></mfrac>", h)
+        self.assertIn('<mover accent="true">', h)
+        self.assertIn('aria-label="', h)                      # leitor de tela lê a fórmula por extenso
+
+    def test_fala_por_extenso(self):
+        from adaptador import leitor_pdf as lp
+        self.assertEqual(lp.para_fala("x⟦^{2}⟧ + ⟦\\frac{3}{2}⟧"), "x ao quadrado mais 3 sobre 2")
+
+    def test_texto_comum_e_escapado(self):
+        from adaptador import leitor_pdf as lp
+        self.assertEqual(lp.para_html("<b>oi</b> & ⟦^{2}⟧"), "&lt;b&gt;oi&lt;/b&gt; &amp; <sup>2</sup>")
+
+    def test_questoes_e_itens_na_mesma_linha_viram_lista(self):
+        from adaptador import leitores
+        blocos = leitores.dividir_questoes_e_itens(
+            "1-) Calcule: a) mmc (20 ;30) = b) mmc (15 ; 20) = c) mmc (14 ; 5 ) = 2-) Calcule as frações:")
+        self.assertEqual([b.tipo for b in blocos], ["paragrafo", "lista", "paragrafo"])
+        self.assertEqual(blocos[1].itens, ["a) mmc (20 ;30) =", "b) mmc (15 ; 20) =", "c) mmc (14 ; 5 ) ="])
+        self.assertEqual(blocos[2].texto, "2-) Calcule as frações:")
+
+
+@unittest.skipUnless(shutil.which("pdflatex"), "pdflatex não instalado")
+class TestPdfComMatematica(unittest.TestCase):
+    """PDF de verdade (LaTeX) com frações empilhadas, expoentes, raiz, integral com limite e vetores."""
+
+    def _pdf(self, corpo: str) -> Path:
+        tmp = Path(tempfile.mkdtemp())
+        (tmp / "a.tex").write_text("\\documentclass{article}\\usepackage{amsmath}\\pagestyle{empty}\\begin{document}"
+                                   + corpo + "\\end{document}", encoding="utf-8")
+        subprocess.run(["pdflatex", "-interaction=nonstopmode", "a.tex"], cwd=tmp, capture_output=True, timeout=120)
+        return tmp / "a.pdf"
+
+    def test_lista_de_fracoes(self):
+        from adaptador import leitores
+        pdf = self._pdf("a) $\\dfrac{3}{2} + \\dfrac{3}{1} =$\n\nb) $\\dfrac{7}{5} - \\dfrac{7}{2} =$")
+        doc = leitores.ler(pdf, pdf.parent)
+        itens = [i for b in doc.blocos for i in (b.itens or [b.texto])]
+        self.assertIn("a) ⟦\\frac{3}{2}⟧ + ⟦\\frac{3}{1}⟧ =", itens)
+        self.assertIn("b) ⟦\\frac{7}{5}⟧ − ⟦\\frac{7}{2}⟧ =", itens)
+
+    def test_expoente_raiz_integral_e_vetor(self):
+        from adaptador import leitores
+        pdf = self._pdf("Seja $z = \\sqrt{x^2 + y^2}$ e $\\vec{F} = (y^2, x)$. Calcule $\\int_C \\vec{F} \\cdot d\\vec{r}$.")
+        texto = " ".join(b.texto for b in leitores.ler(pdf, pdf.parent).blocos)
+        self.assertIn("⟦\\sqrt{x⟦^{2}⟧", texto)
+        self.assertIn("⟦\\vec{F}⟧", texto)
+        self.assertIn("∫⟦_{C}⟧", texto)
+        self.assertIn("d⟦\\vec{r}⟧", texto)

@@ -3,10 +3,15 @@
    são montadas por professor.js e biblioteca.js; o resto aparece como "em breve". */
 (function () {
   var PAINEIS = {
+    escola: {
+      avatar: "escola.jpg", ola: function (n) { return n; },
+      areas: ["area-escola"],
+      breve: [["users", "Convidar professores", "Enviar o código da escola por e-mail."]]
+    },
     professor: {
       avatar: "professor.png", ola: function (n) { return "Boa aula, " + n + "!"; },
-      areas: ["area-turmas", "area-professor"],
-      breve: [["chart-bar", "Mini-checks", "Resultado das últimas aulas, por aluno."]]
+      areas: ["area-turmas", "area-professor", "area-feedbacks"],
+      breve: [["calendar", "Agenda da turma", "Datas das aulas e entregas."]]
     },
     familia: {
       avatar: "familia.png", ola: function (n) { return "Olá, " + n + "!"; },
@@ -17,8 +22,7 @@
     aluno: {
       avatar: "aluno.png", ola: function (n) { return "Oi, " + n + "! Bora estudar?"; },
       areas: ["area-biblioteca"],
-      breve: [["checklist", "Mini-check", "Três perguntas no fim da aula."],
-              ["trophy", "Minhas conquistas", "Figurinhas por cada atividade feita."]]
+      breve: [["trophy", "Minhas conquistas", "Figurinhas por cada atividade feita."]]
     }
   };
 
@@ -52,7 +56,7 @@
       var titulo = el("h1", { tabindex: "-1", texto: p.ola(u.nome) });
       alvo.appendChild(el("div", { classe: "painel-cab" }, [
         el("img", { classe: "pixel", src: "../assets/img/" + p.avatar, alt: "" }),
-        el("div", {}, [el("p", { classe: "rotulo", texto: u.turma ? "Turma " + u.turma : "Painel" }), titulo]),
+        el("div", {}, [el("p", { classe: "rotulo", texto: u.turma ? "Turma " + u.turma : (perfil === "escola" ? "Painel da escola" : (u.escola ? u.escola : "Painel")) }), titulo]),
         sair
       ]));
       alvo.appendChild(el("p", { classe: "aviso" }, [icone("info-box"),

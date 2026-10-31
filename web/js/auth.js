@@ -38,7 +38,7 @@ Prisma.auth = (function () {
     });
   }
 
-  var CAMPO_PADRAO = { professor: "senha", familia: "codigo", aluno: "figuras" };
+  var CAMPO_PADRAO = { professor: "senha", escola: "senha", familia: "codigo", aluno: "figuras" };
 
   return {
     entrar: function (perfil, dados) {
@@ -60,6 +60,16 @@ Prisma.auth = (function () {
       return traduzir(pedir("/api/contas/professor", {
         nome: d.nome, email: d.email_novo, senha: d.senha_nova, codigo_escola: d.codigo_escola, lembrar: !!d.lembrar
       }), "codigo_escola");
+    },
+
+    cadastrarEscola: function (d) {
+      if (!d.nome || d.nome.trim().length < 3) return Promise.resolve({ ok: false, erro: { campo: "escola_nome", texto: "Digite o nome da escola." } });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email || "")) return Promise.resolve({ ok: false, erro: { campo: "escola_email", texto: "Digite um e-mail válido, como coordenacao@escola.br." } });
+      if (!d.senha || d.senha.length < 8) return Promise.resolve({ ok: false, erro: { campo: "escola_senha", texto: "A senha precisa ter pelo menos 8 caracteres." } });
+      var cod = (d.codigo || "").replace(/[^A-Za-z0-9]/g, "");
+      if (cod.length < 6) return Promise.resolve({ ok: false, erro: { campo: "escola_codigo", texto: "O código para os professores precisa ter pelo menos 6 letras ou números." } });
+      if (location.protocol === "file:") return Promise.resolve({ ok: false, erro: { campo: "escola_nome", texto: "Para cadastrar, abra o site pelo servidor do PRISMA, não pelo arquivo." } });
+      return traduzir(pedir("/api/contas/escola", d), "escola_codigo");
     },
 
     /* validação só do formato; a de verdade é no servidor */

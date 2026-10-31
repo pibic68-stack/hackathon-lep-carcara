@@ -39,7 +39,8 @@ def _identificador(nome: str) -> str:
 def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
              descricoes: dict | None = None) -> tuple[Documento, Path]:
     """Lê o arquivo (usando o cache se já foi lido) e aplica as regras comuns a todos."""
-    chave = cache.arquivo(caminho, extras=modelo_audio)
+    # "leitor-v2": leitor de PDF com matemática e cor (31/10). Mudou o leitor, o cache antigo não serve mais.
+    chave = cache.arquivo(caminho, extras=modelo_audio + "|leitor-v2")
     pasta = cache.pasta_de(chave)
     guardado = cache.ler(chave, "documento")
     if guardado:
@@ -60,7 +61,7 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
         if not ia:
             return None
         try:
-            return ia_mod.descrever_imagem(ia, pasta / arquivo)
+            return ia_mod.descrever_imagem(ia, pasta / arquivo, colorida=arquivo in doc.figuras_coloridas)
         except ia_mod.ErroIA as erro:
             if str(erro) not in erros_ia:
                 erros_ia.append(str(erro))
@@ -112,13 +113,13 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
                 continue
             extra_aplicados += versao_doc.aplicados[len(doc.aplicados):]
             extra_pendencias += versao_doc.pendencias[len(doc.pendencias):]
-            html = renderizador.para_html(versao_doc, "padrao", manual, pasta_trabalho, pasta)
+            html = renderizador.para_html(versao_doc, "padrao", manual, pasta_trabalho, pasta, versao=v)
         elif v == "audio":
-            html = renderizador.para_html(doc, "padrao", manual, pasta_trabalho, pasta, audio=True)
+            html = renderizador.para_html(doc, "padrao", manual, pasta_trabalho, pasta, audio=True, versao=v)
             extra_aplicados.append("P5: versão para ouvir criada (lê o texto em voz alta pelo navegador).")
         else:
             html = renderizador.para_html(doc, "ampliada" if v == "ampliada" else "padrao",
-                                          manual, pasta_trabalho, pasta)
+                                          manual, pasta_trabalho, pasta, versao=v)
         (pasta / f"{v}.html").write_text(html, encoding="utf-8")
         versoes[v] = {"status": "gerada", "arquivo": f"{v}.html"}
 

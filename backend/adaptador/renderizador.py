@@ -8,9 +8,11 @@ from __future__ import annotations
 
 import html
 import json
+import re
 import shutil
 from pathlib import Path
 
+from . import leitor_pdf
 from .modelo import Documento
 from .regras import parametros_p2
 
@@ -28,6 +30,16 @@ ESTILOS = {
                  "quadro_fundo": "#FFFFFF", "borda": "#000000"},
 }
 
+# Temas de leitura que o aluno escolhe na própria página (decisão do time, 31/10).
+# A versão Ampliada abre em amarelo no preto, como o alto contraste do site. A preferência de cada pessoa
+# com baixa visão varia (fundo escuro ofusca menos, mas há quem leia melhor no claro), então todos escolhem.
+TEMAS = {
+    "creme":   {"nome": "Creme (padrão)",   "texto": "#1E2235", "fundo": "#FBF7EE", "destaque": "#1F6FB2", "quadro": "#F3EDDF", "borda": "#1E2235", "link": "#1F6FB2"},
+    "amarelo": {"nome": "Amarelo no preto", "texto": "#FFE600", "fundo": "#000000", "destaque": "#FFE600", "quadro": "#000000", "borda": "#FFE600", "link": "#FFFFFF"},
+    "branco":  {"nome": "Branco no preto",  "texto": "#FFFFFF", "fundo": "#000000", "destaque": "#FFFFFF", "quadro": "#000000", "borda": "#FFFFFF", "link": "#FFE600"},
+    "preto":   {"nome": "Preto no branco",  "texto": "#000000", "fundo": "#FFFFFF", "destaque": "#000000", "quadro": "#FFFFFF", "borda": "#000000", "link": "#0E4A82"},
+}
+
 
 def luminancia(hexcor: str) -> float:
     r, g, b = (int(hexcor[i:i + 2], 16) / 255 for i in (1, 3, 5))
@@ -40,16 +52,43 @@ def contraste(a: str, b: str) -> float:
     return (la + 0.05) / (lb + 0.05)
 
 
+def _css_temas() -> str:
+    linhas = []
+    for chave, t in TEMAS.items():
+        linhas.append(f':root[data-tema="{chave}"] {{ --texto:{t["texto"]}; --fundo:{t["fundo"]}; --destaque:{t["destaque"]}; '
+                      f'--quadro:{t["quadro"]}; --borda:{t["borda"]}; --link:{t["link"]}; }}')
+    return "\n".join(linhas)
+
+
 def _css(estilo: str, params: dict) -> str:
     cor = ESTILOS[estilo]
     pt = params["pt_ampliada"] if estilo == "ampliada" else params["pt_padrao"]
     return FONTES_SITE + f"""
 :root {{ --texto:{cor['texto']}; --fundo:{cor['fundo']}; --destaque:{cor['destaque']};
-         --quadro:{cor['quadro_fundo']}; --borda:{cor['borda']}; }}
+         --quadro:{cor['quadro_fundo']}; --borda:{cor['borda']}; --link:{cor['destaque']}; --escala:1; }}
+{_css_temas()}
 * {{ box-sizing: border-box; }}
+html {{ background:var(--fundo); }}
 body {{ margin:0; background:var(--fundo); color:var(--texto); font-family:{FONTE};
-        font-size:{pt}pt; line-height:{max(params['espacamento_minimo'], 1.8 if estilo == 'ampliada' else 1.6)};
-        text-align:left; hyphens:none; font-style:normal; }}
+        font-size:calc({pt}pt * var(--escala)); line-height:{max(params['espacamento_minimo'], 1.8 if estilo == 'ampliada' else 1.6)};
+        text-align:left; hyphens:none; font-style:normal; {"font-weight:700; letter-spacing:.01em;" if estilo == "ampliada" else ""} }}
+a {{ color:var(--link); text-decoration-thickness:2px; text-underline-offset:3px; }}
+/* fórmulas (MathML): mesma cor do texto, fonte de matemática do sistema */
+math {{ font-family:"Cambria Math","STIX Two Math","Latin Modern Math",math; font-size:1.1em; color:inherit; math-style:normal; }}
+mfrac {{ padding:0 .1em; }}
+sup, sub {{ font-size:.75em; line-height:0; }}
+ul.itens {{ list-style:none; padding-left:0; }}
+ul.itens li {{ padding-left:2.2em; text-indent:-2.2em; }}
+/* barra de ajustes de leitura */
+.ajustes {{ display:flex; flex-wrap:wrap; gap:.6rem 1rem; align-items:center; margin:0 0 1.2rem; padding:.6rem .8rem;
+  border:3px solid var(--borda); background:var(--quadro); font-size:max(14pt, .8em); font-weight:400; }}
+.ajustes label {{ font-weight:700; }}
+.ajustes select, .ajustes button {{ font:inherit; font-weight:700; min-height:44px; padding:.2rem .7rem; color:var(--texto);
+  background:var(--fundo); border:3px solid var(--borda); border-radius:0; cursor:pointer; }}
+.ajustes .grupo {{ display:inline-flex; gap:.4rem; align-items:center; }}
+figure img {{ border:3px solid var(--borda); background:#fff; }}
+.cor-aviso {{ font-size:.9em; }}
+
 main {{ max-width:{params['caracteres_por_linha']}ch; margin:0 auto; padding:1.5rem 1rem 4rem; }}
 h1, h2, h3 {{ line-height:1.25; color:var(--destaque); }}
 h1 {{ font-size:1.7em; }} h2 {{ font-size:1.35em; margin-top:2rem; }} h3 {{ font-size:1.15em; }}
@@ -75,7 +114,7 @@ FALA_SIMBOLOS = {"▲": "triângulo", "●": "círculo", "■": "quadrado", "◆
 CSS_AUDIO = """
 .barra-audio { position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; gap:.6rem; align-items:center;
   background:var(--quadro); border:3px solid var(--borda); padding:.6rem .8rem; margin:1rem 0; }
-.barra-audio button, .barra-audio select { font:inherit; font-size:1rem; min-height:44px; padding:.3rem .9rem;
+.barra-audio button, .barra-audio select { font:inherit; font-size:max(14pt, .8em); font-weight:700; min-height:44px; padding:.3rem .9rem;
   color:var(--texto); background:var(--fundo); border:3px solid var(--borda); cursor:pointer; }
 .barra-audio p { margin:0; flex-basis:100%; }
 .lendo { outline:5px solid var(--destaque); outline-offset:6px; border-left:10px solid var(--destaque); padding-left:.6rem; }
@@ -126,19 +165,58 @@ SCRIPT_AUDIO = r"""<script>
 
 
 def _fala(texto: str) -> str:
-    """Texto como deve ser falado: símbolos viram o nome da forma."""
+    """Texto como deve ser falado: fórmulas viram palavras ("x ao quadrado"), símbolos viram o nome da forma."""
+    texto = leitor_pdf.para_fala(texto)
     for simbolo, nome in FALA_SIMBOLOS.items():
-        texto = texto.replace(f"({simbolo})", f"({nome})")
+        texto = texto.replace(f"({simbolo})", f"({nome})").replace(f"{simbolo} =", f"{nome}:")
     return texto
+
+
+def _barra_ajustes(estilo: str) -> str:
+    opcoes = "".join(f'<option value="{k}">{_esc(t["nome"])}</option>' for k, t in TEMAS.items())
+    return (f'<div class="ajustes" role="group" aria-label="Ajustes de leitura">'
+            f'<span class="grupo"><label for="tema">Cores da página</label><select id="tema">{opcoes}</select></span>'
+            f'<span class="grupo" role="group" aria-label="Tamanho da letra">'
+            f'<button type="button" id="letra-menor" aria-label="Diminuir a letra">A−</button>'
+            f'<button type="button" id="letra-maior" aria-label="Aumentar a letra">A+</button></span></div>')
+
+
+SCRIPT_AJUSTES = r"""<script>
+(function () {
+  var CHAVE = "prisma-leitura-__VERSAO__", ESCALAS = [1, 1.15, 1.3, 1.5, 1.75];
+  var raiz = document.documentElement, pref = {};
+  try { pref = JSON.parse(localStorage.getItem(CHAVE)) || {}; } catch (e) { pref = {}; }
+  function aplicar() {
+    raiz.setAttribute("data-tema", pref.tema || "__TEMA__");
+    raiz.style.setProperty("--escala", ESCALAS[pref.escala || 0]);
+    document.getElementById("tema").value = pref.tema || "__TEMA__";
+    document.getElementById("letra-menor").disabled = !(pref.escala > 0);
+    document.getElementById("letra-maior").disabled = (pref.escala || 0) >= ESCALAS.length - 1;
+  }
+  function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify(pref)); } catch (e) { /* segue sem salvar */ } aplicar(); }
+  document.getElementById("tema").addEventListener("change", function (e) { pref.tema = e.target.value; salvar(); });
+  document.getElementById("letra-maior").addEventListener("click", function () { pref.escala = Math.min((pref.escala || 0) + 1, ESCALAS.length - 1); salvar(); });
+  document.getElementById("letra-menor").addEventListener("click", function () { pref.escala = Math.max((pref.escala || 0) - 1, 0); salvar(); });
+  aplicar();
+})();
+</script>"""
 
 
 def _esc(t: str) -> str:
     return html.escape(t, quote=True)
 
 
+def _html(t: str) -> str:
+    """Texto do material para HTML: escapa tudo e transforma a marcação de fórmula em <sup>, <sub> ou MathML."""
+    return leitor_pdf.para_html(t)
+
+
+ITEM_LETRA = re.compile(r"^\(?[a-h]\)\s")
+
+
 def para_html(doc: Documento, estilo: str = "padrao", manual: dict | None = None,
               pasta_imagens: Path | None = None, pasta_saida: Path | None = None,
-              audio: bool = False) -> str:
+              audio: bool = False, versao: str = "") -> str:
     if manual is None:
         from .regras import carregar_manual
         manual = carregar_manual()
@@ -167,19 +245,21 @@ def para_html(doc: Documento, estilo: str = "padrao", manual: dict | None = None
 
         if b.tipo == "titulo":
             n = min(max(b.nivel, 1), 3) + 1  # h1 é o título do documento
-            partes.append(f"<h{n}{marca(b.texto)}>{_esc(b.texto)}</h{n}>")
+            partes.append(f"<h{n}{marca(b.texto)}>{_html(b.texto)}</h{n}>")
         elif b.tipo == "paragrafo":
-            partes.append(f"<p{marca(b.texto)}>{_esc(b.texto)}</p>")
+            partes.append(f"<p{marca(b.texto)}>{_html(b.texto)}</p>")
         elif b.tipo == "lista":
-            partes.append(f"<ul{marca('Lista. ' + '. '.join(b.itens))}>" + "".join(f"<li>{_esc(x)}</li>" for x in b.itens) + "</ul>")
+            letras = all(ITEM_LETRA.match(x) for x in b.itens)
+            partes.append(f"<ul{' class=\"itens\"' if letras else ''}{marca(('' if letras else 'Lista. ') + '. '.join(b.itens))}>"
+                          + "".join(f"<li>{_html(x)}</li>" for x in b.itens) + "</ul>")
         elif b.tipo == "etapas":
             falado = " ".join(f"Passo {k}. {x}." for k, x in enumerate(b.itens, 1))
-            partes.append(f'<ol class="etapas"{marca(falado)}>' + "".join(f"<li>{_esc(x)}</li>" for x in b.itens) + "</ol>")
+            partes.append(f'<ol class="etapas"{marca(falado)}>' + "".join(f"<li>{_html(x)}</li>" for x in b.itens) + "</ol>")
         elif b.tipo == "quadro":
             rotulo = f"quadro-{i}"
             partes.append(
                 f'<aside class="quadro" aria-labelledby="{rotulo}"{marca(b.texto + ". " + ". ".join(b.itens))}><h2 id="{rotulo}">{_esc(b.texto)}</h2>'
-                + "<ul>" + "".join(f"<li>{_esc(x)}</li>" for x in b.itens) + "</ul></aside>"
+                + "<ul>" + "".join(f"<li>{_html(x)}</li>" for x in b.itens) + "</ul></aside>"
             )
         elif b.tipo == "imagem":
             if b.alt:
@@ -199,8 +279,9 @@ def para_html(doc: Documento, estilo: str = "padrao", manual: dict | None = None
     # o texto da aula entra dentro de <script>: o "<" é trocado por um código, para ninguém fechar a tag
     falas_json = json.dumps(falas, ensure_ascii=False).replace("<", chr(92) + "u003c")
 
+    tema = "amarelo" if estilo == "ampliada" else "creme"
     return f"""<!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-tema="{tema}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -210,10 +291,12 @@ def para_html(doc: Documento, estilo: str = "padrao", manual: dict | None = None
 <body>
 <a class="pular" href="#conteudo">Pular para o conteúdo</a>
 <main id="conteudo">
-<h1>{_esc(doc.titulo)}</h1>
+{_barra_ajustes(estilo)}
+<h1>{_html(doc.titulo)}</h1>
 {BARRA_AUDIO if audio else ""}
 {chr(10).join(partes)}
 </main>
+{SCRIPT_AJUSTES.replace("__VERSAO__", versao or estilo).replace("__TEMA__", tema)}
 {SCRIPT_AUDIO.replace("__FALAS__", falas_json) if audio else ""}
 </body>
 </html>

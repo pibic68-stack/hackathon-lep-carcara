@@ -14,7 +14,8 @@
   var PERFIS = {
     professor: { rotulo: "Professor(a)", ola: "Olá, professor(a)!", avatar: "professor.png", form: "form-email" },
     familia: { rotulo: "Família", ola: "Olá, família!", avatar: "familia.png", form: "form-codigo" },
-    aluno: { rotulo: "Aluno(a)", ola: "Oi! Vamos estudar?", avatar: "aluno.png", form: "form-aluno" }
+    aluno: { rotulo: "Aluno(a)", ola: "Oi! Vamos estudar?", avatar: "aluno.png", form: "form-aluno" },
+    escola: { rotulo: "Escola", ola: "Olá, coordenação!", avatar: "escola.jpg", form: "form-email" }
   };
   var perfil = null, figuras = [];
   function $(id) { return document.getElementById(id); }
@@ -36,8 +37,9 @@
     $("form-avatar").src = "assets/img/" + cfg.avatar;
     $("form-rotulo").textContent = cfg.rotulo;
     $("titulo-form").textContent = cfg.ola;
-    ["form-email", "form-codigo", "form-aluno", "form-cadastro"].forEach(function (f) { $(f).hidden = f !== cfg.form; });
+    ["form-email", "form-codigo", "form-aluno", "form-cadastro", "form-escola"].forEach(function (f) { $(f).hidden = f !== cfg.form; });
     $("criar-conta").hidden = p !== "professor";
+    $("criar-escola").hidden = p !== "escola";
     limparErros();
     $("status").textContent = "";
     history.replaceState(null, "", "#" + p);
@@ -45,12 +47,14 @@
   }
 
   function mostrarCadastro(sim) {
+    var escola = perfil === "escola";
+    var form = escola ? "form-escola" : "form-cadastro";
     limparErros();
     $("status").textContent = "";
     $("form-email").hidden = sim;
-    $("form-cadastro").hidden = !sim;
-    $("titulo-form").textContent = sim ? "Bem-vindo(a) ao PRISMA!" : PERFIS.professor.ola;
-    $(sim ? "nome" : "email").focus();
+    $(form).hidden = !sim;
+    $("titulo-form").textContent = sim ? (escola ? "Boas-vindas, escola!" : "Bem-vindo(a) ao PRISMA!") : PERFIS[perfil].ola;
+    $(sim ? (escola ? "escola_nome" : "nome") : "email").focus();
   }
 
   /* ---------- erros acessíveis ---------- */
@@ -96,6 +100,8 @@
     $("trocar-perfil").addEventListener("click", mostrarPerfis);
     $("abrir-cadastro").addEventListener("click", function () { mostrarCadastro(true); });
     $("voltar-entrar").addEventListener("click", function () { mostrarCadastro(false); });
+    $("abrir-cadastro-escola").addEventListener("click", function () { mostrarCadastro(true); });
+    $("voltar-entrar-escola").addEventListener("click", function () { mostrarCadastro(false); });
     $("esqueci").addEventListener("click", function () {
       $("status").textContent = "Ainda não dá para trocar a senha sozinho. Peça ajuda à coordenação da escola.";
     });
@@ -139,6 +145,10 @@
       return { nome: $("nome").value.trim(), email_novo: $("email_novo").value.trim(), senha_nova: $("senha_nova").value,
                codigo_escola: $("codigo_escola").value.trim(), lembrar: $("lembrar_novo").checked };
     }, function (_, d) { return Prisma.auth.cadastrar(d); });
+    enviar($("form-escola"), function () {
+      return { nome: $("escola_nome").value.trim(), email: $("escola_email").value.trim(), senha: $("escola_senha").value,
+               codigo: $("escola_codigo").value.trim(), lembrar: $("lembrar_escola").checked };
+    }, function (_, d) { return Prisma.auth.cadastrarEscola(d); });
     enviar($("form-codigo"), function () { return { codigo: $("codigo").value }; });
     enviar($("form-aluno"), function () { return { turma: $("turma").value, figuras: figuras.slice() }; });
 
