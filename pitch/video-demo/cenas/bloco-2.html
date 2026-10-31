@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Bloco 2: nós somos a PRISMA</title>
+<link rel="stylesheet" href="/web/css/tokens.css">
+<link rel="stylesheet" href="comum.css">
+<style>
+  /* os buracos dos vídeos ficam transparentes; o montar.py põe os vídeos por baixo */
+  .moldura { position: absolute; width: 680px; height: 383px; border: 6px solid var(--tinta); box-shadow: 10px 10px 0 var(--tinta); }
+  .moldura .faixa { position: absolute; left: 0; right: 0; top: -6px; height: 14px; }
+  .moldura .palavra { position: absolute; left: -6px; bottom: -62px; font-family: var(--fonte-titulo); font-weight: 700; font-size: 40px;
+    color: var(--papel); background: var(--tinta); padding: 2px 18px; }
+  .palavra.grande { color: var(--tinta); background: var(--sol); }
+  .aparece { animation: aparece .3s ease both; }
+  .pula { animation: pula .35s cubic-bezier(.3,1.6,.5,1) both; }
+  @keyframes aparece { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pula { from { opacity: 0; transform: translateY(16px) scale(.7); } to { opacity: 1; transform: none; } }
+  #logo { position: absolute; inset: 0 0 -190px 0; background-color: var(--papel);
+    background-image: radial-gradient(var(--cor-pontos) 1.6px, transparent 1.7px); background-size: 28px 28px; }
+  #logo .centro { position: absolute; left: 0; right: 0; top: 140px; display: flex; flex-direction: column; align-items: center; }
+  #logo img { width: 300px; image-rendering: pixelated; }
+  #logo .titulo { font-size: 160px; margin-top: 10px; }
+  #logo .sigla { margin-top: 20px; font-size: 40px; font-weight: 700; color: var(--ceu-escuro); text-align: center; }
+</style>
+</head>
+<body>
+<div class="palco">
+  <div id="cartoes"></div>
+  <div id="logo" class="aparece">
+    <div class="centro">
+      <img class="surge" id="logo-img" src="/web/assets/img/prisma-logo.svg" alt="">
+      <div class="titulo surge" id="logo-txt">PRISMA</div>
+      <div class="sigla entra" id="logo-sigla">Plataforma de Recursos Inclusivos<br>e Sala de Materiais Acessíveis</div>
+    </div>
+  </div>
+</div>
+<script src="time.js"></script>
+<script src="motor.js"></script>
+<script>
+  var T = window.TEMPOS_TIME;
+  window.DURACAO = T.fim;
+  var POS = [[200, 15], [1040, 15], [200, 455], [1040, 455]];
+  var CORES = ["#1F6FB2", "#A3401F", "#2E7D32", "#8A5A2B"];
+  window.montar = function () {
+    var box = document.getElementById("cartoes");
+    TIME.forEach(function (p, i) {
+      var m = document.createElement("div");
+      m.className = "moldura aparece";
+      m.style.left = POS[i][0] + "px"; m.style.top = POS[i][1] + "px";
+      m.style.animationDelay = T.cartoes[i] + "s";
+      var fala = T.cartoes[i] + T.antes_fala;
+      m.innerHTML = '<div class="faixa" style="background:' + CORES[i] + '"></div>' +
+        '<div class="palavra pula' + (i === 3 ? " grande" : "") + '" style="animation-delay:' + fala + 's">' + p.palavra + "</div>";
+      box.appendChild(m);
+    });
+    document.getElementById("logo").style.animationDelay = T.logo + "s";
+    document.getElementById("logo-img").style.animationDelay = (T.logo + 0.2) + "s";
+    document.getElementById("logo-txt").style.animationDelay = (T.logo + 0.5) + "s";
+    document.getElementById("logo-sigla").style.animationDelay = (T.logo + 1.0) + "s";
+  };
+</script>
+</body>
+</html>

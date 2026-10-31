@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Bloco 3: a dor</title>
+<link rel="stylesheet" href="/web/css/tokens.css">
+<link rel="stylesheet" href="/web/css/ficha.css">
+<link rel="stylesheet" href="comum.css">
+<style>
+  /* ---- parte A: a ficha e a professora ---- */
+  #a-ficha { position: absolute; left: 760px; top: 40px; width: 640px; }
+  #a-coruja { position: absolute; left: 230px; top: 250px; width: 300px; }
+  #a-balao { left: 470px; top: 180px; }
+  #a-rotulo { position: absolute; left: 230px; top: 570px; }
+
+  /* ---- parte B: três alunos ---- */
+  .coluna { position: absolute; top: 30px; width: 560px; }
+  .coluna .tela { position: relative; height: 560px; overflow: hidden; border: 4px solid var(--tinta); background: var(--papel-2); }
+  .coluna .tela .ficha { position: absolute; left: 30px; top: 18px; width: 610px; transform: scale(.82); transform-origin: top left; margin: 0; }
+  .coluna .quem { display: flex; gap: 20px; align-items: center; margin-top: 18px; }
+  .coluna .quem img { width: 120px; height: 120px; border: 4px solid var(--tinta); }
+  .coluna .nome { font-family: var(--fonte-titulo); font-size: 52px; font-weight: 700; }
+  .coluna .barreira { font-size: 30px; line-height: 1.25; color: var(--tinta-2); }
+  #lia { left: 60px; } #davi { left: 680px; } #teo { left: 1300px; }
+  #lia .tela .ficha { filter: url(#deuteranopia); }
+  #davi .tela .ficha { filter: blur(3.2px); }
+  .aviso { position: absolute; right: 14px; bottom: 14px; z-index: 3; }
+
+  /* bagunça visual da ficha do Téo */
+  .enfeite { position: absolute; z-index: 2; font-size: 54px; line-height: 1; }
+  .gira { animation: gira 2.4s linear infinite; }
+  .balanca { animation: balanca 1.2s ease-in-out infinite alternate; }
+  .pula { animation: pula .9s ease-in-out infinite alternate; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  @keyframes balanca { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }
+  @keyframes pula { from { transform: translateY(0); } to { transform: translateY(-14px); } }
+  .faixa { position: absolute; z-index: 2; font-family: var(--fonte-titulo); font-weight: 700; font-size: 30px; padding: 4px 14px; color: #fff; }
+
+  /* ---- parte C: dados ---- */
+  .dado { position: absolute; top: 140px; width: 540px; height: 560px; display: flex; flex-direction: column; }
+  #d1 { left: 90px; } #d2 { left: 690px; } #d3 { left: 1290px; }
+  .dado .numero { font-size: 120px; color: var(--ceu-escuro); line-height: 1; margin: 6px 0 14px; }
+  .dado .txt { font-size: 34px; line-height: 1.3; font-weight: 700; }
+  .dado .fonte { margin-top: auto; font-family: var(--fonte-mono); font-size: 22px; color: var(--tinta-3); }
+  .grade { display: grid; grid-template-columns: repeat(10, 34px); gap: 8px; margin: 10px 0 18px; }
+  .grade i { width: 34px; height: 34px; background: var(--ceu-escuro); }
+  .grade i.fora { background: transparent; border: 4px solid var(--tinta-3); }
+  .quatro { display: flex; gap: 18px; margin: 10px 0 18px; }
+  .quatro img { width: 96px; height: 96px; border: 4px solid var(--tinta); opacity: .45; }
+  .quatro img.um { opacity: 1; outline: 8px solid var(--laranja-escuro); outline-offset: 4px; }
+  #c-titulo { position: absolute; left: 0; right: 0; top: 330px; text-align: center; font-size: 110px; }
+
+  /* ---- parte D: a professora sem tempo ---- */
+  #d-coruja { position: absolute; left: 300px; top: 210px; width: 330px; }
+  #pilha { position: absolute; left: 760px; top: 90px; width: 360px; height: 640px; }
+  #pilha i { position: absolute; left: 0; width: 300px; height: 40px; background: var(--branco); border: 3px solid var(--tinta); }
+  #relogio { position: absolute; left: 1290px; top: 150px; width: 300px; height: 300px; border: 8px solid var(--tinta); border-radius: 50%; background: var(--branco); }
+  #ponteiro { position: absolute; left: 142px; top: 40px; width: 16px; height: 112px; background: var(--laranja-escuro); transform-origin: 50% 100%; }
+  #ponteiro2 { position: absolute; left: 144px; top: 80px; width: 12px; height: 72px; background: var(--tinta); transform-origin: 50% 100%; }
+  #d-num { position: absolute; left: 760px; top: 20px; }
+  #d-tempo { position: absolute; left: 1190px; top: 500px; width: 500px; text-align: center; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <!-- simulação de deuteranopia (Machado, Oliveira e Fernandes, 2009) -->
+  <filter id="deuteranopia" color-interpolation-filters="linearRGB">
+    <feColorMatrix type="matrix" values="0.367 0.861 -0.228 0 0  0.280 0.673 0.047 0 0  -0.012 0.043 0.969 0 0  0 0 0 1 0"/>
+  </filter>
+</svg>
+
+<div class="palco">
+
+  <!-- A: a ficha de hoje -->
+  <div class="camada sai" data-f="3-0.4">
+    <div id="a-ficha" class="entra" data-f="@0.2"></div>
+    <img id="a-coruja" class="pixel esq" data-f="1" src="/web/assets/img/professor.png" alt="">
+    <div id="a-balao" class="balao surge" data-f="1+0.3">fiz com carinho ♥</div>
+    <div id="a-rotulo" class="rotulo entra" data-f="1+0.5">professora</div>
+  </div>
+
+  <!-- B: três alunos, três barreiras -->
+  <div class="camada sai" data-f="6-0.3">
+    <div id="lia" class="coluna entra" data-f="3">
+      <div class="tela"><div class="f"></div><span class="etiqueta aviso">as setas parecem iguais</span></div>
+      <div class="quem"><img class="pixel" src="/web/assets/img/aluno.png" alt=""><div><div class="nome">Lia</div><div class="barreira">vê vermelho e verde parecidos</div></div></div>
+    </div>
+    <div id="davi" class="coluna entra" data-f="4">
+      <div class="tela"><div class="f"></div><span class="etiqueta aviso">a letra some</span></div>
+      <div class="quem"><img class="pixel" src="/web/assets/img/aluno.png" alt=""><div><div class="nome">Davi</div><div class="barreira">enxerga pouco de perto</div></div></div>
+    </div>
+    <div id="teo" class="coluna entra" data-f="5">
+      <div class="tela"><div class="f"></div>
+        <span class="enfeite gira" style="left:40px;top:60px">★</span>
+        <span class="enfeite balanca" style="right:30px;top:110px;color:#E53935">♥</span>
+        <span class="enfeite pula" style="left:250px;top:250px;color:#FDD835">✦</span>
+        <span class="enfeite gira" style="right:60px;top:330px;color:#43A047">✿</span>
+        <span class="enfeite balanca" style="left:30px;top:400px;color:#1E88E5">☀</span>
+        <span class="faixa balanca" style="left:160px;top:10px;background:#E53935">atenção!!!</span>
+        <span class="faixa pula" style="right:20px;top:200px;background:#8E24AA">super dica</span>
+        <span class="faixa balanca" style="left:60px;top:470px;background:#F4511E">não esqueça!</span>
+        <span class="etiqueta aviso">muita coisa ao mesmo tempo</span></div>
+      <div class="quem"><img class="pixel" src="/web/assets/img/aluno.png" alt=""><div><div class="nome">Téo</div><div class="barreira">se cansa com página cheia</div></div></div>
+    </div>
+  </div>
+
+  <!-- C: dados -->
+  <div class="camada">
+    <div id="c-titulo" class="titulo surge-sai" data-f="6, 7-0.3">isso não é raro</div>
+    <div class="camada sai" data-f="10-0.3">
+      <div id="d1" class="dado cartao entra" data-f="7">
+        <div class="rotulo">educação especial</div>
+        <div class="numero" id="n1">0</div>
+        <div class="txt">matrículas no Brasil</div>
+        <div class="grade" style="margin-top:28px" id="grade1"></div>
+        <div class="fonte">INEP, Censo Escolar 2025</div>
+      </div>
+      <div id="d2" class="dado cartao entra" data-f="8">
+        <div class="rotulo">na sala de todo mundo</div>
+        <div class="numero" id="n2">0%</div>
+        <div class="grade" id="grade"></div>
+        <div class="txt">estudam em classes comuns</div>
+        <div class="fonte">INEP, Censo Escolar 2025 (4 a 17 anos)</div>
+      </div>
+      <div id="d3" class="dado cartao entra" data-f="9">
+        <div class="rotulo">estudantes daltônicos</div>
+        <div class="numero">1 em 4</div>
+        <div class="quatro"><img class="pixel um" src="/web/assets/img/aluno.png" alt=""><img class="pixel" src="/web/assets/img/aluno.png" alt=""><img class="pixel" src="/web/assets/img/aluno.png" alt=""><img class="pixel" src="/web/assets/img/aluno.png" alt=""></div>
+        <div class="txt">têm dificuldade nas provas</div>
+        <div class="fonte">Alves e Alves, UniFOA, 2025</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- D: e a professora? -->
+  <div class="camada">
+    <img id="d-coruja" class="pixel esq" data-f="10" src="/web/assets/img/professor.png" alt="">
+    <div id="d-num" class="entra" data-f="11"><span class="numero" style="font-size:96px" id="n3">0</span> <span class="titulo" style="font-size:60px">alunos</span></div>
+    <div id="pilha"></div>
+    <div id="relogio" class="surge" data-f="11+1.2"><div id="ponteiro2"></div><div id="ponteiro"></div></div>
+    <div id="d-tempo" class="titulo entra" data-f="11+1.6" style="font-size:64px">e pouco tempo</div>
+  </div>
+</div>
+
+<script src="/web/js/dados.js"></script>
+<script src="/web/js/icones.js"></script>
+<script src="/web/js/material.js"></script>
+<script src="motor.js"></script>
+<script>
+  window.BLOCO = 3; window.SOBRA = 0.6;
+  window.montar = function () {
+    document.getElementById("a-ficha").innerHTML = Prisma.ficha("original");
+    document.querySelectorAll(".coluna .f").forEach(function (f) { f.outerHTML = Prisma.ficha("original"); });
+    var g = document.getElementById("grade");
+    var g1 = document.getElementById("grade1");
+    for (var j = 0; j < 30; j++) { var c1 = document.createElement("i"); c1.style.background = "var(--laranja-escuro)"; c1.className = "surge"; c1.style.animationDelay = (F(7) + 0.3 + j * 0.05) + "s"; g1.appendChild(c1); }
+    for (var i = 0; i < 50; i++) { var c = document.createElement("i"); if (i >= 48) c.className = "fora"; g.appendChild(c); }
+    // 35 fichas empilhando
+    var p = document.getElementById("pilha"), t0 = F(11) + 0.2;
+    for (var k = 0; k < 35; k++) {
+      var e = document.createElement("i");
+      e.style.bottom = (k * 17) + "px";
+      e.style.rotate = (((k * 37) % 9) - 4) + "deg";
+      e.style.animation = "desce .35s cubic-bezier(.2,.8,.2,1) both";
+      e.style.animationDelay = (t0 + k * 0.05) + "s";
+      p.appendChild(e);
+    }
+  };
+  var fmtMi = function (v) { return v.toFixed(1).replace(".", ",") + " mi"; };
+  window.aoTempo = function (t) {
+    contar(document.getElementById("n1"), t, F(7) + 0.2, F(7) + 2.2, 0, 2.5, fmtMi);
+    contar(document.getElementById("n2"), t, F(8) + 0.2, F(8) + 2.2, 0, 96, function (v) { return Math.round(v) + "%"; });
+    contar(document.getElementById("n3"), t, F(11) + 0.2, F(11) + 1.95, 0, 35, function (v) { return Math.round(v); });
+    var a = Math.max(0, t - (F(11) + 1.2));
+    document.getElementById("ponteiro").style.transform = "rotate(" + (a * 140) + "deg)";
+    document.getElementById("ponteiro2").style.transform = "rotate(" + (a * 12) + "deg)";
+  };
+</script>
+</body>
+</html>
