@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 7
-- **Exportado em:** 31/10/2026 07:06
+- **Mensagens do time:** 8
+- **Exportado em:** 31/10/2026 07:34
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -521,3 +521,111 @@ Depois de abrir, aperte Ctrl+F5 no navegador. Isso força recarregar e evita que
 | `.claude/launch.json`, `backend/.gitkeep` | Sem uso. |
 
 Não mexi em `prompts/` (a regra do projeto manda manter), nem em `docs/divisao-tarefas.md`, `docs/relatorio-coerencia-acessibilidade.md` e `docs/pesquisa/`. Também deixei as pastas vazias `pitch/` e `relatorios/`, porque são entregas do time. Se quiserem uma limpeza mais agressiva, me digam o que mais pode sair.
+
+
+---
+
+## 🧑 Time · 31/10 07:24
+
+@"/mnt/user-data/attachments/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/719d6d89-Relat_rio_A1_Pr_tica2_Szpigel_Borges_Rodrigues.pdf" enviamos esse relatorio e essa foi a resposta. nao esta a contento
+precisamos que apare os erros que estao impedindo a ia de trabalhar
+tambem precisamos de alguma forma de acompanhar a produçao da ia, a demora pra produçao e sua possivel falha podem atrapalhar na apresentaçao
+
+<details><summary>Ações executadas pelo Claude (22)</summary>
+
+- 🔧 `Bash`: Fetch; read IA Leitura Fácil loop
+- 🔧 `Bash`: Check whether Gemini API is reachable from here
+- 🔧 `WebSearch`: Gemini API models list free tier gemini-3.1-flash-lite rate limits 503 overloaded
+- 🔧 `WebFetch`: https://claw.aguidetocloud.com/google/gemini-api/models/
+- 🔧 `Bash`: Read API client and upload form code
+- 🔧 `Bash`: Read upload flow and helpers
+- 🔧 `Read`: /mnt/user-data/attachments/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/719d6d89-Relat_rio_A1_Pr_tica2_Szpigel_Borges_Rodrigues.pdf
+- 🔧 `Bash`: Inspect how the report PDF is read
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/backend/adaptador/progresso.py
+- 🔧 `Bash`: Read Gemini class
+- 🔧 `Bash`: Read Gemini tests
+- 🔧 `Bash`: Rewrite Gemini client with retries, endpoint and model fallback
+- 🔧 `Bash`: Persist working model; run IA tests
+- 🔧 `Bash`: Add tests for retries and fallback
+- 🔧 `Bash`: Add progress and early stop in Leitura Fácil
+- 🔧 `Bash`: Read pipeline functions
+- 🔧 `Bash`: Add progress steps to pipeline
+- 🔧 `Bash`: Version labels; read API processing
+- 🔧 `Bash`: Wire progress and IA test into API
+- 🔧 `Bash`: Verify call sites, run tests
+- 🔧 `Bash`: Read professor.js header and usage
+- 🔧 `Bash`: See where form is mounted
+
+</details>
+
+
+## 🤖 Claude · 31/10 07:28
+
+Now the front end: client calls and the live progress panel.
+
+<details><summary>Ações executadas pelo Claude (24)</summary>
+
+- 🔧 `Bash`: Add progress panel and IA test to teacher UI
+- 🔧 `Bash`: Syntax-check JS, add panel CSS
+- 🔧 `Bash`: Use site tokens in CSS
+- 🔧 `Bash`: Find title selection and bullet regex use
+- 🔧 `Bash`: Add structure cleanup and re-read report
+- 🔧 `Bash`: Join page-split paragraphs, normalize reaction arrows
+- 🔧 `Bash`: Add structure and progress API tests
+- 🔧 `Bash`: Start server with simulated slow IA
+- 🔧 `Bash`: Start fake-IA server detached
+- 🔧 `Bash`: End-to-end test of the progress panel
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/producao-meio.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/producao-fim.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/lf2-relatorio.png
+- 🔧 `Bash`: Group LF warnings, autoscroll diary, cap image height
+- 🔧 `Bash`: View tunnel main start
+- 🔧 `Bash`: IA check in the publish window
+- 🔧 `Bash`: Rerun end-to-end with fixes
+- 🔧 `Bash`: Restart fake server
+- 🔧 `Bash`: Run end-to-end again
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/producao-fim.png
+- 🔧 `Bash`: Count cached IA answers in progress
+- 🔧 `Bash`: Document, commit, push, zip
+- 🔧 `Bash`: Remove fake-IA cache from repo, rebuild zip
+- 🔧 `SendUserFile`
+
+</details>
+
+
+## 🤖 Claude · 31/10 07:34
+
+O que travou a IA foi o erro 503 do Google, que significa servidor sobrecarregado. Não é erro da chave nem do PRISMA. A plataforma tentava 3 vezes em 14 segundos e desistia da versão inteira. Agora ela insiste mais e troca de modelo, e o professor acompanha tudo ao vivo no painel.
+
+Não consegui testar com o Gemini de verdade: daqui não tenho acesso ao Google. Os testes passam, e o painel funcionou do começo ao fim com uma IA simulada que falha de propósito. Os nomes dos modelos reserva vêm da documentação, e o PRISMA pula sozinho os que não existirem.
+
+**Quando o Google responde 503, a plataforma agora:**
+1. espera 2 s e depois 6 s, e tenta de novo;
+2. tenta pelo outro caminho da API do Gemini;
+3. passa para modelos reserva (gemini-3-flash-preview, gemini-flash-latest, gemini-flash-lite-latest);
+4. lembra por 10 minutos o modelo que funcionou e começa por ele nos pedidos seguintes;
+5. se todos falharem, diz isso com clareza e sugere esperar 1 ou 2 minutos e usar "Gerar as versões de novo".
+
+Também parou de esperar à toa. Se a IA falhar duas vezes seguidas, ela não espera lote por lote nem imagem por imagem. O que faltou fica pendente e o professor é avisado. Os avisos de trechos não simplificados viraram um item só: no teste, a lista "Para você conferir" caiu de 55 para 7.
+
+**Para acompanhar a produção** (o print `producao-meio.png` mostra o painel):
+- **Painel no professor:** logo abaixo do envio aparece "Acompanhar a produção", atualizado a cada segundo. Ele mostra a etapa atual, uma barra de andamento e o tempo total. Mostra também os pedidos à IA, o tempo médio de cada um, as novas tentativas e o modelo em uso. Embaixo fica um diário do que aconteceu. Se a IA ficar mais de 40 s sem responder, aparece um aviso explicando que o PRISMA continua tentando.
+- **Antes de enviar:** o botão "Testar a IA agora" diz em segundos se ela está respondendo.
+- **Ao abrir o `publicar.bat`:** a janela já mostra se a IA está respondendo.
+
+**O relatório de vocês também tinha problemas de leitura, e corrigi estes:**
+- **Título:** o material agora se chama "Experimento I – Determinação da Dureza da Água", e não "INSTITUTO MILITAR DE ENGENHARIA".
+- **Sumário:** saiu, porque os números de página não valem na versão adaptada. Ele era a origem dos "." soltos.
+- **Estrutura:** "2.1 Materiais…" virou subtítulo, os itens com "•" viraram lista e parágrafos cortados pela troca de página foram juntados.
+- **Equações químicas:** as setas viraram ⇌ e →.
+- **Logo da capa:** não ocupa mais a tela inteira.
+
+Ainda saem estranhas as tabelas e a equação (4), que tem as cores escritas embaixo dos íons. O professor precisa conferir essas partes.
+
+Os nomes reais de vocês, que estão na capa do relatório, vão para o Gemini. A regra do projeto é usar só material sem dados reais, porque o plano gratuito pode usar o conteúdo enviado. Para a demo, prefiram um material sem nomes reais.
+
+**Na apresentação:** abram o `publicar.bat` uns 10 minutos antes e cliquem em "Testar a IA agora". Enviem uma vez o material da demo antes de apresentar. As respostas da IA ficam guardadas, e na hora o mesmo arquivo sai em segundos, mesmo com o Google ocupado.
+
+Sources:
+- [Gemini API: modelos disponíveis](https://claw.aguidetocloud.com/google/gemini-api/models/)
+- [ai.google.dev: preços e limites](https://ai.google.dev/pricing)
