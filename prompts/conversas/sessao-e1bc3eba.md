@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 5
-- **Exportado em:** 30/10/2026 22:03
+- **Mensagens do time:** 6
+- **Exportado em:** 30/10/2026 23:30
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -412,3 +412,37 @@ O que não funciona nessa versão publicada:
 - **Backend:** as funções que dependem dele (enviar material, aprovar, biblioteca do aluno) mostram erro, porque o servidor do Raphael roda no computador dele. Para a demo completa, abra o site pelo servidor local do backend (`python -m adaptador.api`, que também serve o `web/`).
 - **Menu entre páginas:** não testei se, no visualizador do Claude, os links entre a página inicial e as outras páginas funcionam. Se algum não abrir, me diga qual.
 - **Sem GitHub Pages:** isso não resolve para o grupo todo, porque o repositório é privado e não tenho acesso às configurações dele. Se quiserem um endereço público, o caminho é ativar o Pages no GitHub (em Settings), e eu explico o passo a passo.
+
+
+---
+
+## 🧑 Time · 30/10 23:30
+
+acabamos de fazer muitas alteraçoes na plataforma. estamos testando o cadastro de um professor e colocamos o codigo da escola sendo 123. abra pra mim o publicar.bat direto pra eu abrir a plataforma
+
+<details><summary>Ações executadas pelo Claude (5)</summary>
+
+- 🔧 `Bash`: Atualizar o repositório e procurar o publicar.bat
+- 🔧 `Bash`: Ler o publicar.bat antes de qualquer execução
+- 🔧 `ToolSearch`: select:mcp__remote-devices__get_device_info
+- 🔧 `remote-devices / get_device_info`
+- 🔧 `remote-devices / device_list_dir`
+
+</details>
+
+
+## 🤖 Claude · 30/10 23:30
+
+Não consigo abrir o `publicar.bat` por aqui. Neste momento só tenho acesso a arquivos do seu computador, na pasta `Downloads\hack` (a das pesquisas). Não tenho como executar programas, e o repositório do PRISMA não está nessa pasta.
+
+**Para abrir a plataforma você mesmo**
+1. Abra a pasta do repositório clonado e dê `git pull`. Quem criou o `publicar.bat` já enviou as últimas alterações.
+2. Confira se o arquivo `backend\.env` existe e tem a chave e o `PRISMA_CODIGO_ESCOLA`. Ele fica fora do Git, então vem do computador de quem configurou.
+3. Dê duplo clique em `publicar.bat`. Ele liga o servidor e, na janela que abrir, mostra uma linha `https://....trycloudflare.com`. Esse é o link para abrir e passar a quem for testar.
+4. Precisa de Python e do `cloudflared` instalados (o .bat procura os dois). Se faltar um, a janela avisa.
+
+**Dois cuidados**
+- O link da Cloudflare é público e muda a cada vez. Com o código `123`, qualquer pessoa que receber o link consegue criar conta de professor. Para o teste tudo bem, mas antes da demo troque o `PRISMA_CODIGO_ESCOLA` por algo mais difícil e só envie o link a quem vai testar.
+- Escrever o código aqui no chat tem um efeito colateral: as conversas vão para o GitHub (`prompts/`). Como `123` é só de teste, não é grave, mas o `CLAUDE.md` pede para nunca colocar o código da escola no chat. Ao trocar o código, não cole o novo aqui.
+
+Se quiser, posso ativar o controle da tela do seu computador para abrir o `publicar.bat` por você. Antes preciso saber em qual pasta está o repositório, e você terá que aprovar o acesso na tela.
