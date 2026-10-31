@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 6
-- **Exportado em:** 31/10/2026 07:04
+- **Mensagens do time:** 7
+- **Exportado em:** 31/10/2026 07:06
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -456,3 +456,68 @@ Essa página é só a vitrine da interface. O login, o envio de material e a Lei
 Se você quis dizer a plataforma completa, que roda no seu computador, a versão mais nova é a do `PRISMA.zip`. Se o link `trycloudflare` ainda mostra o resultado antigo, feche as duas janelas do PRISMA e abra o `publicar.bat` de novo.
 
 A página separada "Instruções · PRISMA" (curso e Manual) continua na versão antiga. A versão nova do curso está dentro do site, no menu Instruções. Posso atualizar a página separada também, se quiser.
+
+
+---
+
+## 🧑 Time · 31/10 07:05
+
+abra o mais novo resultado direto pra mim pelo publicar.bat, pra mim ta aparecendo o anterior
+limpe o github de todo complemento que foi criado e ja foi implementado, deixe mais organizado e simples. muita coisa ja nao tem mais utilidade
+
+<details><summary>Ações executadas pelo Claude (7)</summary>
+
+- 🔧 `Bash`: Fetch and survey repo contents
+- 🔧 `Bash`: List tracked files and biggest
+- 🔧 `Bash`: Check who references each candidate file
+- 🔧 `Bash`: Inspect duplicate manual files and builders
+- 🔧 `Bash`: Check remaining references before deleting
+- 🔧 `SendUserMessage`
+- 🔧 `Bash`: Fix old-server issue in bat, remove obsolete files
+
+</details>
+
+
+## 🤖 Claude · 31/10 07:06
+
+Agora consertar as referências que ficaram para trás e os geradores.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Fix stale references after cleanup
+- 🔧 `Bash`: Rebuild Instruções and run tests
+- 🔧 `Bash`: Commit, push, build zip
+- 🔧 `SendUserFile`
+
+</details>
+
+
+## 🤖 Claude · 31/10 07:06
+
+Não consigo abrir o `publicar.bat` por você: ele roda no Windows e eu estou numa máquina Linux na nuvem. Mas achei provavelmente por que aparece a versão antiga, e corrigi.
+
+**Por que aparecia a versão antiga.** A janela "PRISMA servidor" da vez anterior continuava aberta, ocupando a porta 8000. O servidor novo não conseguia ligar e o navegador abria o velho. O `publicar.bat` agora:
+- fecha qualquer PRISMA antigo antes de ligar;
+- mostra na tela de qual pasta ele está rodando, para você conferir se é a nova.
+
+**Para ver o resultado novo:**
+1. Feche as janelas "PRISMA servidor" e do `publicar.bat` que estiverem abertas.
+2. Extraia o `PRISMA.zip` numa pasta nova, sem sobrescrever a antiga.
+3. Copie o `backend\.env` da pasta antiga (a chave do Gemini) para `backend\` da nova. O `.env` fica de fora do GitHub, então precisa ser copiado.
+4. Abra o `publicar.bat` da pasta nova.
+
+Depois de abrir, aperte Ctrl+F5 no navegador. Isso força recarregar e evita que ele mostre a versão guardada. Materiais enviados antes das últimas mudanças precisam ser reenviados (ou usar "Gerar as versões de novo").
+
+**Limpeza do repositório.** Tirei 27 arquivos (cerca de 5,6 mil linhas) e atualizei os documentos que apontavam para eles. Os 101 testes continuam passando.
+
+| Removido | Motivo |
+|---|---|
+| `docs/manual/manual.html` | O PDF substitui. |
+| `web/prisma-instrucoes/padroes.json` | Cópia sem uso: o backend lê `docs/manual/padroes.json`. |
+| `docs/certificado-como-implementar.md` | Guia do certificado, já implementado. O `web/certificado/LEIA-ME.md` ficou. |
+| `docs/plano-site.md` | Plano do site, já feito. |
+| `web/certificado/exemplos/`, `backend/exemplos/aula-ciclo-da-agua.pdf` | PDFs de exemplo que se recriam. |
+| `web/assets/anim/originais/` e `web/ferramentas/adaptar_animacoes.py` | Animações de origem e a ferramenta que converteu para a paleta do site, já aplicada. As animações finais ficam em `web/assets/anim/`. |
+| `.claude/launch.json`, `backend/.gitkeep` | Sem uso. |
+
+Não mexi em `prompts/` (a regra do projeto manda manter), nem em `docs/divisao-tarefas.md`, `docs/relatorio-coerencia-acessibilidade.md` e `docs/pesquisa/`. Também deixei as pastas vazias `pitch/` e `relatorios/`, porque são entregas do time. Se quiserem uma limpeza mais agressiva, me digam o que mais pode sair.
