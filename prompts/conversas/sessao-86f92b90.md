@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `86f92b90`
 
 - **Início:** 31/10 00:10
-- **Mensagens do time:** 5
-- **Exportado em:** 31/10/2026 00:53
+- **Mensagens do time:** 6
+- **Exportado em:** 31/10/2026 00:59
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -440,3 +440,23 @@ A descrição também deixa três pontos para quem revisar:
 - O certificado diz "concluiu os dez passos", mas hoje o site só sabe se o mini-check terminou. O time precisa decidir se rastreia os 10 passos ou troca a frase.
 - O login da família guarda "Família de …", não o nome da pessoa, então a família digita o próprio nome.
 - O certificado ainda não aparece no site. Para isso, é preciso seguir o guia do Szpigel.
+
+
+---
+
+## 🧑 Time · 31/10 00:58
+
+meus amigos não estão achando o lugar da instrução...
+
+<details><summary>Ações executadas pelo Claude (3)</summary>
+
+- 🔧 `Bash`: Check whether PR merged and guide on main
+- 🔧 `ccd_turn / wrap_up`
+- 🔧 `ccd_turn / wrap_up`
+
+</details>
+
+
+## 🤖 Claude · 31/10 00:59
+
+O guia não aparece porque o pull request 3 ainda não foi juntado à `main`. Enquanto isso, mande para eles os links diretos da branch que deixei acima. Depois de juntar, o guia aparece normalmente na `main`, em `docs/certificado-como-implementar.md`.
