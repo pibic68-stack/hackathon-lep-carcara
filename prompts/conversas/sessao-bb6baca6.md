@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `bb6baca6`
 
 - **Início:** 30/10 20:09
-- **Mensagens do time:** 21
-- **Exportado em:** 31/10/2026 11:28
+- **Mensagens do time:** 22
+- **Exportado em:** 31/10/2026 12:05
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -2476,3 +2476,110 @@ Enviado. O plano de negócio está na `main` do GitHub (commit `3598e92`), na pa
 As decisões também ficaram registradas no `CLAUDE.md`. A pasta `backend/cache/` ficou de fora do commit.
 
 Antes de apresentar, vale o Adler conferir duas fontes: a prevalência de dislexia (5%, que veio de uma citação da ABD em jornal) e o valor do Fundeb 2026.
+
+
+---
+
+## 🧑 Time · 31/10 12:00
+
+Ficou muito bom, mas precisamos mudar o formato para slides (ainda em pdf). Gostaria que você mantivesse tudo, mas trocasse todo lugar que está escrito "LEP" para "LEPV" (Liga de Empreendedorismo da Praia Vermelha). Além disso, não gostamos da estética da capa utilizada. Primeiramente, utilize a logo da PRISMA (ela não está constando na capa atual) acima do texto em negrito "PRISMA", abaixo do qual está escrito "Plataforma de ...", tire os 4 retângulos brancos, nada de informação na capa, apenas apresentação, pode jogar essas informações pro slide seguinte. Deixe um pouco mais destacado o time Carcará 3301. Retire a informação que está no quadrado amarelo da foto que eu enviei
+
+
+## 🤖 Claude · 31/10 12:01
+
+Vou transformar o documento em slides 16:9, ainda em PDF:
+- **Conteúdo:** fica todo, dividido em mais páginas.
+- **"LEP":** vira "LEPV".
+- **Capa:** só de apresentação, com a logo do PRISMA acima do nome e o time Carcará 3301 em destaque. Os 4 números vão para o slide seguinte.
+- **Hipóteses:** tiro a frase marcada em amarelo.
+
+Primeiro vejo a logo e onde mais aparece "LEP".
+
+<details><summary>Ações executadas pelo Claude (6)</summary>
+
+- 🔧 `ccd_turn / update_plan`
+- 🔧 `Bash`: Inspect the logo and find all LEP mentions
+- 🔧 `Read`: C:\Users\rapha\hackathon-lep-carcara\pitch\plano-negocio\gerar_pdf.py
+- 🔧 `Write`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\slides_tail.py
+- 🔧 `Bash`: Swap in the slide layout and generate the PDF
+- 🔧 `Bash`: Check slide count, size, LEP and removed sentence; render previews
+
+</details>
+
+
+## 🤖 Claude · 31/10 12:03
+
+27 slides em 16:9, nenhum "LEP" sozinho e a frase marcada saiu. Como os slides cortam o que passar da borda, primeiro meço automaticamente se algum conteúdo transbordou. Depois olho os slides.
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `Bash`: Detect content overflowing each slide
+
+</details>
+
+
+## 🤖 Claude · 31/10 12:04
+
+Só dois slides passam da borda: o 11 (funil) por 36 px e o 17 (custos) por 4 px. Diminuo um pouco o funil e a letra da tabela de custos.
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `Bash`: Fix overflowing slides, recheck and render previews
+
+</details>
+
+
+## 🤖 Claude · 31/10 12:04
+
+Nenhum slide passa da borda. Agora olho os slides, começando pela capa e pelos que têm gráfico.
+
+<details><summary>Ações executadas pelo Claude (11)</summary>
+
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\s01.png
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\s02.png
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\s05.png
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\s06.png
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\s11.png
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\s16.png
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\s20.png
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\s25.png
+- 🔧 `Bash`: Apply final slide tweaks and regenerate
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\t05.png
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\t02.png
+
+</details>
+
+
+## 🤖 Claude · 31/10 12:05
+
+O "25,8 mi" quebrou em duas linhas no slide 2. Ajusto o tamanho, regenero e atualizo o guia da pasta.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Fix wrapped number, update README, regenerate
+- 🔧 `Read`: C:\Users\rapha\AppData\Local\Temp\claude\C--Users-rapha-hackathon-lep-carcara\bb6baca6-f95d-4782-9a77-aad7bd7f13f3\scratchpad\pg\u02.png
+- 🔧 `SendUserFile`
+- 🔧 `ccd_turn / wrap_up`
+
+</details>
+
+
+## 🤖 Claude · 31/10 12:05
+
+O plano de negócio agora está em slides: 27 páginas no formato 16:9, ainda em PDF ([plano-de-negocio-prisma.pdf](pitch/plano-negocio/plano-de-negocio-prisma.pdf)). Ainda não commitei; o envio para a `main` aguarda seu aval.
+
+**O que mudou:**
+- **Capa:** só apresentação.
+  - logo do PRISMA acima de "PRISMA" em negrito;
+  - "Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis" logo abaixo;
+  - **Time Carcará 3301** em destaque, maior e com o mascote, numa faixa própria.
+  - Os 4 retângulos saíram e os números foram para o slide 2.
+- **LEP virou LEPV:** na capa e no rodapé de todos os slides, com o nome por extenso na capa (Liga de Empreendedorismo da Praia Vermelha).
+- **Frase marcada removida:** as hipóteses ganharam um slide próprio, sem a frase sobre o `modelo.py`.
+- **Conteúdo:** ficou tudo, dividido em mais slides. Dois gráficos mudaram de forma, sem mudar os números:
+  - os 6,4% de professores com formação viraram um número em destaque, porque a barra estreita cortava o valor;
+  - o funil ganhou outro título, que antes repetia o título do gráfico.
+
+**Como conferi:** medi automaticamente que nenhum slide passa da borda e olhei os slides com gráfico um a um.
+
+Achei "LEP" só no plano de negócio. Se aparecer em outro lugar do site ou dos documentos, posso trocar também.
