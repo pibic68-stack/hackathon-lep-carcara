@@ -537,7 +537,7 @@ function montaQuiz(){const t=document.body.dataset.trilha||"prof";const q=$("#qu
   QUIZ[t].forEach(([perg,ops,certa,exp],i)=>{const d=document.createElement("div");d.className="pergunta";d.innerHTML=`<p>${i+1}. ${esc(perg)}</p>`;const os=document.createElement("div");os.className="opcoes";const ex=document.createElement("p");ex.className="explica";
     ops.forEach((o,j)=>{const b=document.createElement("button");b.type="button";b.id=`q-${t}-${i}-${j}`;b.textContent=o;b.addEventListener("click",()=>{if(d.dataset.feito)return;d.dataset.feito=1;feitos++;if(j===certa)acertos++;b.classList.add(j===certa?"certo":"errado");os.children[certa].classList.add("certo");ex.textContent=exp;if(feitos===QUIZ[t].length){placar.textContent=`Você acertou ${acertos} de ${feitos}.`;mostraCertificado(t)}});os.appendChild(b)});
     d.append(os,ex);q.appendChild(d)});q.appendChild(placar)}
-/* ---------- certificado: aparece quando o teste final termina (guia: docs/certificado-como-implementar.md) ---------- */
+/* ---------- certificado: aparece quando o teste final termina (guia: web/certificado/LEIA-ME.md) ---------- */
 function mostraCertificado(t){
   if($("#cert"))return;
   const c=document.createElement("div");c.id="cert";c.className="painel cert";

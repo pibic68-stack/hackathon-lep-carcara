@@ -89,7 +89,11 @@ if not defined CF (
 
 rem --- 4. servidor (janela propria, que fica aberta para mostrar erros) ---
 echo.
-echo  Ligando o servidor do PRISMA...
+echo  Fechando qualquer PRISMA antigo que ainda esteja ligado...
+for /f "tokens=5" %%P in ('netstat -ano ^| findstr /r /c:":8000 .*LISTENING"') do taskkill /f /pid %%P >nul 2>nul
+taskkill /f /fi "WINDOWTITLE eq PRISMA servidor*" >nul 2>nul
+timeout /t 2 /nobreak >nul
+echo  Ligando o servidor do PRISMA ^(versao desta pasta^)...
 start "PRISMA servidor (nao feche)" /min cmd /k "cd /d "%~dp0backend" && %PY% -X utf8 -m adaptador.api"
 
 set /a N=0
@@ -107,7 +111,7 @@ timeout /t 1 /nobreak >nul
 goto :espera
 
 :no_ar
-echo  Servidor no ar: http://127.0.0.1:8000
+echo  Servidor no ar: http://127.0.0.1:8000  ^(pasta: %~dp0^)
 start "" http://127.0.0.1:8000/
 
 if not defined CF (

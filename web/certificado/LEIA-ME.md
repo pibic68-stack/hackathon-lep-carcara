@@ -11,9 +11,9 @@ O texto também diz a trilha (P1: cor nunca sozinha).
 
 | Trilha | Código | Cor da moldura | Mascote (canto) | Exemplo |
 |---|---|---|---|---|
-| Professores | `prof` | céu escuro `#1F6FB2` | coruja | `exemplos/certificado-professor.pdf` |
-| Famílias | `fam` | laranja-escuro `#A3401F` | urso | `exemplos/certificado-familia.pdf` |
-| Estudantes | `est` | grama escura `#2E7D32` | preguiça | `exemplos/certificado-aluno.pdf` |
+| Professores | `prof` | céu escuro `#1F6FB2` | coruja | `gerar_pdf.py --exemplos` |
+| Famílias | `fam` | laranja-escuro `#A3401F` | urso | `gerar_pdf.py --exemplos` |
+| Estudantes | `est` | grama escura `#2E7D32` | preguiça | `gerar_pdf.py --exemplos` |
 
 Os códigos `prof`, `fam` e `est` são os mesmos de `data-t` nos botões de trilha do mini curso.
 Os nomes dos exemplos são fictícios.
@@ -25,7 +25,6 @@ Os nomes dos exemplos são fictícios.
 | `modelo.html` | O modelo (fonte única). Folha A4 deitada. Abre com duplo clique e tem uma barra para digitar o nome e salvar em PDF. A barra não sai no PDF. |
 | `certificado.js` | Ajudante para o site: `PrismaCertificado.abrir({ papel, nome })`. |
 | `gerar_pdf.py` | Gera o PDF pronto pelo Chrome ou Edge sem janela. Para o backend e para os exemplos. |
-| `exemplos/` | Os 3 PDFs de exemplo. Recriar com `python web/certificado/gerar_pdf.py --exemplos`. |
 
 ## Como preencher o modelo
 
@@ -45,7 +44,6 @@ Ele é sempre o mesmo para a mesma pessoa, trilha e data. Se um dia houver pági
 
 ## Como ligar no site (duas opções)
 
-Passo a passo com o código pronto para colar: `docs/certificado-como-implementar.md`.
 
 ### 1. Sem backend: janela "Salvar em PDF" do navegador
 

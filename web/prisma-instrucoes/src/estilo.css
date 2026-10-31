@@ -319,7 +319,7 @@ body[data-trilha="est"] .texto{font-size:max(var(--letra-min), 1.25rem);line-hei
 /* Comprimento de linha de até ~60 caracteres (critério P2.4 do próprio manual) */
 .wrap p,.principios li,.refs li,.corpo-padrao li,.glossario dd,.ev li>span:last-child,.explica,.detalhe p{max-width:45ch}
 
-/* certificado do mini curso (guia: docs/certificado-como-implementar.md) */
+/* certificado do mini curso (guia: web/certificado/LEIA-ME.md) */
 .cert{margin-top:18px}
 .cert label{display:block;font-weight:700;margin:10px 0 6px}
 .cert input{font:inherit;font-size:max(var(--letra-min,1rem),1.1rem);width:min(100%,28em);min-height:48px;padding:8px 12px;border:3px solid var(--cor-borda);background:var(--cor-superficie);color:var(--cor-texto)}

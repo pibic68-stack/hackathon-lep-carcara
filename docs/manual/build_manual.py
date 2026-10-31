@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Gera o Manual PRISMA (HTML + PDF) a partir de padroes.json, a fonte única.
+"""Gera o Manual PRISMA (PDF) a partir de padroes.json, a fonte única.
 
 Uso:
     python3 docs/manual/build_manual.py
 Saídas:
-    docs/manual/manual.html            (para leitura no navegador)
     docs/manual/manual-prisma-v1.pdf   (para baixar)
 
 Para mudar um padrão, critério, dado ou referência, edite padroes.json e rode de novo.
@@ -521,7 +520,6 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--sem-pdf", action="store_true")
     a = ap.parse_args()
-    (AQUI / "manual.html").write_text(documento(css_fontes(False)), encoding="utf-8")
     if a.sem_pdf:
         return
     from playwright.sync_api import sync_playwright
