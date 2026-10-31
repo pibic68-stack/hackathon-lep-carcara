@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 4
-- **Exportado em:** 31/10/2026 03:08
+- **Mensagens do time:** 5
+- **Exportado em:** 31/10/2026 03:44
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -345,3 +345,77 @@ Não deixei no GitHub a imagem da fotossíntese que o teste gerou na pasta de ca
 Sources:
 - [Gemini API: áudio (Interactions API)](https://techdevnotes.com/releases/gemini-docs/20260626-140339Z-75a2454c2e49/content/pages/audio.txt)
 - [Gemini API: Files API](https://techdevnotes.com/releases/gemini-docs/20260626-140339Z-75a2454c2e49/content/pages/files.txt)
+
+
+---
+
+## 🧑 Time · 31/10 03:40
+
+o audio foi transcrito perfeitamente, mas encontramos esses 3 erros
+erros de formataçao na leitura rapida do primeiro print
+no segundo, a marcaçao com icones pra cada cor ficou PERFEITA, mas o aluno em questao nao pedia cor com icone ("Cor sempre com símbolo"). é importante que a ia so faça isso se a opçao for marcada
+no terceiro, mostra outro dispositivo tentando abrir o site ao mesmo tempo e nao conseguindo. é importante que isso seja um processo pratico porque iremos apresentar o projeto pra outra pessoa em outro computador
+
+<details><summary>Ações executadas pelo Claude (9)</summary>
+
+- 🔧 `Bash`: Fetch and check local changes
+- 🔧 `Bash`: Reproduce answer-line PDF reading
+- 🔧 `Bash`: Read renderer blocks and LF transform
+- 🔧 `Bash`: See sentence splitter and module layout
+- 🔧 `Bash`: Add answer-line handling, test it
+- 🔧 `Bash`: Keep trailing underscores, estimate line count
+- 🔧 `Bash`: Find preparar callers
+- 🔧 `Bash`: Make image symbols conditional on daltonism
+- 🔧 `Bash`: Revert pendency wording, run tests
+
+</details>
+
+
+## 🤖 Claude · 31/10 03:41
+
+Now tests for these two fixes, then the link problem.
+
+<details><summary>Ações executadas pelo Claude (11)</summary>
+
+- 🔧 `Bash`: Add tests for answer lines and conditional symbols
+- 🔧 `Bash`: Clean test, rerun suite
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/backend/adaptador/tunel.py
+- 🔧 `Bash`: Bind LAN, wire tunnel helper into bat
+- 🔧 `Bash`: Retry bat edit
+- 🔧 `Bash`: Restore and correctly edit bat
+- 🔧 `Bash`: Add tunnel tests
+- 🔧 `Bash`: Simplify tunnel tests, run suite
+- 🔧 `Bash`: Record decisions; view README publish section
+- 🔧 `Bash`: Commit, push, rebuild zip
+- 🔧 `SendUserFile`
+
+</details>
+
+
+## 🤖 Claude · 31/10 03:44
+
+Corrigi os três erros. As mudanças estão no GitHub e no `PRISMA.zip`. Os testes automáticos passam, mas o link novo ainda não foi testado num Windows de verdade. Para reaproveitar a chave, copie o `backend/.env` da pasta antiga para a nova.
+
+**1. Leitura Fácil com "." soltos.** O PDF tinha linhas pontilhadas para o aluno escrever a resposta. A plataforma tratava cada "." como uma frase. Agora:
+- O pontilhado ou sublinhado vira uma pauta de linhas na página. Na versão Ouvir, ele é lido como "Espaço para escrever a resposta".
+- Esses pontos não vão mais para a IA. Se a IA devolver só pontuação num trecho, volta o texto original.
+- O pontilhado no fim do título é cortado, e o "Ação do Sabão ." fica "Ação do Sabão".
+
+Testei com um PDF montado do mesmo jeito, porque não tenho o arquivo original. Se puderem, reenviem esse material e confiram.
+
+**2. Símbolos na imagem.** Agora os símbolos só aparecem se algum aluno da turma tiver "Cor sempre com símbolo" marcado. Sem esse aluno, a imagem fica limpa. Deixei sempre ativa a legenda de símbolos do texto colorido, que é pequena e faz parte da regra P1.1 do Manual. Se quiserem que ela também dependa da opção, é uma mudança rápida.
+
+**3. Link que não abria em outro aparelho.** O "Error 1033" quer dizer que o túnel não estava conectado quando o outro aparelho tentou abrir. Isso acontece de dois jeitos: o link aparecia antes de estar pronto, ou a rede bloqueia o túnel (comum em universidade). O `publicar.bat` agora:
+- só mostra o link depois de abri-lo ele mesmo pela internet e ver que funciona;
+- já deixa o link copiado (é só Ctrl+V) e grava em `link.txt`;
+- confere o link a cada 20 segundos e, se cair, cria outro sozinho e avisa que o endereço mudou;
+- não deixa o computador dormir enquanto a janela estiver aberta;
+- se a rede bloquear o túnel, diz isso claramente e mostra as saídas.
+
+As saídas para uma rede bloqueada:
+- **Celular como roteador (4G):** costuma resolver.
+- **Mesmo Wi-Fi:** o outro computador abre em `http://IP:8000`. O endereço certo aparece na janela. Na primeira vez, o Windows pergunta sobre o firewall: clique em "Permitir".
+
+Para a apresentação, rodem o `publicar.bat` uns 10 minutos antes, na rede do local, e abram o link no celular com o Wi-Fi desligado para confirmar. Se a rede de lá bloquear, usem o 4G do celular.
+
+Se quiserem um link fixo, que não dependa de um PC ligado, eu preparo a hospedagem na nuvem.
