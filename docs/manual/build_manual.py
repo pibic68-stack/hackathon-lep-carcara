@@ -2,7 +2,7 @@
 """Gera o Manual PRISMA (HTML + PDF) a partir de padroes.json, a fonte única.
 
 Uso:
-    python3 docs/manual/build_manual.py --fontes PASTA_COM_TTF
+    python3 docs/manual/build_manual.py
 Saídas:
     docs/manual/manual.html            (para leitura no navegador)
     docs/manual/manual-prisma-v1.pdf   (para baixar)
@@ -24,8 +24,14 @@ ESC = html.escape
 SIMB = {"dados": "●", "pratica": "◆", "norma": "■", "projeto": "○"}
 ROT = {"dados": "Dados", "pratica": "Prática", "norma": "Norma", "projeto": "Projeto"}
 AUTO = {"automatico": "Automático", "ia_revisao": "IA + revisão", "manual": "Manual"}
-INK, MUTED, GRID, BLUE = "#142033", "#4A5668", "#D8DEE6", "#1F5FBF"
-CAT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"]  # validado (dataviz, ordem fixa)
+INK, MUTED, GRID, BLUE = "#1E2235", "#4A4F6A", "#D9D3C4", "#1F6FB2"  # tokens do site (web/css/tokens.css)
+CAT = ["#57B3F9", "#FFAD60", "#7BD389", "#FFC93C", "#B89AF0", "#8A5A2B"]  # as cores do site: céu, laranja, grama, sol, lilás, carcará
+ROTULO_FATIA = [INK, INK, INK, INK, INK, "#FFFFFF"]  # cor do número dentro de cada fatia (contraste)
+
+
+LOGO_SVG = AQUI.parent.parent / "web" / "assets" / "img" / "prisma-logo.svg"
+FONTES = AQUI.parent.parent / "web" / "assets" / "fontes"
+LOGO = "data:image/svg+xml;base64," + base64.b64encode(LOGO_SVG.read_bytes()).decode()
 
 
 def br(n, casas=0):
@@ -47,12 +53,12 @@ def rosca(fatias, titulo, fonte, nota=""):
         large = 1 if a1g - a0g > math.pi else 0
         p = (f"M{cx+R*math.cos(a0g):.2f},{cy+R*math.sin(a0g):.2f} A{R},{R} 0 {large} 1 {cx+R*math.cos(a1g):.2f},{cy+R*math.sin(a1g):.2f} "
              f"L{cx+r*math.cos(a1g):.2f},{cy+r*math.sin(a1g):.2f} A{r},{r} 0 {large} 0 {cx+r*math.cos(a0g):.2f},{cy+r*math.sin(a0g):.2f} Z")
-        s.append(f'<path d="{p}" fill="{CAT[i]}"/>')
+        s.append(f'<path d="{p}" fill="{CAT[i]}" stroke="{INK}" stroke-width="2.5" stroke-linejoin="miter"/>')
         pct = 100 * f["valor"] / tot
         if pct >= 10:
             m = (a0 + a1) / 2
             rm = (R + r) / 2
-            s.append(f'<text x="{cx+rm*math.cos(m):.1f}" y="{cy+rm*math.sin(m)+5:.1f}" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">{br(pct)}%</text>')
+            s.append(f'<text x="{cx+rm*math.cos(m):.1f}" y="{cy+rm*math.sin(m)+5:.1f}" text-anchor="middle" font-size="15" font-weight="700" fill="{ROTULO_FATIA[i]}">{br(pct)}%</text>')
         ang = a1
     s.append(f'<text x="{cx}" y="{cy-4}" text-anchor="middle" font-size="22" font-weight="700" fill="{INK}">{br(tot/1e6,2)} mi</text>')
     s.append(f'<text x="{cx}" y="{cy+18}" text-anchor="middle" font-size="12" fill="{MUTED}">registros</text></svg>')
@@ -76,7 +82,7 @@ def barras_h(titulo, itens, fonte, maximo=100, sufixo="%", largura=640, esq=190)
         y = topo + i * alt_l + 10
         w = max(util * val / maximo, 6)
         s.append(f'<text x="{esq-12}" y="{y+16}" fill="{INK}" font-size="14" text-anchor="end">{ESC(rot)}</text>')
-        s.append(f'<path d="M{esq},{y} h{w-4:.1f} a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-{w-4:.1f} z" fill="{BLUE}"/>')
+        s.append(f'<rect x="{esq}" y="{y}" width="{w:.1f}" height="24" fill="{BLUE}" stroke="{INK}" stroke-width="2"/>')
         s.append(f'<text x="{esq+w+8:.1f}" y="{y+17}" fill="{INK}" font-size="14" font-weight="700">{br(val, 1 if val % 1 else 0)}{sufixo}</text>')
     s.append("</svg>")
     return f'<figure><figcaption class="tit">{ESC(titulo)}</figcaption>{"".join(s)}<figcaption class="fonte">Fonte: {ESC(fonte)}</figcaption></figure>'
@@ -178,10 +184,10 @@ def automacao():
 
 
 ICO = {
-    "sol": '<svg viewBox="0 0 40 40" class="ico"><circle cx="20" cy="20" r="8" fill="#C26A00"/><g stroke="#C26A00" stroke-width="3" stroke-linecap="round"><path d="M20 3v6M20 31v6M3 20h6M31 20h6M8 8l4 4M28 28l4 4M8 32l4-4M28 12l4-4"/></g></svg>',
-    "nuvem": '<svg viewBox="0 0 40 40" class="ico"><path d="M12 30h17a7 7 0 0 0 0-14 10 10 0 0 0-19 3 6 6 0 0 0 2 11z" fill="#4A5668"/></svg>',
-    "chuva": '<svg viewBox="0 0 40 40" class="ico"><path d="M12 22h17a7 7 0 0 0 0-14 10 10 0 0 0-19 3 6 6 0 0 0 2 11z" fill="#4A5668"/><g stroke="#1F5FBF" stroke-width="3" stroke-linecap="round"><path d="M14 27l-2 6M21 27l-2 6M28 27l-2 6"/></g></svg>',
-    "ciclo": '<svg viewBox="0 0 40 40" class="ico"><g fill="none" stroke="#1F5FBF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M31 15a12 12 0 0 0-22 0"/><path d="M9 25a12 12 0 0 0 22 0"/><path d="M31 8v8h-8M9 32v-8h8"/></g></svg>',
+    "sol": '<svg viewBox="0 0 40 40" class="ico"><circle cx="20" cy="20" r="8" fill="#A3401F"/><g stroke="#A3401F" stroke-width="3" stroke-linecap="round"><path d="M20 3v6M20 31v6M3 20h6M31 20h6M8 8l4 4M28 28l4 4M8 32l4-4M28 12l4-4"/></g></svg>',
+    "nuvem": '<svg viewBox="0 0 40 40" class="ico"><path d="M12 30h17a7 7 0 0 0 0-14 10 10 0 0 0-19 3 6 6 0 0 0 2 11z" fill="#4A4F6A"/></svg>',
+    "chuva": '<svg viewBox="0 0 40 40" class="ico"><path d="M12 22h17a7 7 0 0 0 0-14 10 10 0 0 0-19 3 6 6 0 0 0 2 11z" fill="#4A4F6A"/><g stroke="#1F6FB2" stroke-width="3" stroke-linecap="round"><path d="M14 27l-2 6M21 27l-2 6M28 27l-2 6"/></g></svg>',
+    "ciclo": '<svg viewBox="0 0 40 40" class="ico"><g fill="none" stroke="#1F6FB2" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M31 15a12 12 0 0 0-22 0"/><path d="M9 25a12 12 0 0 0 22 0"/><path d="M31 8v8h-8M9 32v-8h8"/></g></svg>',
 }
 
 
@@ -221,7 +227,7 @@ def documento(css_fontes):
 <style>{css_fontes}{CSS}</style></head><body>
 
 <section class="capa">
-  <svg viewBox="0 0 120 80" class="prisma" aria-hidden="true"><path d="M10 70 L45 10 L80 70 Z" fill="none" stroke="{INK}" stroke-width="4" stroke-linejoin="round"/><path d="M0 44 L32 40" stroke="{INK}" stroke-width="3"/><g stroke-width="4" stroke-linecap="round"><path d="M60 42 L118 30" stroke="{CAT[0]}"/><path d="M61 46 L118 46" stroke="{CAT[1]}"/><path d="M62 50 L118 62" stroke="{CAT[2]}"/></g></svg>
+  <img class="prisma" src="{LOGO}" alt="Logo da PRISMA: um prisma de vidro que recebe um feixe de luz e solta um arco-íris">
   <p class="eyebrow">PRISMA · Manual de padrões · versão {ESC(D["versao"])}</p>
   <h1>Manual PRISMA</h1>
   <p class="sigla">{ESC(D["sigla"])}</p>
@@ -232,7 +238,7 @@ def documento(css_fontes):
     <li><b>Famílias</b><span>Parte 9, em linguagem simples.</span></li>
     <li><b>Estudantes</b><span>Parte 10, em Leitura Fácil.</span></li>
   </ul>
-  <p class="nota-capa">Este manual segue as próprias regras: fonte Atkinson Hyperlegible (criada para leitores com baixa visão), títulos em Lexend (criada para facilitar a leitura), texto alinhado à esquerda e nenhuma informação passada só por cor. Time Carcará 3301, Hackathon LEP 2026.</p>
+  <p class="nota-capa">Este manual segue as próprias regras: texto em Atkinson Hyperlegible Next (criada para leitores com baixa visão), títulos em Pixelify Sans (a fonte pixel do site, só em frases curtas), números sempre na fonte do texto, texto alinhado à esquerda e nenhuma informação passada só por cor. Time Carcará 3301, Hackathon LEP 2026.</p>
 </section>
 
 <section class="parte">
@@ -374,15 +380,15 @@ def documento(css_fontes):
 
 CSS = """
 @page { size: A4; }
-:root { --ink:#142033; --muted:#4A5668; --line:#D8DEE6; --soft:#EEF2F7; --blue:#1F5FBF;
-  --display:'Lexend',system-ui,sans-serif; --body:'Atkinson Hyperlegible',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace; }
+:root { --ink:#1E2235; --muted:#4A4F6A; --line:#D9D3C4; --soft:#F3EDDF; --blue:#1F6FB2; --sol:#FFC93C;
+  --display:'Pixelify Sans','Atkinson Hyperlegible Next',system-ui,sans-serif; --body:'Atkinson Hyperlegible Next',system-ui,sans-serif; --mono:'Departure Mono',ui-monospace,monospace; }
 * { box-sizing:border-box }
 body { margin:0; color:var(--ink); background:#fff; font:11pt/1.55 var(--body); }
 h1,h2,h3,h4 { font-family:var(--display); line-height:1.2; margin:0; text-wrap:balance; }
-h2 { font-size:22pt; font-weight:600; margin-bottom:10pt; }
-h3 { font-size:14pt; font-weight:600; }
+h2 { font-size:22pt; font-weight:400; margin-bottom:10pt; }
+h3 { font-size:14pt; font-weight:400; }
 .h3s { margin:16pt 0 6pt; }
-h4 { font-size:9.5pt; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:10pt 0 4pt; }
+h4 { font-size:9.5pt; font-weight:400; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:10pt 0 4pt; }
 p { margin:0 0 8pt; max-width:64ch; }
 ul,ol { margin:0 0 8pt; padding-left:16pt; }
 li { margin-bottom:3pt; }
@@ -390,32 +396,32 @@ cite { font-style:normal; color:var(--muted); font-size:9.5pt; }
 .eyebrow { font-family:var(--mono); font-size:9pt; letter-spacing:.08em; text-transform:uppercase; color:var(--blue); margin-bottom:4pt; }
 .mono { font-family:var(--mono); font-size:.92em; }
 .capa { min-height:250mm; display:flex; flex-direction:column; justify-content:center; break-after:page; }
-.prisma { width:44mm; margin-bottom:10pt; }
-.capa h1 { font-size:44pt; font-weight:700; letter-spacing:-.01em; margin:4pt 0 2pt; }
+.prisma { width:66mm; height:auto; margin-bottom:12pt; image-rendering:pixelated; }
+.capa h1 { font-size:44pt; font-weight:400; letter-spacing:-.01em; margin:4pt 0 2pt; }
 .sigla { font-family:var(--display); font-size:13pt; color:var(--muted); margin-bottom:14pt; }
 .capa .sub { font-size:13pt; max-width:48ch; }
 .capa-leitores { list-style:none; padding:0; margin:18pt 0; display:grid; gap:0; }
 .capa-leitores li { display:grid; grid-template-columns:48mm 1fr; gap:8pt; padding:8pt 0; border-top:1px solid var(--line); }
-.capa-leitores b { font-family:var(--display); font-weight:600; }
+.capa-leitores b { font-family:var(--display); font-weight:400; }
 .nota-capa { font-size:9pt; color:var(--muted); max-width:72ch; }
 .parte { break-before:page; }
 .numeros { display:grid; grid-template-columns:repeat(3,1fr); gap:10pt; margin:12pt 0; }
 .numeros div { border-top:3pt solid var(--ink); padding-top:6pt; }
-.numeros b { display:block; font-family:var(--display); font-size:21pt; font-weight:700; }
+.numeros b { display:block; font-family:var(--body); font-size:21pt; font-weight:700; }
 .numeros span { font-size:9.5pt; color:var(--muted); }
 .fonte-solta { font-size:9pt; color:var(--muted); }
 figure { margin:14pt 0; break-inside:avoid; }
 .grafico { width:100%; height:auto; font-family:var(--body); }
-figcaption.tit { font-family:var(--display); font-weight:600; font-size:11.5pt; margin-bottom:6pt; }
+figcaption.tit { font-family:var(--display); font-weight:400; font-size:11.5pt; margin-bottom:6pt; }
 figcaption.fonte { font-size:8.5pt; color:var(--muted); margin-top:4pt; }
 .rosca-grade { display:grid; grid-template-columns:62mm 1fr; gap:14pt; align-items:center; }
 .rosca { width:62mm; height:auto; font-family:var(--body); }
 .leg-rosca { list-style:none; padding:0; margin:0; font-size:10pt; }
 .leg-rosca li { display:grid; grid-template-columns:12pt 1fr auto 24mm; gap:6pt; align-items:baseline; padding:4pt 0; border-top:1px solid var(--line); }
-.leg-rosca i { width:10pt; height:10pt; border-radius:2pt; display:inline-block; transform:translateY(1pt); }
+.leg-rosca i { width:10pt; height:10pt; display:inline-block; transform:translateY(1pt); outline:1.5pt solid var(--ink); }
 .leg-rosca b { font-variant-numeric:tabular-nums; }
 .leg-rosca em { font-style:normal; color:var(--muted); text-align:right; font-variant-numeric:tabular-nums; }
-.medidor .trilho { height:22pt; background:var(--soft); border:1px solid var(--line); border-radius:4pt; overflow:hidden; }
+.medidor .trilho { height:22pt; background:var(--soft); border:1px solid var(--line); overflow:hidden; }
 .medidor .trilho span { display:flex; align-items:center; justify-content:flex-end; height:100%; background:var(--ink); color:#fff; padding-right:6pt; font-size:10pt; }
 .med-leg { display:flex; gap:16pt; font-size:9.5pt; margin-top:4pt; }
 .falas { list-style:none; padding:0; }
@@ -425,52 +431,52 @@ figcaption.fonte { font-size:8.5pt; color:var(--muted); margin-top:4pt; }
 .fluxo { list-style:none; padding:0; }
 .fluxo li { display:grid; grid-template-columns:18pt 26mm 1fr; gap:8pt; align-items:baseline; padding:7pt 0; border-top:1px solid var(--line); }
 .fluxo .n { font-family:var(--mono); color:var(--blue); }
-.fluxo b { font-family:var(--display); font-weight:600; }
+.fluxo b { font-family:var(--display); font-weight:400; }
 .fluxo em { font-style:normal; color:var(--blue); }
 .tab { width:100%; border-collapse:collapse; font-size:9.5pt; }
-.tab th { text-align:left; font-family:var(--display); font-weight:600; border-bottom:1.5pt solid var(--ink); padding:4pt 6pt 4pt 0; }
+.tab th { text-align:left; font-family:var(--display); font-weight:400; border-bottom:1.5pt solid var(--ink); padding:4pt 6pt 4pt 0; }
 .tab td { border-bottom:1px solid var(--line); padding:5pt 6pt 5pt 0; vertical-align:top; }
 .como { display:block; color:var(--muted); font-size:8.8pt; margin-top:1pt; }
 .necs { display:grid; grid-template-columns:1fr 1fr; gap:10pt; }
-.nec { border:1px solid var(--line); border-radius:4pt; padding:8pt 10pt; font-size:9.5pt; break-inside:avoid; }
+.nec { border:1px solid var(--line); padding:8pt 10pt; font-size:9.5pt; break-inside:avoid; }
 .nec header { display:flex; justify-content:space-between; gap:8pt; align-items:baseline; margin-bottom:4pt; }
 .nec h3 { font-size:11.5pt; }
 .nec .reg { font-family:var(--mono); font-size:8pt; color:var(--muted); white-space:nowrap; }
 .nec p { margin-bottom:4pt; }
-.nec .lim { background:var(--soft); padding:4pt 6pt; border-radius:3pt; }
+.nec .lim { background:var(--soft); padding:4pt 6pt; }
 .nec .nota { color:var(--muted); font-size:8.8pt; }
 .mapa { border-collapse:collapse; font-size:9pt; width:100%; break-inside:avoid; }
 .mapa th, .mapa td { border:1px solid var(--line); padding:3pt 4pt; text-align:center; }
 .mapa tbody th { text-align:left; font-weight:400; }
-.mapa thead th { font-family:var(--mono); font-weight:500; }
+.mapa thead th { font-family:var(--mono); font-weight:400; }
 .mapa td.forte { background:var(--ink); color:#fff; }
 .mapa td.medio { background:var(--soft); }
 .chave { list-style:none; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:4pt 14pt; font-size:10pt; }
-.tag { display:inline-block; font-family:var(--mono); font-size:7.5pt; letter-spacing:.04em; text-transform:uppercase; padding:1pt 5pt; border:1px solid var(--ink); border-radius:3pt; white-space:nowrap; }
+.tag { display:inline-block; font-family:var(--mono); font-size:8.5pt; letter-spacing:.04em; text-transform:uppercase; padding:1pt 5pt; border:1px solid var(--ink); white-space:nowrap; }
 .tag-dados { background:var(--ink); color:#fff; }
 .tag-norma { background:var(--soft); }
 .tag-projeto { border-style:dashed; color:var(--muted); border-color:var(--muted); }
 .resumo { list-style:none; padding:0; margin:12pt 0; }
 .resumo li { display:grid; grid-template-columns:24pt 44mm 1fr; gap:8pt; padding:5pt 0; border-top:1px solid var(--line); font-size:9.5pt; }
-.cod { font-family:var(--mono); font-weight:500; color:var(--blue); }
+.cod { font-family:var(--mono); font-weight:400; color:var(--blue); }
 .padrao { break-before:page; }
 .padrao header { display:flex; align-items:baseline; gap:10pt; border-bottom:2pt solid var(--ink); padding-bottom:6pt; margin-bottom:8pt; }
 .padrao header .cod { font-size:24pt; }
 .padrao h3 { font-size:19pt; }
-.regra { font-family:var(--display); font-size:12.5pt; font-weight:500; max-width:56ch; }
-.simples { background:var(--soft); border-radius:4pt; padding:7pt 10pt; font-size:10.5pt; margin-bottom:6pt; }
+.regra { font-family:var(--display); font-size:12.5pt; font-weight:400; max-width:56ch; }
+.simples { background:var(--soft); padding:7pt 10pt; font-size:10.5pt; margin-bottom:6pt; }
 .duas { display:grid; grid-template-columns:1.3fr 1fr; gap:14pt; }
 .duas ul, .duas ol { font-size:10pt; }
 .lado { border-left:2pt solid var(--line); padding-left:10pt; font-size:10pt; }
 .niveis { display:grid; grid-template-columns:auto 1fr; gap:3pt 8pt; font-size:9.5pt; margin:6pt 0; }
-.niveis dt { font-family:var(--mono); font-weight:500; }
+.niveis dt { font-family:var(--mono); font-weight:400; }
 .niveis dd { margin:0; }
 .crit { width:100%; border-collapse:collapse; font-size:9pt; }
-.crit th { text-align:left; font-family:var(--display); font-weight:600; border-bottom:1.5pt solid var(--ink); padding:3pt 6pt 3pt 0; }
+.crit th { text-align:left; font-family:var(--display); font-weight:400; border-bottom:1.5pt solid var(--ink); padding:3pt 6pt 3pt 0; }
 .crit td { border-bottom:1px solid var(--line); padding:4pt 6pt 4pt 0; vertical-align:top; }
 .crit tr { break-inside:avoid; }
 .crit td:first-child { width:12mm; } .crit td:nth-child(3) { width:36mm; } .crit td:last-child { width:22mm; }
-.auto { font-family:var(--mono); font-size:7.5pt; text-transform:uppercase; letter-spacing:.03em; padding:1pt 4pt; border-radius:3pt; border:1px solid var(--ink); white-space:nowrap; }
+.auto { font-family:var(--mono); font-size:8.5pt; text-transform:uppercase; letter-spacing:.03em; padding:1pt 4pt; border:1px solid var(--ink); white-space:nowrap; }
 .auto-automatico { background:var(--ink); color:#fff; }
 .auto-ia_revisao { background:var(--soft); }
 .auto-manual { border-style:dashed; }
@@ -478,9 +484,9 @@ figcaption.fonte { font-size:8.5pt; color:var(--muted); margin-top:4pt; }
 .evid li { display:grid; grid-template-columns:20mm 1fr; gap:8pt; padding:4pt 0; border-top:1px solid var(--line); break-inside:avoid; }
 .evid cite { display:block; }
 .passos li { margin-bottom:5pt; }
-.codigo { font-family:var(--mono); font-size:8.5pt; background:var(--soft); border-radius:4pt; padding:8pt 10pt; white-space:pre-wrap; }
+.codigo { font-family:var(--mono); font-size:8.5pt; background:var(--soft); padding:8pt 10pt; white-space:pre-wrap; }
 .lf-grade { display:grid; grid-template-columns:1fr 1fr; gap:10pt; }
-.lf-caixa { border:1px solid var(--line); border-radius:4pt; padding:8pt 10pt; font-size:10pt; break-inside:avoid; }
+.lf-caixa { border:1px solid var(--line); padding:8pt 10pt; font-size:10pt; break-inside:avoid; }
 .lf-rot { font-family:var(--mono); font-size:8pt; text-transform:uppercase; letter-spacing:.05em; color:var(--blue); margin-bottom:4pt; }
 .linhas span { display:block; }
 .glos { font-size:8.8pt; color:var(--muted); border-top:1px dashed var(--line); padding-top:4pt; }
@@ -489,40 +495,38 @@ figcaption.fonte { font-size:8.5pt; color:var(--muted); margin-top:4pt; }
 .bloco-mapa { break-before:page; }
 .limites li { margin-bottom:7pt; }
 .familia p, .familia li { font-size:12pt; }
-.aviso { border:1.5pt solid var(--ink); border-radius:4pt; padding:8pt 10pt; margin-top:12pt; }
+.aviso { border:1.5pt solid var(--ink); padding:8pt 10pt; margin-top:12pt; }
 .estudante .linhas { font-size:16pt; line-height:1.75; }
 .glossario { display:grid; grid-template-columns:36mm 1fr; gap:5pt 10pt; font-size:10pt; }
-.glossario dt { font-family:var(--display); font-weight:600; }
+.glossario dt { font-family:var(--display); font-weight:400; }
 .glossario dd { margin:0; }
 .refs ol { font-size:8.8pt; padding-left:14pt; }
 .refs li { margin-bottom:4pt; }
 """
 
 
-def css_fontes(pasta):
-    if not pasta:
-        return ('@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400'
-                '&family=IBM+Plex+Mono:wght@400;500&family=Lexend:wght@400;500;600;700&display=swap");')
-
-    def face(fam, arq, peso="400", estilo="normal"):
-        b64 = base64.b64encode((pasta / arq).read_bytes()).decode()
-        return f"@font-face{{font-family:'{fam}';src:url(data:font/ttf;base64,{b64}) format('truetype');font-weight:{peso};font-style:{estilo};}}"
-    return "".join([face("Atkinson Hyperlegible", "AtkinsonHyperlegible-Regular.ttf"), face("Atkinson Hyperlegible", "AtkinsonHyperlegible-Bold.ttf", "700"),
-                    face("Atkinson Hyperlegible", "AtkinsonHyperlegible-Italic.ttf", "400", "italic"), face("Lexend", "Lexend[wght].ttf", "100 900"),
-                    face("IBM Plex Mono", "IBMPlexMono-Regular.ttf"), face("IBM Plex Mono", "IBMPlexMono-Medium.ttf", "500")])
+def css_fontes(embutir=True):
+    """As fontes são as do site (web/assets/fontes), as mesmas da interface."""
+    def face(fam, arq, peso="400"):
+        if embutir:
+            b64 = base64.b64encode((FONTES / arq).read_bytes()).decode()
+            return f"@font-face{{font-family:'{fam}';src:url(data:font/woff2;base64,{b64}) format('woff2');font-weight:{peso};}}"
+        return f"@font-face{{font-family:'{fam}';src:url('../../web/assets/fontes/{arq}') format('woff2');font-weight:{peso};}}"
+    return "".join([face("Atkinson Hyperlegible Next", "atkinson-400.woff2"), face("Atkinson Hyperlegible Next", "atkinson-700.woff2", "700"),
+                    face("Pixelify Sans", "pixelify-400.woff2"), face("Pixelify Sans", "pixelify-700.woff2", "700"),
+                    face("Departure Mono", "departure-mono.woff2")])
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--fontes", type=Path, help="pasta com os .ttf (embute as fontes no PDF)")
     ap.add_argument("--sem-pdf", action="store_true")
     a = ap.parse_args()
-    (AQUI / "manual.html").write_text(documento(css_fontes(None)), encoding="utf-8")
+    (AQUI / "manual.html").write_text(documento(css_fontes(False)), encoding="utf-8")
     if a.sem_pdf:
         return
     from playwright.sync_api import sync_playwright
     tmp = AQUI / "_manual_pdf.html"
-    tmp.write_text(documento(css_fontes(a.fontes)), encoding="utf-8")
+    tmp.write_text(documento(css_fontes(True)), encoding="utf-8")
     with sync_playwright() as pw:
         nav = pw.chromium.launch()
         pg = nav.new_page()
@@ -530,7 +534,7 @@ def main():
         pg.wait_for_timeout(500)
         pg.pdf(path=str(AQUI / "manual-prisma-v1.pdf"), format="A4", print_background=True, display_header_footer=True,
                header_template="<span></span>",
-               footer_template='<div style="width:100%;font:8px sans-serif;color:#4A5668;padding:0 18mm;display:flex;justify-content:space-between">'
+               footer_template='<div style="width:100%;font:8px sans-serif;color:#4A4F6A;padding:0 18mm;display:flex;justify-content:space-between">'
                                '<span>Manual PRISMA · v1.0 · Time Carcará 3301</span><span><span class="pageNumber"></span> de <span class="totalPages"></span></span></div>',
                margin={"top": "18mm", "bottom": "20mm", "left": "18mm", "right": "18mm"})
         nav.close()
