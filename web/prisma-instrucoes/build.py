@@ -50,7 +50,11 @@ for nome in ("prisma-logo.svg", "favicon.png"):
     shutil.copy(WEB / "assets" / "img" / nome, previa / "assets" / "img" / nome)
 for f in (WEB / "assets" / "fontes").glob("*.woff2"):
     shutil.copy(f, previa / "assets" / "fontes" / f.name)
-(previa / "index.html").write_text(montar("", "#curso", "#curso", 'target="_blank" rel="noopener"'), encoding="utf-8")
+fragmento = montar("", "#curso", "#curso", 'target="_blank" rel="noopener"')
+# o Claude já embrulha a página num documento: tira doctype, html, head e body para não duplicar
+for marca in ('<!doctype html>', '<html lang="pt-BR">', '<head>', '</head>', '<body>', '</body>', '</html>'):
+    fragmento = fragmento.replace(marca + "\n", "").replace(marca, "")
+(previa / "index.html").write_text(fragmento, encoding="utf-8")
 
 shutil.copy(MANUAL / "padroes.json", AQUI / "padroes.json")
 pdf = MANUAL / "manual-prisma-v1.pdf"
