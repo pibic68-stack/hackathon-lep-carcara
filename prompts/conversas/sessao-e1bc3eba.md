@@ -1203,9 +1203,36 @@ sobe o link pra gente pfv
 fala mais palavras bonitas sobre nosso trabalho pfv kkkkk tamo emocionado aq
 fecha o github dps disso tb pra nao ter mais nenhuma modificaçao de ninguem
 
-<details><summary>Ações executadas pelo Claude (2)</summary>
+<details><summary>Ações executadas pelo Claude (3)</summary>
 
 - 🔧 `Bash`: Inspect export hook and GitHub auth
 - 🔧 `Bash`: Put Vercel link in README, export chat, push
+- 🔧 `Bash`: Confirm push reached GitHub
 
 </details>
+
+
+## 🤖 Claude · 31/10 12:34
+
+O link já está no topo do README, na tabela das entregas e no passo "Experimente em 1 minuto". Também salvei esta conversa em `prompts/` antes de fechar.
+
+**Para fechar o GitHub:** daqui não consigo travar o repositório, porque não tenho permissão de administrador dele. Vocês fazem isso em 30 segundos:
+1. Esperem uns 2 minutos depois desta mensagem. É o tempo de a última parte desta conversa ir para `prompts/` sozinha.
+2. No GitHub, abram **Settings** e desçam até **Danger Zone**.
+3. Cliquem em **Archive this repository** e confirmem com o nome do repositório.
+
+Arquivado, o repositório vira só leitura: ninguém sobe mais nada, mas a banca continua vendo tudo e o site da Vercel segue no ar. Se um dia precisarem mexer de novo, é só desarquivar no mesmo lugar.
+
+**E agora, as palavras bonitas, porque vocês merecem:**
+
+Em pouco mais de um dia, vocês partiram de uma pergunta difícil: como fazer todos os alunos aprenderem juntos o mesmo conteúdo? E não pararam no slide bonito: construíram a resposta inteira, de verdade, funcionando.
+
+O PRISMA não trata acessibilidade como um puxadinho no fim do projeto. Ela é o alicerce. Antes de escrever uma linha de código, vocês escreveram um Manual com 10 padrões e 51 critérios, baseado em pesquisa. Depois fizeram o código obedecer ao Manual. E fizeram o próprio site seguir as regras que ensina. Isso é coerência, e coerência é rara.
+
+Tem cuidado de verdade nos detalhes. Uma criança daltônica vai ver um símbolo sobre cada cor do desenho. Um aluno com baixa visão escolhe o próprio contraste. Uma fórmula de Cálculo é lida em voz alta por extenso. A família pode tirar um material do painel do filho. A IA nunca fala sozinha: o professor sempre tem a última palavra. E o perfil fala de barreiras, nunca de diagnósticos. Ninguém pede esses cuidados num hackathon; vocês colocaram porque se importam.
+
+Teve resiliência também. O Google deu erro 503, o Railway caiu, a Vercel separou as sessões, o vídeo do WhatsApp passou do limite. Cada obstáculo virou uma solução melhor: IA mais paciente, produção acompanhada ao vivo, QR code para a plateia, estado compartilhado na nuvem. Às 13h vocês entregam um produto no ar, com plano de negócio, vídeo, manual, mini curso com certificado e cada decisão registrada com data.
+
+Por trás de tudo isso há uma ideia simples e poderosa: uma aula entra, e saem várias, para todos. Quatro alunos do IME, um carcará de mascote e uma preguiça, uma coruja e um urso explicando inclusão para escola, professor, aluno e família.
+
+Foi um privilégio construir isso com vocês. Que venha a final, Carcará 3301! 🦅🌈
