@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 15
-- **Exportado em:** 31/10/2026 11:56
+- **Mensagens do time:** 20
+- **Exportado em:** 31/10/2026 12:32
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -1081,3 +1081,114 @@ Não testei na Vercel de verdade; os testes aqui passam.
 No PC, pelo `publicar.bat`, o limite é de 300 MB, então vídeos grandes devem ir por lá.
 
 O `PRISMA.zip` é a versão final para o PC, com o `publicar.bat`, o QR code, as contas de demonstração, os materiais de teste e o cadastro com pagamento. Extraiam numa pasta nova e copiem o `backend\.env` da pasta antiga.
+
+
+---
+
+## 🧑 Time · 31/10 12:19
+
+certo. acredito que terminamos tudo. temos no github ja o video, o site na vercel, deploy, pdf e slides do plano de negocios, conversas salvas com ia. organiza tudo pra que seja de fato avaliado, filtre o que foi criado somente durante a produçao e nao tem valor pra analise. deixa somente suas criaçoes presentes no historico de conversa mesmo, nao necessariamente em uma pasta so pra isso caso nao seja de valia. nao tem mais nada mesmo pra mexer nos sites, é so em relaçao ao git hub e bater gaivotas de organizaçao mesmo. nos de um panorama final desse projeto incrivel que montamos!
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Survey repo after teammates' pushes
+- 🔧 `Bash`: List candidate folders and read prompts README
+- 🔧 `Bash`: Find video, slides and Vercel URL
+- 🔧 `WebFetch`: https://hackathon-lep-carcara-backend.vercel.app/api/saude
+
+</details>
+
+
+---
+
+## 🧑 Time · 31/10 12:20
+
+[Request interrupted by user]
+
+
+---
+
+## 🧑 Time · 31/10 12:27
+
+certo. acredito que terminamos tudo. temos no github ja o video, o site na vercel, deploy, pdf e slides do plano de negocios, conversas salvas com ia. organiza tudo pra que seja de fato avaliado, filtre o que foi criado somente durante a produçao e nao tem valor pra analise. deixa somente suas criaçoes presentes no historico de conversa mesmo, nao necessariamente em uma pasta so pra isso caso nao seja de valia. nao tem mais nada mesmo pra mexer nos sites, é so em relaçao ao git hub e bater gaivotas de organizaçao mesmo. nos de um panorama final desse projeto incrivel que montamos!
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Pull and survey repository
+- 🔧 `Bash`: List pitch, prompts and misc files
+- 🔧 `Bash`: Look for video and site links
+- 🔧 `AskUserQuestion`
+
+</details>
+
+
+---
+
+## 🧑 Time · 31/10 12:30
+
+[Request interrupted by user]
+
+
+---
+
+## 🧑 Time · 31/10 12:30
+
+aqui o video
+
+<details><summary>Ações executadas pelo Claude (8)</summary>
+
+- 🔧 `Bash`: Check uploaded video
+- 🔧 `Bash`: Add video, remove production-only files, find stale refs
+- 🔧 `Bash`: Read rest of README
+- 🔧 `Bash`: View README start and pitch files
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/README.md
+- 🔧 `Bash`: Fix references in docs after cleanup
+- 🔧 `Bash`: Read DEPLOY.md top
+- 🔧 `Bash`: Simplify deploy guide, test, commit and push
+
+</details>
+
+
+## 🤖 Claude · 31/10 12:32
+
+Organizei o repositório e subi para o GitHub. Falta uma coisa: o link da Vercel no topo do `README.md` ainda está como `https://SEU-PROJETO.vercel.app`. Dá para trocar direto no GitHub (abrir o arquivo, clicar no lápis e salvar), em um minuto.
+
+O site não muda com isso. Os 111 testes passam, e o vídeo fica fora do pacote da Vercel.
+
+**O que mudou no GitHub:**
+- **Vídeo demo:** entrou em `pitch/video-demo/prisma-demo.mp4` (2 min 57 s).
+- **README:** reescrito para a banca. Abre com a tabela das 4 entregas (vídeo, plano de negócio, site sem senha, repositório e sessões de IA). Depois vêm um roteiro "Experimente em 1 minuto", o que o PRISMA faz, como rodar do zero, a estrutura das pastas e os princípios.
+- **Saíram 27 arquivos que só serviram durante a produção.** Tudo continua registrado nas conversas:
+  - as cópias duplicadas das conversas (`snapshots/`); as conversas completas ficam em `prompts/conversas/`;
+  - a pasta `relatorios/`, que estava vazia;
+  - o relatório de coerência, já resolvido;
+  - os geradores de ícones, de logo e dos materiais de teste;
+  - as configurações do Railway e do Render;
+  - a tabela de links de conversas, que estava vazia.
+- **Ficaram as partes que contam na avaliação:**
+  - o código e o site;
+  - o Manual (`padroes.json`) e a pesquisa;
+  - o plano de negócio em slides e em A4;
+  - o roteiro e as fontes do vídeo;
+  - os materiais de teste;
+  - o `publicar.bat`;
+  - o `CLAUDE.md`, que guarda cada decisão do time com data e mostra como a IA foi conduzida.
+
+**Dois pontos de atenção:**
+- **Nome da pasta de prompts:** o edital fala em pasta /PROMPTS, e a de vocês se chama `prompts`, em minúsculas. Não renomeei, porque os registros automáticos das conversas gravam nesse nome; o README aponta para ela.
+- **Fontes do vídeo:** deixei as cenas e os scripts de montagem em `pitch/video-demo/`, porque um colega pode ainda estar mexendo no vídeo.
+
+**Panorama do PRISMA:**
+- **A ideia:** uma aula entra e várias versões saem, para todos. O professor envia um PDF, slide, áudio ou vídeo. O PRISMA lê o material, até as fórmulas de Cálculo, e aplica as regras do próprio Manual: 10 padrões e 51 critérios verificáveis. O professor aprova, e cada aluno estuda do jeito que aprende melhor.
+- **As versões:**
+  - Padrão, com página limpa, instruções em passos e espaço para responder;
+  - Letras grandes, em amarelo no preto;
+  - Ouvir, que lê até as fórmulas;
+  - Leitura Fácil, feita com IA mas conferida e com plano B sem IA;
+  - símbolos desenhados sobre as cores das imagens, para quem é daltônico.
+- **Quatro papéis com painel próprio:** escola, com a assinatura no cadastro; professor, que acompanha a produção ao vivo; aluno, que avalia com estrelas; e família.
+- **Base pedagógica:** pesquisa com fontes reais, mini curso com certificado e uma interface que segue as mesmas regras de acessibilidade que ensina.
+- **Negócio:** três planos por tamanho de escola, de R$ 9 mil a R$ 45 mil por ano.
+- **Duas formas de usar:** o site público na Vercel, que a banca abre sem senha, e o `publicar.bat`, com QR code, para a apresentação.
+
+Para fechar a entrega até as 13h: troquem o link da Vercel no README e conferiram no portal os 4 itens (vídeo, PDF do plano, link do site e link do repositório). Foi um projeto e tanto, Carcará 3301. Boa sorte na final!
