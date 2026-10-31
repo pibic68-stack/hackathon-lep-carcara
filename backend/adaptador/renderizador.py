@@ -92,6 +92,8 @@ figure img {{ border:3px solid var(--borda); background:#fff; }}
 .legenda-cores .simbolo {{ font-size:1.25em; }}
 details.sem-simbolos {{ margin:.5rem 0; }} details.sem-simbolos summary {{ cursor:pointer; min-height:44px; font-weight:700; }}
 .cor-aviso {{ font-size:.9em; }}
+.resposta {{ height:calc(var(--linhas) * 2.2em); margin:.6em 0 1.2em;
+  background:repeating-linear-gradient(to bottom, transparent 0, transparent calc(2.2em - 2px), var(--borda) calc(2.2em - 2px), var(--borda) 2.2em); opacity:.55; }}
 
 main {{ max-width:{params['caracteres_por_linha']}ch; margin:0 auto; padding:1.5rem 1rem 4rem; }}
 h1, h2, h3 {{ line-height:1.25; color:var(--destaque); }}
@@ -252,6 +254,10 @@ def para_html(doc: Documento, estilo: str = "padrao", manual: dict | None = None
             partes.append(f"<h{n}{marca(b.texto)}>{_html(b.texto)}</h{n}>")
         elif b.tipo == "paragrafo":
             partes.append(f"<p{marca(b.texto)}>{_html(b.texto)}</p>")
+        elif b.tipo == "resposta":
+            linhas = min(max(b.nivel, 1), 12)
+            partes.append(f'<div class="resposta" role="img" aria-label="Espaço para escrever a resposta"'
+                          f'{marca("Espaço para escrever a resposta.")} style="--linhas:{linhas}"></div>')
         elif b.tipo == "lista":
             letras = all(ITEM_LETRA.match(x) for x in b.itens)
             partes.append(f"<ul{' class=\"itens\"' if letras else ''}{marca(('' if letras else 'Lista. ') + '. '.join(b.itens))}>"

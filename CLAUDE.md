@@ -38,9 +38,13 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
   - Home: a caixa do "Como funciona" tem a altura da maior etapa (botões não pulam); rótulos do diagrama se afastam sozinhos ou viram lista no caderno quando não cabem; menu do topo recolhe quando a letra grande não cabe.
 
 - Decisões de 31/10, 3h (testes do time):
-  - **Símbolos dentro das imagens coloridas** (`backend/adaptador/simbolos_imagem.py`): cada região de cor ganha o símbolo da legenda (● verde, ◆ amarelo, ◇ marrom...) em preto com contorno branco; regiões grandes em xadrez, pequenas (sol, tronco, grupo de bolinhas) com um símbolo no centro; bordas finas e degradês de fundo ficam de fora. A versão mostra a imagem com símbolos, a legenda e "Ver a imagem sem os símbolos"; o Ouvir lê a legenda.
+  - **Símbolos dentro das imagens coloridas** (`backend/adaptador/simbolos_imagem.py`) **só quando algum aluno da turma tem "Cor sempre com símbolo"** (daltonismo; pedido do Adler, 3h40). Sem esse aluno, a imagem fica limpa. A legenda de símbolos do TEXTO colorido continua sempre (P1.1). Cada região de cor ganha o símbolo da legenda (● verde, ◆ amarelo, ◇ marrom...) em preto com contorno branco; regiões grandes em xadrez, pequenas (sol, tronco, grupo de bolinhas) com um símbolo no centro; bordas finas e degradês de fundo ficam de fora. A versão mostra a imagem com símbolos, a legenda e "Ver a imagem sem os símbolos"; o Ouvir lê a legenda.
   - **Vídeo/áudio sem faster-whisper**: a IA (Gemini) transcreve e lista "O que aparece na tela"; o professor confere.
   - **Chave da IA pelo publicar.bat**: na primeira vez ele pede a chave e grava só em `backend/.env`. O `publicar.bat` também instala o Python pelo winget. No painel, versões que faltaram têm o botão "Gerar as versões de novo" (`POST /api/materiais/{id}/refazer`).
+
+- Decisões de 31/10, 3h40:
+  - **Linhas para responder** (pontilhado ou sublinhado) viram o bloco `resposta` (pauta desenhada na página, "Espaço para escrever a resposta" no Ouvir) e não vão para a IA; pontilhado no fim de título é cortado (`transformacoes.linhas_de_resposta`). Corrige a Leitura Fácil cheia de "." soltos.
+  - **Link público** (`backend/adaptador/tunel.py`, chamado pelo `publicar.bat`): só mostra o link depois de testá-lo pela internet (evita o "Error 1033"), copia para a área de transferência, grava em `link.txt`, confere a cada 20 s e recria se cair, tenta http2 e depois quic, e não deixa o PC dormir. O servidor agora escuta na rede local (`0.0.0.0`): no mesmo Wi-Fi abre em `http://IP:8000`.
 
 ## Regras para o Claude
 - Responder em português.

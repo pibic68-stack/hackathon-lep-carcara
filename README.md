@@ -22,8 +22,10 @@ Configuração em `backend/.env` (modelo em `backend/.env.exemplo`, que nunca le
 - `PRISMA_CODIGO_ESCOLA`: código que o professor digita para criar conta. Sem ele, o cadastro fica fechado.
 
 **Link público para a banca:** rode `publicar.bat` (Windows). Ele liga o servidor e cria um endereço
-`https://...trycloudflare.com` que qualquer pessoa abre. O endereço muda a cada vez e só funciona
-enquanto este computador estiver ligado. Detalhes em [`backend/README.md`](backend/README.md).
+`https://...trycloudflare.com` que qualquer pessoa abre. O link só aparece depois de testado pela internet,
+já vem copiado (Ctrl+V) e fica em `link.txt`. Muda a cada vez e só funciona enquanto este computador
+e a janela estiverem ligados. Se a rede bloquear o túnel, use o celular como roteador; no mesmo Wi-Fi,
+o site também abre em `http://IP-do-computador:8000`. Detalhes em [`backend/README.md`](backend/README.md).
 
 ### Quem entra e como
 

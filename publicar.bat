@@ -118,14 +118,13 @@ if not defined CF (
 )
 
 echo.
-echo  ------------------------------------------------------------
-echo   Criando o link publico. Procure abaixo a linha com
-echo      https://alguma-coisa.trycloudflare.com
-echo   e mande esse endereco para quem vai testar.
-echo   Para desligar: feche esta janela e a janela "PRISMA servidor".
-echo  ------------------------------------------------------------
+echo  Criando o link publico. Ele so aparece quando ja estiver funcionando
+echo  ^(leva ate 1 minuto^). Se o Windows perguntar sobre o firewall, clique em Permitir.
+echo  Para desligar: feche esta janela e a janela "PRISMA servidor".
 echo.
-"%CF%" tunnel --no-autoupdate --protocol http2 --url http://127.0.0.1:8000
+pushd "%~dp0backend"
+%PY% -X utf8 -m adaptador.tunel "%CF%"
+popd
 
 :fim
 echo.

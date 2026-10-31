@@ -147,3 +147,46 @@ class TestRefazer(Base if Base else unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLinhasDeResposta(unittest.TestCase):
+    def test_pontilhado_vira_espaco_de_resposta_e_nao_vai_para_a_ia(self):
+        from adaptador import transformacoes as t
+        doc = Documento("Lista", [
+            Bloco("titulo", texto="3.1 Análise Qualitativa: Ação do Sabão .", nivel=2),
+            Bloco("paragrafo", texto="Explique por que o sabão tira a gordura."),
+            Bloco("paragrafo", texto="." * 400),
+            Bloco("lista", itens=["." * 60, "_" * 40]),
+            Bloco("paragrafo", texto="Nome: ______________ Turma: ________"),
+        ])
+        novo = t.linhas_de_resposta(doc)
+        self.assertEqual(novo.blocos[0].texto, "3.1 Análise Qualitativa: Ação do Sabão")
+        self.assertEqual([b.tipo for b in novo.blocos], ["titulo", "paragrafo", "resposta", "paragrafo"])
+        self.assertEqual(novo.blocos[2].nivel, 5 + 2)                     # 400 pontos ≈ 5 linhas + 2 itens
+        self.assertEqual(novo.blocos[3].texto, "Nome: ______ Turma: ______")
+        enviados = []
+
+        def ia(textos, refazer=False):
+            enviados.extend(textos)
+            return (["."] + textos[1:], [])                               # a IA devolve só um ponto no 1º
+        lf = t.leitura_facil(novo, "lf2", ia, 15)
+        self.assertNotIn("." * 400, enviados)
+        self.assertTrue(all(any(c.isalnum() for c in x) for x in enviados))
+        textos = [b.texto for b in lf.blocos if b.tipo == "paragrafo"]
+        self.assertIn("Explique por que o sabão tira a gordura.", textos)   # voltou o original, não "."
+        self.assertFalse([x for x in textos if not any(c.isalnum() for c in x)])
+
+    def test_pagina_mostra_pauta(self):
+        doc = Documento("Lista", [Bloco("resposta", nivel=3)])
+        html = renderizador.para_html(doc, "padrao", audio=True)
+        self.assertIn('class="resposta"', html)
+        self.assertIn("--linhas:3", html)
+        self.assertIn("Espaço para escrever a resposta", html)
+
+
+class TestSimbolosSoComDaltonismo(unittest.TestCase):
+    def test_so_quando_a_turma_pede(self):
+        from adaptador import pipeline
+        self.assertFalse(pipeline.pede_simbolos(None))
+        self.assertFalse(pipeline.pede_simbolos({"necessidades": ["baixa_visao"], "preferencias": ["audio"]}))
+        self.assertTrue(pipeline.pede_simbolos({"necessidades": ["daltonismo"], "preferencias": []}))

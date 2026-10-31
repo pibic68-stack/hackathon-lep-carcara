@@ -19,6 +19,7 @@ limite de tentativas de login e de envios por hora.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import time
@@ -583,4 +584,7 @@ if SITE.exists():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000, proxy_headers=True, forwarded_allow_ips="127.0.0.1")
+    # 0.0.0.0: outro aparelho no mesmo Wi-Fi também abre (http://IP-do-computador:8000). O Windows pode
+    # perguntar sobre o firewall na primeira vez: "Permitir". PRISMA_HOST=127.0.0.1 deixa só neste computador.
+    uvicorn.run(app, host=os.environ.get("PRISMA_HOST", "0.0.0.0"), port=8000,
+                proxy_headers=True, forwarded_allow_ips="127.0.0.1")

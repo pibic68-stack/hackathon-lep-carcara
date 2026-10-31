@@ -59,7 +59,7 @@ def cor_com_simbolo(doc: Documento) -> Documento:
     desenhos = [f for f in novo.figuras_coloridas if not f.startswith("imagens/")]
     if imagens:
         novo.pendencias.append(
-            f"P1.2: {len(imagens)} imagem(ns) colorida(s). O PRISMA já pôs um símbolo sobre cada cor. Na descrição, diga o que cada cor representa "
+            f"P1.2: {len(imagens)} imagem(ns) colorida(s). Na descrição, diga o que cada cor representa "
             "(por exemplo: \"barras vermelhas: meninas\"). É assim que o aluno daltônico e a versão Ouvir entendem o desenho."
         )
         for b in novo.blocos:
@@ -197,7 +197,58 @@ ABREVIACAO = re.compile(r"\b(?:ex|etc|obs|p\.ex|cf|aprox)\.|[\\&<§#]", re.I)
 
 
 def _frases(texto: str) -> list[str]:
-    return [f.strip() for f in re.split(r"(?<=[.!?])\s+", texto.strip()) if f.strip()]
+    """Frases do texto. Pedaço sem letra nem número ("." de linha pontilhada) não é frase."""
+    return [f.strip() for f in re.split(r"(?<=[.!?])\s+", texto.strip()) if TEM_CONTEUDO.search(f)]
+
+
+# ---------- linhas para o aluno escrever a resposta ----------
+
+TEM_CONTEUDO = re.compile(r"[^\W_]")                     # letra ou número
+PREENCHER = re.compile(r"(?:[._…·\-–—]\s?){5,}")       # "..........", "_____", "-----"
+
+
+def linhas_de_resposta(doc: Documento) -> Documento:
+    """Linha pontilhada ou sublinhada (espaço para o aluno escrever) vira um bloco "resposta":
+    na página aparece como pauta, e a IA e o leitor de voz não recebem pontinhos.
+    Dentro de uma frase ("Nome: ______"), a linha fica curta e igual em todo lugar."""
+    novo = copy.deepcopy(doc)
+    saida: list[Bloco] = []
+
+    def resposta(n: int) -> None:
+        if saida and saida[-1].tipo == "resposta":
+            saida[-1].nivel += n
+        else:
+            saida.append(Bloco("resposta", nivel=n))         # nivel = quantas linhas
+
+    def so_preencher(t: str) -> bool:
+        return bool(t.strip()) and not TEM_CONTEUDO.search(t)
+
+    def encurtar(t: str) -> str:
+        return re.sub(r"\s{2,}", " ", PREENCHER.sub(" ______ ", t)).strip()
+
+    for b in novo.blocos:
+        if b.tipo == "paragrafo":
+            if so_preencher(b.texto):
+                resposta(max(1, b.texto.count("\n") + 1, round(len(re.sub(r"\s", "", b.texto)) / 80)))
+                continue
+            # título seguido de pontilhado na mesma linha ("3.1 Ação do Sabão ........")
+            b.texto = re.sub(r"\s*(?:[.…·]\s?){5,}\s*$", "", b.texto)
+            b.texto = encurtar(b.texto)
+            saida.append(b)
+        elif b.tipo in ("lista", "etapas", "quadro"):
+            vazios = sum(1 for x in b.itens if so_preencher(x) or not x.strip())
+            b.itens = [encurtar(x) for x in b.itens if x.strip() and not so_preencher(x)]
+            if b.itens or b.tipo == "quadro":
+                saida.append(b)
+            if vazios:
+                resposta(vazios)
+        elif b.tipo == "titulo":
+            b.texto = re.sub(r"[\s._…·]+$", "", b.texto) or b.texto     # título não termina em ponto
+            saida.append(b)
+        else:
+            saida.append(b)
+    novo.blocos = saida
+    return novo
 
 
 def _palavras(frase: str) -> int:
@@ -210,10 +261,10 @@ def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> 
     novo = copy.deepcopy(doc)
     alvos = []  # (bloco, índice do item ou None, texto)
     for b in novo.blocos:
-        if b.tipo == "paragrafo":
+        if b.tipo == "paragrafo" and TEM_CONTEUDO.search(b.texto):
             alvos.append((b, None, b.texto))
         elif b.tipo in ("lista", "etapas"):
-            alvos.extend((b, i, x) for i, x in enumerate(b.itens))
+            alvos.extend((b, i, x) for i, x in enumerate(b.itens) if TEM_CONTEUDO.search(x))
     if not alvos:
         return novo
 
@@ -235,7 +286,9 @@ def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> 
         glossario = glossario + [g for g in glos2 if g["termo"] not in nomes]
         novo.aplicados.append(f"P3.1: {len(refazer)} trecho(s) com frase longa voltaram para a IA reescrever.")
 
-    for (b, i, _), texto in zip(alvos, textos):
+    for (b, i, original), texto in zip(alvos, textos):
+        if not TEM_CONTEUDO.search(texto or ""):
+            texto = original                  # a IA devolveu só pontuação: fica o texto original
         if i is None:
             b.texto = texto
         else:

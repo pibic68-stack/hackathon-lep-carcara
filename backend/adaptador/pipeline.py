@@ -32,12 +32,18 @@ def versoes_do_perfil(perfil: dict | None) -> list[str]:
     return pedidas
 
 
+def pede_simbolos(perfil: dict | None) -> bool:
+    """Símbolos desenhados por cima das imagens coloridas: só quando algum aluno da turma tem
+    "Cor sempre com símbolo" (daltonismo). Decisão do time em 31/10: sem esse aluno, a imagem fica limpa."""
+    return bool(perfil) and "daltonismo" in (perfil.get("necessidades") or []) + (perfil.get("preferencias") or [])
+
+
 def _identificador(nome: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", nome.lower()).strip("-") or "material"
 
 
 def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
-             descricoes: dict | None = None) -> tuple[Documento, Path]:
+             descricoes: dict | None = None, perfil: dict | None = None) -> tuple[Documento, Path]:
     """Lê o arquivo (usando o cache se já foi lido) e aplica as regras comuns a todos."""
     # "leitor-v2": leitor de PDF com matemática e cor (31/10). Mudou o leitor, o cache antigo não serve mais.
     chave = cache.arquivo(caminho, extras=modelo_audio + "|leitor-v2")
@@ -67,8 +73,10 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
                 erros_ia.append(str(erro))
             return None
 
+    doc = t.linhas_de_resposta(doc)                   # pontilhado vira espaço de resposta (antes da IA)
     doc = t.cor_com_simbolo(doc)                      # P1
-    _simbolos_nas_imagens(doc, pasta)                 # P1.1 dentro das imagens coloridas
+    if pede_simbolos(perfil):
+        _simbolos_nas_imagens(doc, pasta)             # P1.1 dentro das imagens: só se a turma marcou "Cor sempre com símbolo"
     doc = t.instrucoes_em_etapas(doc)                 # P6
     doc = t.sinalizar_linguagem_figurada(doc)         # P6 (só avisa)
     doc = t.imagens_com_descricao(doc, descrever)     # P4
@@ -109,7 +117,7 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
             nome_pasta: str | None = None) -> dict:
     caminho = Path(caminho)
     manual = regras.carregar_manual()
-    doc, pasta_trabalho = preparar(caminho, manual, ia, modelo_audio, descricoes)
+    doc, pasta_trabalho = preparar(caminho, manual, ia, modelo_audio, descricoes, perfil)
 
     pasta = Path(saida) / (nome_pasta or _identificador(caminho.stem))
     pasta.mkdir(parents=True, exist_ok=True)
