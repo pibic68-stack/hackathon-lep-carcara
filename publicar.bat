@@ -24,7 +24,13 @@ python -c "import sys" >nul 2>nul && set "PY=python"
 if not defined PY ( py -3 -c "import sys" >nul 2>nul && set "PY=py -3" )
 if not defined PY (
   echo.
-  echo  [ERRO] Python nao encontrado.
+  echo  Python nao encontrado. Instalando sozinho pelo Windows ^(1 a 3 minutos, so uma vez^)...
+  winget install -e --id Python.Python.3.12 --scope user --silent --accept-package-agreements --accept-source-agreements
+  for /d %%D in ("%LocalAppData%\Programs\Python\Python3*") do if exist "%%D\python.exe" set PY="%%D\python.exe"
+)
+if not defined PY (
+  echo.
+  echo  [ERRO] Nao consegui instalar o Python sozinho.
   echo         Instale em https://www.python.org/downloads/ e MARQUE a caixa
   echo         "Add python.exe to PATH" na primeira tela. Depois abra este arquivo de novo.
   goto :fim
