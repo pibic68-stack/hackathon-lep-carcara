@@ -1,13 +1,13 @@
 # Intro do vídeo (30 s)
 
-Sala de aula voxel no Blender: a aluna cadeirante entra, as palavras flutuam pela sala, a câmera chega ao quadro, o giz vira o prisma da logo, o raio de luz abre as seis cores e aparece o slogan.
+Sala de aula voxel no Blender: a professora entra pela porta e acena para a aluna cadeirante, que já está no lugar dela. Uma aluna usa o crachá de TEA. As palavras flutuam pela sala, a câmera chega ao quadro, o giz vira o prisma da logo, o raio de luz abre as seis cores e aparece o slogan.
 O plano está em `docs/video/plano-intro.md`.
 
 ## Arquivos
 
 | Arquivo | O que faz |
 |---|---|
-| `cena.py` | Apaga a cena e monta tudo: sala, turma, professora, aluna, quadro, logo em pixels, palavras, luzes |
+| `cena.py` | Apaga a cena e monta tudo: sala, turma (com o crachá de TEA), professora, aluna, quadro, logo em pixels, palavras, luzes |
 | `animacao.py` | Grava os keyframes e escreve `saida/eventos.json` com os tempos de cada evento |
 | `trilha.py` | Compõe a música e os efeitos com numpy (96 BPM) a partir de `eventos.json` |
 | `montar.py` | Junta os quadros e a trilha num MP4 |
@@ -24,7 +24,7 @@ A pasta `saida/` fica fora do Git: `.blend`, quadros, trilha, MP4 e as fontes co
 
 ## Sincronia
 
-Cada compasso dura 2,5 s. A porta abre em 2,5 s e cada palavra entra a cada 1,25 s, com uma nota de marimba.
+Cada compasso dura 2,5 s. A porta abre em 2,5 s e a professora entra (os passos estão em `eventos.json`). Cada palavra entra a cada 1,25 s, com uma nota de marimba.
 O quadro começa em 20 s. O raio entra em 22,5 s e as cores saem uma por colcheia (0,3125 s), cada uma com sua nota.
 O slogan entra em 25 s, com o acorde final. O corte com o whoosh vem em 29,5 s.
 Para mudar um tempo, edite `animacao.py`, rode de novo e refaça a trilha.

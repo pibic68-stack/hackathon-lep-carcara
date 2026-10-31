@@ -47,6 +47,7 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
   - **Link público** (`backend/adaptador/tunel.py`, chamado pelo `publicar.bat`): só mostra o link depois de testá-lo pela internet (evita o "Error 1033"), copia para a área de transferência, grava em `link.txt`, confere a cada 20 s e recria se cair, tenta http2 e depois quic, e não deixa o PC dormir. O servidor agora escuta na rede local (`0.0.0.0`): no mesmo Wi-Fi abre em `http://IP:8000`.
 
 - Intro do vídeo de demo (31/10): 30 s em voxel/pixel 3D no Blender, música original por código (96 BPM, eventos no início de cada compasso), logo e slogan no próprio quadro negro, narração gravada pelo time depois. Plano em `docs/video/plano-intro.md`. O vídeo inteiro tem até 5 min e é entregue até 13h de 31/10.
+- Intro, ajuste de 31/10 (manhã): a professora entra pela porta e a aluna cadeirante já começa no lugar dela. Uma aluna (a de tranças) usa o cordão e o crachá de TEA com estampa de quebra-cabeça.
 
 ## Regras para o Claude
 - Responder em português.

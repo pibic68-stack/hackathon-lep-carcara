@@ -693,6 +693,55 @@ for i, (x, y) in enumerate(SEATS):
         a.rotation_euler.x = math.radians(62)
     STUDENT_NAMES.append(nm)
 
+
+def cracha_tea(root):
+    """Cordão e crachá de TEA (estampa de quebra-cabeça em vermelho, amarelo, azul e ciano)."""
+    PZ = [P["r1"], P["r3"], lin("2F5FD0"), lin("3FB8E8")]
+    lerp = lambda a, b, u: a + (b - a) * u
+    S = 0.44
+    T0, TH = S + 0.13, 0.42
+    fy = -0.02 + 0.11 + 0.006            # frente do tronco
+    top = T0 + TH
+    c = MB()
+    # cordão: sobe pelos dois lados do peito, passa por cima dos ombros e dá a volta na nuca
+    cx, cz = 0.0, 0.77                   # ponto onde o cordão encontra o crachá
+    for sx in (-1, 1):
+        x0, z0 = sx * 0.075, top + 0.005
+        n = 7
+        for k in range(n):
+            u = (k + 0.5) / n
+            x, z = lerp(x0, cx + sx * 0.012, u), lerp(z0, cz + 0.07, u)
+            ang = math.atan2(x0 - (cx + sx * 0.012), z0 - (cz + 0.07))
+            c.box((x, fy, z), (0.026, 0.008, 0.036), PZ[(k + (sx > 0)) % 4], rot=(0, ang, 0))
+        for k in range(4):               # por cima do ombro até a nuca
+            y = lerp(fy - 0.01, -0.14, (k + 0.5) / 4)
+            c.box((sx * 0.075, y, top + 0.012), (0.026, 0.06, 0.008), PZ[(k + 2 + (sx > 0)) % 4])
+    c.box((0, -0.14, top + 0.012), (0.17, 0.026, 0.008), PZ[1])
+    c.box((cx, fy + 0.002, cz + 0.06), (0.028, 0.01, 0.03), P["prata"])        # presilha
+    # crachá: moldura de quebra-cabeça, cartão branco, faixa azul, rostinho e linhas
+    cw, chh, cz0 = 0.12, 0.16, cz - 0.03
+    yy = fy + 0.008
+    c.box((cx, yy, cz0), (cw, 0.008, chh), P["branco"])
+    cell = 0.02
+    nx, nz = int(round(cw / cell)), int(round(chh / cell))
+    for i in range(nx):
+        for j in range(nz):
+            if 0 < i < nx - 1 and 0 < j < nz - 1:
+                continue
+            x = cx - cw / 2 + (i + 0.5) * cell
+            z = cz0 - chh / 2 + (j + 0.5) * cell
+            c.box((x, yy + 0.002, z), (cell, 0.006, cell), PZ[(i * 3 + j * 2) % 4])
+    yf = yy + 0.0055
+    c.box((cx, yf, cz0 + 0.048), (cw - 0.04, 0.003, 0.016), lin("2F5FD0"))     # faixa "AUTISMO"
+    c.box((cx, yf, cz0 + 0.012), (0.036, 0.003, 0.036), lin("F2C9A5"))        # rostinho
+    c.box((cx, yf + 0.001, cz0 + 0.027), (0.04, 0.003, 0.012), lin("4A2C1A"))
+    c.box((cx, yf, cz0 - 0.022), (0.06, 0.003, 0.008), lin("2F5FD0"))
+    c.box((cx, yf, cz0 - 0.038), (0.07, 0.003, 0.006), P["metal"])
+    return c.obj(root.name + "_Cracha", C_PERS, parent=root)
+
+
+cracha_tea(bpy.data.objects["Aluno04"])   # aluna de tranças, vista de frente nos planos do meio
+
 # aluna cadeirante (inspirada na referência: cabelo ruivo ondulado, jaqueta azul, blusa roxa)
 GIRL = dict(skin=lin("F5D3B8"), hair=lin("D9662B"), shirt=lin("4F7FD6"), inner=lin("A46BD1"),
             pants=lin("8A4B32"), shoes=lin("57B3F9"), style="wavy")

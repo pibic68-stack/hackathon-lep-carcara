@@ -221,11 +221,12 @@ for i, (t0, m) in enumerate(zip(EV["cores"], [77, 81, 84, 89, 93, 96])):
 for b_, m in [(0, 84), (.5, 81), (1, 77), (1.5, 79), (2, 81), (3, 77)]:
     add(mus, EV["slogan"] + 0.2 + b_ * BEAT, bell(m, 1.6, 0.42), pan=0.25)
 
-# ---------------------------------------------------------------- portas e rodas (bem baixinho)
+# ---------------------------------------------------------------- porta e passos da professora (bem baixinho)
 add(sfx, EV["porta"] - 0.15, lowpass(noise(0.05), 3000) * np.exp(-tt(0.05) * 80) * 0.25, pan=-0.5)
-roll = lowpass(noise(4.8), 180) * 0.6
-roll *= np.minimum(1, tt(4.8) / 0.5) * np.minimum(1, (4.8 - tt(4.8)) / 0.6)
-add(sfx, EV["aluna_entra"], roll * 0.5, pan=-0.4)
+for k, t0 in enumerate(EV["passos"]):
+    d = 0.09
+    step = lowpass(noise(d), 900) * np.exp(-tt(d) * 45) + 0.5 * np.sin(2 * np.pi * 95 * tt(d)) * np.exp(-tt(d) * 60)
+    add(sfx, t0, step * rng.uniform(0.09, 0.12), pan=-0.4 if t0 < EV["professora_anda"] else -0.15)
 
 # ---------------------------------------------------------------- reverb e mixagem
 def reverb(x, secs=1.8, mix=0.22):

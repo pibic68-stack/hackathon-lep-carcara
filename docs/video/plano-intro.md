@@ -18,8 +18,8 @@ Esta intro abre o vídeo. O resto (demo da plataforma) é editado depois.
 
 | Tempo | Imagem | Som |
 |---|---|---|
-| 0 a 2,5 s | A tela clareia. Plano aberto do fundo da sala, luz da manhã. A professora aponta o PRISMA de giz com o ponteiro | fundo suave e celesta |
-| 2,5 a 7,5 s | A porta abre e a aluna cadeirante entra. A professora acena e a turma sorri. Ela vai para o lugar dela na primeira fila | entra o piano |
+| 0 a 2,5 s | A tela clareia. Plano aberto do fundo da sala, luz da manhã. A turma já está sentada, com a aluna cadeirante na mesa adaptada | fundo suave e celesta |
+| 2,5 a 7,5 s | A porta abre e a professora entra. Ao passar pela aluna cadeirante, as duas se acenam. A turma acompanha com o olhar. Ela chega à frente do quadro | entra o piano e os passos |
 | 7,5 a 17,5 s | Sobrevoo pelas carteiras. Palavras aparecem a cada 1,25 s, sobem e somem. A professora anda até a frente do quadro e conversa com a turma; alunos levantam a mão, cochicham, escrevem e balançam a cabeça no ritmo | marimba, uma nota por palavra |
 | 17,5 a 20 s | A câmera chega ao quadro enquanto a professora aponta o "PRISMA" a giz | a música cresce |
 | 20 a 22,5 s | O giz vira pó e o prisma pixelado se monta bloco a bloco | acorde suspenso |
@@ -31,12 +31,14 @@ Palavras: inclusão, acessibilidade, aprender, ver, ouvir, ler, autonomia, para 
 
 Ajustes de 31/10 (madrugada): mais movimento na sala (ventiladores de teto girando, turma se mexendo), professora com ponteiro e caminhada, palavras sem placa preta. Render final em 32 amostras, por tempo.
 
+Ajustes de 31/10 (manhã): quem entra pela porta agora é a professora; a aluna cadeirante já começa no lugar dela. A aluna de tranças usa o cordão e o crachá de TEA (estampa de quebra-cabeça) e vira o corpo para conversar com a colega entre 10,3 s e 13 s, para o crachá aparecer de frente. Na trilha, o som das rodas virou passos. Para caber no prazo, só os quadros 1 a 356 foram renderizados de novo; do quadro 357 (14,8 s) em diante a cena é igual à anterior, e esses quadros vieram do vídeo da madrugada.
+
 ## Acessibilidade do vídeo
 
 - Nada pisca: a luz acende em rampa suave (WCAG 2.3.1, no máximo 3 clarões por segundo).
 - Cada texto fica pelo menos 2 a 3 s na tela, com alto contraste.
 - Volume moderado e whoosh com pico limitado.
-- Turma diversa: aluno de óculos, aluna com aparelho auditivo, aluna cadeirante com mesa na altura certa.
+- Turma diversa: aluno de óculos, aluna com aparelho auditivo, aluna cadeirante com mesa na altura certa, aluna com o crachá de TEA.
 
 ## Etapas
 

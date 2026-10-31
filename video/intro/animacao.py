@@ -50,7 +50,7 @@ def ease_back(u):
     return 1 + (c + 1) * (u - 1) ** 3 + c * (u - 1) ** 2
 
 
-# ---------------------------------------------------------------- trajeto da aluna
+# ---------------------------------------------------------------- trajetos (spline Catmull-Rom com velocidade uniforme)
 def cr(P, u):
     i = min(int(u), len(P) - 2)
     s = u - i
@@ -58,75 +58,53 @@ def cr(P, u):
     return 0.5 * ((2 * p1) + (-p0 + p2) * s + (2 * p0 - 5 * p1 + 4 * p2 - p3) * s * s + (-p0 + 3 * p1 - 3 * p2 + p3) * s ** 3)
 
 
-GP = [Vector(p) for p in [(-5.6, -1.0), (-4.7, -1.0), (-4.05, -0.82), (-3.78, -0.25), (-3.62, 0.25),
-                          (-3.2, 0.5), (-2.82, 0.64), (-2.7, 0.9)]]
-DENSE = [cr(GP, u * (len(GP) - 1) / 1200) for u in range(1201)]
-CUM = [0.0]
-for a, b in zip(DENSE, DENSE[1:]):
-    CUM.append(CUM[-1] + (b - a).length)
-GL = CUM[-1]
-G_T0, G_T1 = 2.6, 7.35
-EV["aluna_entra"] = G_T0
+def make_path(pts):
+    P = [Vector(p) for p in pts]
+    dense = [cr(P, u * (len(P) - 1) / 1200) for u in range(1201)]
+    cum = [0.0]
+    for a, b in zip(dense, dense[1:]):
+        cum.append(cum[-1] + (b - a).length)
+    return dense, cum
 
 
-def girl_s(t):
-    return GL * ss(G_T0, G_T1, t)
-
-
-def girl_at(t):
-    s = girl_s(t)
+def path_at(path, s):
+    dense, cum = path
     j = 0
-    while j < len(CUM) - 2 and CUM[j + 1] < s:
+    while j < len(cum) - 2 and cum[j + 1] < s:
         j += 1
-    u = (s - CUM[j]) / max(1e-9, CUM[j + 1] - CUM[j])
-    p = DENSE[j].lerp(DENSE[j + 1], u)
-    a, b = DENSE[max(j - 3, 0)], DENSE[min(j + 4, len(DENSE) - 1)]
+    u = (s - cum[j]) / max(1e-9, cum[j + 1] - cum[j])
+    p = dense[j].lerp(dense[j + 1], u)
+    a, b = dense[max(j - 3, 0)], dense[min(j + 4, len(dense) - 1)]
     d = b - a
-    return p, math.atan2(-d.x, d.y), s
+    return p, math.atan2(-d.x, d.y)
 
 
-gp = {}
-prev = -math.pi / 2
-G = {}
-for f in FR:
-    p, th, s = girl_at(T(f))
-    th = unwrap(prev, th)
-    prev = th
-    G[f] = (p, th, s)
-put(O["Aluna"], "location", {f: (G[f][0].x, G[f][0].y, 0) for f in FR})
-put(O["Aluna"], "rotation_euler", {f: (0, 0, G[f][1]) for f in FR})
+def trap(t, t0, t1, a=0.55):
+    """Fração do caminho com velocidade em trapézio (acelera e freia em a segundos)."""
+    T_, tau = t1 - t0, t - t0
+    v = 1 / (T_ - a)
+    if tau <= 0:
+        return 0.0
+    if tau < a:
+        return 0.5 * v * tau * tau / a
+    if tau < T_ - a:
+        return v * (a / 2 + tau - a)
+    if tau < T_:
+        r = T_ - tau
+        return 1 - 0.5 * v * r * r / a
+    return 1.0
+
+
+# ---------------------------------------------------------------- aluna cadeirante: já está no lugar dela
+# mesma pose final do trajeto antigo (ao lado da mesa adaptada)
+GPATH = make_path([(-5.6, -1.0), (-4.7, -1.0), (-4.05, -0.82), (-3.78, -0.25), (-3.62, 0.25),
+                   (-3.2, 0.5), (-2.82, 0.64), (-2.7, 0.9)])
+GIRL_P, GIRL_TH = path_at(GPATH, GPATH[1][-1])
+put(O["Aluna"], "location", {1: (GIRL_P.x, GIRL_P.y, 0), NF: (GIRL_P.x, GIRL_P.y, 0)})
+put(O["Aluna"], "rotation_euler", {1: (0, 0, GIRL_TH), NF: (0, 0, GIRL_TH)})
 for side in "ED":
-    put(O[f"Aluna_Roda{side}"], "rotation_euler", {f: (-G[f][2] / 0.3, 0, 0) for f in FR})
-# braços: empurram as rodas, depois aceno para a professora, depois mãos na mesa
-WAVE_G = (7.55, 9.1)
-for side, sx in (("E", -1), ("D", 1)):
-    R = {}
-    for f in FR:
-        t = T(f)
-        moving = win(t, G_T0 + 0.1, G_T1 - 0.15, 0.3)
-        ph = 2 * math.pi * G[f][2] / 0.75
-        push = (0.35 + 0.45 * math.sin(ph), 0.15 if sx < 0 else -0.15, 0)
-        rest = (0.25, 0.12 if sx < 0 else -0.12, 0)
-        desk = (math.radians(62), 0, 0)
-        x = lerp(rest[0], push[0], moving)
-        y = lerp(rest[1], push[1], moving)
-        z = 0.0
-        if side == "D":
-            w = win(t, WAVE_G[0], WAVE_G[1], 0.3)
-            x = lerp(x, 2.75, w)
-            y = lerp(y, -0.15 + 0.3 * math.sin(2 * math.pi * 2.2 * t), w)
-        k = ss(WAVE_G[1] - 0.1, WAVE_G[1] + 0.6, t)
-        x, y = lerp(x, desk[0], k), lerp(y, desk[1], k)
-        R[f] = (x, y, z)
-    put(O[f"Aluna_Braco{side}"], "rotation_euler", R)
-# cabeça: olha a turma ao entrar, depois a professora
-H = {}
-for f in FR:
-    t = T(f)
-    yaw = -0.45 * win(t, 4.3, 6.4, 0.5) + 0.25 * win(t, 6.6, 9.4, 0.4) + 0.06 * math.sin(t * 1.3)
-    tilt = 0.06 * math.sin(t * 2.1) - 0.08 * win(t, 7.5, 9.2, 0.3)
-    H[f] = (tilt, 0.08 * win(t, 7.5, 9.2, 0.3), yaw)
-put(O["Aluna_Cabeca"], "rotation_euler", H)
+    put(O[f"Aluna_Roda{side}"], "rotation_euler", {1: (0, 0, 0), NF: (0, 0, 0)})
+GIRL_HEAD = Vector((GIRL_P.x, GIRL_P.y, 1.0))
 
 # ---------------------------------------------------------------- porta
 DOOR_T = (2.3, 3.05)
@@ -135,9 +113,15 @@ put(O["Porta"], "rotation_euler", {f: (0, 0, -math.radians(95) * ease_back((T(f)
                                     for f in FR})
 
 # ---------------------------------------------------------------- professora
-# Roteiro: aponta o PRISMA de giz para a turma -> olha a porta -> acena para a aluna ->
-# anda até a frente do quadro -> conversa com a turma -> aponta o giz enquanto a câmera chega ->
+# Roteiro: entra pela porta -> acena para a aluna ao passar por ela -> chega à frente do quadro e
+# olha a turma -> anda até o centro -> conversa com a turma -> aponta o giz enquanto a câmera chega ->
 # assiste a logo montar -> aponta a logo enquanto a câmera recua e mostra a cena.
+EPATH = make_path([(-5.5, -1.0), (-4.8, -1.0), (-4.1, -0.9), (-3.8, -0.4), (-3.74, 0.6), (-3.7, 1.7),
+                   (-3.52, 2.62), (-3.27, 3.03), (-3.05, 3.15)])
+EL = EPATH[1][-1]
+T_IN = (2.55, 7.9)                            # entra pela porta e chega à frente do quadro
+STEP_IN = 0.34                                # passo da entrada (m)
+EV["professora_entra"] = T_IN[0]
 P0 = Vector((-3.05, 3.15, 0))
 P1 = Vector((-2.1, 3.4, 0))
 WALK = (9.9, 11.8)
@@ -148,10 +132,31 @@ CAM_END = Vector((-0.65, 0.0, 2.15))       # alto, para não pegar a cabeça da 
 FACE0 = math.pi + 0.5                         # de frente para a turma, meio virada para o quadro
 FACE1 = math.pi + 0.45
 
+# yaw do trajeto, desenrolado perto de FACE0 para as misturas não darem volta inteira
+_EY, _prev = {}, 1.5 * math.pi
+
 
 def t_pos(t):
+    """(posição, passos dados, yaw do trajeto ou None)."""
+    if t < T_IN[1]:
+        s = EL * trap(t, *T_IN)
+        p, yaw = path_at(EPATH, s)
+        return Vector((p.x, p.y, 0)), s / STEP_IN, yaw
     u = ss(*WALK, t)
-    return P0.lerp(P1, u), u * (P1 - P0).length
+    return P0.lerp(P1, u), EL / STEP_IN + u * (P1 - P0).length / STEP, None
+
+
+def t_when_y(y):
+    t = T_IN[0]
+    while t < T_IN[1] and t_pos(t)[0].y < y:
+        t += 1 / FPS
+    return t
+
+
+T_GIRL = (t_when_y(-0.55), t_when_y(1.45))    # trecho em que passa ao lado da aluna
+WAVE_T = (T_GIRL[0] - 0.1, T_GIRL[1] + 0.25)  # a professora acena
+WAVE_G = (T_GIRL[0] + 0.25, T_GIRL[1] + 0.7)  # a aluna responde
+EV["professora_acena"] = WAVE_T[0]
 
 
 def rz(v, a):
@@ -170,18 +175,17 @@ def look_yaw(src, th, target, lim=1.1):
     return max(-lim, min(lim, unwrap(0, yaw_to(src, target) - th)))
 
 
-girl_head_at = lambda t: Vector((girl_at(min(t, G_T1))[0].x, girl_at(min(t, G_T1))[0].y, 1.0))
 CLASS = [Vector((-1.8, -1.2, 1.1)), Vector((1.2, -2.2, 1.1)), Vector((2.6, 0.2, 1.1)), Vector((0.0, -0.6, 1.1))]
-DOOR = Vector((-4.5, -1.0, 1.4))
 # sequência do olhar: (início, alvo)
-LOOK = [(0.0, CLASS[3]), (0.75, CHALK), (1.6, CLASS[0]), (2.35, DOOR), (3.2, "aluna"), (9.6, "frente"),
+LOOK = [(0.0, "frente"), (T_GIRL[0] - 0.2, "aluna"), (T_GIRL[1] + 0.3, "frente"), (T_IN[1] - 0.3, CLASS[0]),
+        (T_IN[1] + 0.8, CLASS[3]), (9.6, "frente"),
         (12.0, CLASS[0]), (13.0, CLASS[1]), (14.0, CHALK), (15.1, CLASS[2]), (16.4, CHALK), (17.7, CLASS[3]),
         (18.7, CHALK), (24.95, CAM_END), (25.6, LOGO), (26.5, CAM_END)]
 
 
 def look_target(spec, t, pos, th):
     if spec == "aluna":
-        return girl_head_at(t)
+        return GIRL_HEAD
     if spec == "frente":
         return pos + rz(Vector((0, 2.0, 1.6)), th)
     return spec
@@ -189,35 +193,38 @@ def look_target(spec, t, pos, th):
 
 tw_yaw = yaw_to(P0, P1)
 TR, TL, TA_E, TA_D, TH, TLEG = {}, {}, {}, {}, {}, {}
-prev = FACE0
+EV["passos"] = []
+prev, prev_py, last_step = FACE0, 1.5 * math.pi, 0
 for f in FR:
     t = T(f)
-    pos, s = t_pos(t)
-    g = girl_head_at(t)
-    # corpo
-    girl_yaw = unwrap(prev, yaw_to(pos, g))
+    pos, steps, pyaw = t_pos(t)
+    if pyaw is not None:
+        prev_py = unwrap(prev_py, pyaw)
+    # corpo: segue o trajeto ao entrar, depois vira para a turma
     th = FACE0 + 0.06 * math.sin(t * 0.9)
-    th = lerp(th, lerp(math.pi, girl_yaw, 0.85), win(t, 2.7, 9.6, 0.8))
+    th = lerp(prev_py, th, ss(T_IN[1] - 0.35, T_IN[1] + 0.8, t))
     late = FACE1 + 0.12 * math.sin(t * 0.75)
     th = lerp(th, late, ss(9.6, 11.2, t))
     th = lerp(th, unwrap(th, tw_yaw), win(t, WALK[0] - 0.4, WALK[1] + 0.35, 0.45))
-    point_w = win(t, -1.0, 2.35, 0.4) + win(t, 14.0, 15.2, 0.35) + win(t, 16.3, 20.6, 0.5) + win(t, 25.8, 30.0, 0.8)
+    point_w = win(t, 14.0, 15.2, 0.35) + win(t, 16.3, 20.6, 0.5) + win(t, 25.8, 30.0, 0.8)
     th += 0.22 * point_w * (1 - win(t, WALK[0] - 0.4, WALK[1] + 0.35, 0.45))
     th = unwrap(prev, th)
     prev = th
     # passos
-    walking = win(t, WALK[0], WALK[1], 0.25)
-    ph = math.pi * s / STEP
-    leg = 0.38 * math.sin(ph) * walking
-    bob = 0.022 * abs(math.sin(ph)) * walking
+    walking = win(t, T_IN[0], T_IN[1], 0.3) + win(t, WALK[0], WALK[1], 0.25)
+    ph = math.pi * steps
+    if int(steps) > last_step and walking > 0.3:
+        EV["passos"].append(round(t, 3))
+    last_step = int(steps)
+    amp = 0.42 if t < T_IN[1] + 0.5 else 0.38
+    leg = amp * math.sin(ph) * walking
+    bob = 0.025 * abs(math.sin(ph)) * walking
     TR[f] = (0, 0, th)
     TL[f] = (pos.x, pos.y, bob)
     TLEG[f] = leg
     # braço esquerdo (ponteiro): repouso, apontando, balanço ao andar
     rest_e = (0.12 + 0.05 * math.sin(t * 1.3), 0.08, 0.0)
-    if t < 8:      # lê o PRISMA da esquerda para a direita
-        tgt = CHALK + Vector((lerp(-1.1, 1.1, ss(0.0, 2.2, t)), 0, 0.05 * math.sin(t * 2 * math.pi / 0.625)))
-    elif t < 22:
+    if t < 22:
         tgt = CHALK + Vector((lerp(-1.1, 1.1, ss(16.6, 19.6, t)) if t > 16 else 0.0, 0,
                               0.05 * math.sin((t - 7.5) * 2 * math.pi / 1.25)))
     else:
@@ -227,8 +234,8 @@ for f in FR:
     ex = lerp(rest_e[0], pe[0], pw) - 0.28 * math.sin(ph) * walking
     ey = lerp(rest_e[1], pe[1], pw)
     TA_E[f] = (ex, ey, 0)
-    # braço direito (livro): repouso, aceno para a aluna, gestos de explicação, "olha só" no final
-    wv = win(t, 3.6, 6.3, 0.45)
+    # braço direito (livro): balanço ao andar, aceno para a aluna, gestos de explicação, "olha só" no final
+    wv = win(t, WAVE_T[0], WAVE_T[1], 0.45)
     talk = win(t, 12.2, 16.2, 0.5) * (0.5 + 0.5 * math.sin(2 * math.pi * 0.8 * (t - 12.2) - 1.57))
     show = win(t, 25.4, 30.0, 0.8)
     dx = 0.42 + 0.28 * math.sin(ph) * walking + 0.45 * talk + 0.12 * show
@@ -241,13 +248,12 @@ for f in FR:
     hp = pos + Vector((0, 0, 1.7))
     y0 = look_yaw(hp, th, look_target(LOOK[i][1], t, pos, th))
     yaw = y0
-    tilt = 0.0
     if i + 1 < len(LOOK):
         y1 = look_yaw(hp, th, look_target(LOOK[i + 1][1], t, pos, th))
         yaw = lerp(y0, y1, ss(LOOK[i + 1][0] - 0.35, LOOK[i + 1][0], t))
     up = 0.18 * (win(t, 20.6, 24.95, 0.4) + win(t, 25.6, 26.5, 0.3))
-    tilt = up + 0.04 * math.sin(t * 1.7) - 0.05 * win(t, 3.4, 7.0, 0.5)
-    TH[f] = (tilt, 0.07 * win(t, 3.4, 7.0, 0.5) + 0.04 * math.sin(t * 1.1), yaw)
+    tilt = up + 0.04 * math.sin(t * 1.7) - 0.05 * win(t, *T_GIRL, 0.4)
+    TH[f] = (tilt, 0.07 * win(t, *T_GIRL, 0.4) + 0.04 * math.sin(t * 1.1), yaw)
 put(O["Professora"], "rotation_euler", TR)
 put(O["Professora"], "location", TL)
 put(O["Professora_BracoE"], "rotation_euler", TA_E)
@@ -255,13 +261,27 @@ put(O["Professora_BracoD"], "rotation_euler", TA_D)
 put(O["Professora_Cabeca"], "rotation_euler", TH)
 put(O["Professora_PernaE"], "rotation_euler", {f: (TLEG[f], 0, 0) for f in FR})
 put(O["Professora_PernaD"], "rotation_euler", {f: (-TLEG[f], 0, 0) for f in FR})
-EV["professora_acena"] = 3.6
 EV["professora_anda"] = WALK[0]
 
 
 def teacher_head(t):
     p = TL[F(t)]
     return Vector((p[0], p[1], 1.7))
+
+
+# aluna: olha a professora desde que a porta abre, acena quando ela passa e depois escreve na mesa
+desk = (math.radians(62), 0, 0)
+for side, sx in (("E", -1), ("D", 1)):
+    R = {}
+    for f in FR:
+        t = T(f)
+        x, y = desk[0], 0.0
+        if side == "D":
+            w = win(t, WAVE_G[0], WAVE_G[1], 0.3)
+            x = lerp(x, 2.75, w)
+            y = lerp(y, -0.15 + 0.3 * math.sin(2 * math.pi * 2.2 * t), w)
+        R[f] = (x, y, 0.0)
+    put(O[f"Aluna_Braco{side}"], "rotation_euler", R)
 
 
 # ---------------------------------------------------------------- turma
@@ -274,6 +294,8 @@ CHAT = {"Aluno04": ("Aluno05", 10.6, 12.6), "Aluno05": ("Aluno04", 10.7, 12.5),
         "Aluno08": ("Aluno07", 13.4, 15.4),
         "Aluno07": ("Aluno08", 13.5, 15.3)}
 EV["maos"] = [h[2] for h in HANDS]
+# a aluna do crachá de TEA vira o corpo na cadeira para conversar: o crachá fica de frente para a câmera
+TWIST = {"Aluno04": (10.3, 13.0, -1.35)}
 NOD_T0 = 7.5                                   # balançam a cabeça a cada 2 tempos (junto com as palavras)
 for nm in students:
     root = O[nm]
@@ -287,7 +309,7 @@ for nm in students:
     Rt = {}
     for f in FR:
         t = T(f)
-        g = G[f][0]
+        g = teacher_head(t)
         a = max(-1.35, min(1.35, unwrap(0, yaw_to(src, g))))
         w = win(t, 2.9 + delay, 8.6 + delay, 0.5)
         tp = teacher_head(t)
@@ -302,8 +324,9 @@ for nm in students:
             cw = win(t, c0, c1, 0.35)
             yaw = lerp(yaw, max(-1.35, min(1.35, yaw_to(src, O[other].location))), cw)
             tilt += 0.05 * math.sin(2 * math.pi * 2.6 * t + ph) * cw
-        Hh[f] = (tilt, 0.04 * math.sin(t * 0.6 + ph), yaw)
-        Rt[f] = (0, 0.025 * math.sin(t * 0.6 + ph), 0.045 * math.sin(t * 0.45 + ph * 1.3))
+        bt = TWIST[nm][2] * win(t, TWIST[nm][0], TWIST[nm][1], 0.55) if nm in TWIST else 0.0
+        Hh[f] = (tilt, 0.04 * math.sin(t * 0.6 + ph), yaw - bt)
+        Rt[f] = (0, 0.025 * math.sin(t * 0.6 + ph), 0.045 * math.sin(t * 0.45 + ph * 1.3) + bt)
     put(O[nm + "_Cabeca"], "rotation_euler", Hh)
     put(root, "rotation_euler", Rt)
     rest = math.radians(62)
@@ -321,19 +344,21 @@ for nm in students:
                 h = win(t, a0, a1, 0.35)
                 x = lerp(x, 0.15, h)
                 y = lerp(y, sgn * (2.5 + 0.18 * math.sin(2 * math.pi * 2.0 * t)), h)
+            if nm in TWIST:     # longe da mesa, as mãos descansam no colo
+                x = lerp(x, 0.45, win(t, TWIST[nm][0], TWIST[nm][1], 0.55))
             A[f] = (x, y, 0)
         put(O[f"{nm}_Braco{side}"], "rotation_euler", A)
 
-# aluna: depois de chegar, acompanha a professora com o olhar e escreve
+# cabeça da aluna: olha o quadro, vira para a porta quando ela abre e acompanha a professora
 Hg = {}
 for f in FR:
     t = T(f)
-    p, th, _ = G[f]
-    k = ss(9.0, 9.8, t)
-    ty = max(-1.1, min(1.1, unwrap(0, yaw_to(p, teacher_head(t)) - th)))
-    old = H[f]
+    ty = max(-1.1, min(1.1, unwrap(0, yaw_to(GIRL_P, teacher_head(t)) - GIRL_TH)))
+    yaw = lerp(0.06 * math.sin(t * 1.3), ty, ss(2.3, 3.1, t))
     nod = -0.05 * (0.5 + 0.5 * math.cos(2 * math.pi * (t - NOD_T0) / 1.25)) * win(t, 9.5, 17.8, 0.6)
-    Hg[f] = (lerp(old[0], 0.02 + nod, k), old[1] * (1 - k), lerp(old[2], ty, k))
+    tilt = 0.04 * math.sin(t * 2.1) * (1 - ss(8.5, 9.5, t)) + (0.02 + nod) * ss(8.5, 9.5, t)
+    roll = 0.08 * win(t, WAVE_G[0], WAVE_G[1], 0.3)
+    Hg[f] = (tilt, roll, yaw)
 put(O["Aluna_Cabeca"], "rotation_euler", Hg)
 
 # ventiladores de teto
@@ -394,9 +419,9 @@ CTGT_STATIC = [(0.0, V(-1.4, 0.4, 1.0)), (2.5, V(-3.6, -0.9, 1.2)), (9.0, V(-0.6
                (29.5, BOARD_T)]
 
 
-def girl_head(t):
-    p = girl_at(t)[0]
-    return Vector((p.x, p.y, 0.95))
+def teacher_frame(t):
+    p = TL[F(min(t, T_IN[1]))]
+    return Vector((p[0], p[1], 1.25))
 
 
 def cam_pos(t):
@@ -406,7 +431,7 @@ def cam_pos(t):
 def cam_tgt(t):
     st = hermite(CTGT_STATIC, t)
     w = win(t, 3.4, 9.2, 1.1)
-    return st.lerp(girl_head(min(t, 7.6)), w).lerp(CAM_TGT_END, ss(*PULL, t))
+    return st.lerp(teacher_frame(t), w).lerp(CAM_TGT_END, ss(*PULL, t))
 
 
 Lc, Rc, prev = {}, {}, None
@@ -563,4 +588,4 @@ sc.frame_set(1)
 with open(os.path.join(OUT, "eventos.json"), "w", encoding="utf-8") as fh:
     json.dump(EV, fh, indent=1)
 bpy.ops.wm.save_mainfile()
-result = {"girl_len": round(GL, 2), "cam_head_clearance": round(clear, 2), "pix": len(pix), "events": EV}
+result = {"entrada_m": round(EL, 2), "t_aluna": [round(x, 2) for x in T_GIRL], "passos": len(EV["passos"]), "cam_head_clearance": round(clear, 2), "pix": len(pix), "events": EV}
