@@ -58,8 +58,6 @@ Rodar dentro de `web/`, com Python e Pillow (`pip install pillow`):
 
 | Script | Gera |
 |---|---|
-| `python ferramentas/gerar_logo.py` | Logo e favicon |
-| `python ferramentas/gerar_icones.py` | `js/icones.js` a partir de `assets/icones/*.svg` |
 
 As animações ficam com cara de pixel art no navegador: `js/lottie-pixel.js` desenha em baixa resolução,
 troca cada pixel pela cor da paleta que mais aparece em volta dele e amplia sem suavizar, sempre por um número

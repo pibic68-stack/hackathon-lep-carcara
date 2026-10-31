@@ -1,125 +1,81 @@
 # PRISMA · Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis
 
-> **Uma aula entra e várias versões saem.** A Sala de Materiais é a biblioteca que os alunos acessam.
+> **Uma aula entra e várias versões saem, para todos.** O professor envia o material, o PRISMA cria versões
+> acessíveis, o professor aprova e a turma estuda do jeito que aprende melhor.
 
-Time **Carcará 3301** · Hackathon LEPV (Educação)
+Time **Carcará 3301** (alunos do IME) · Hackathon da Liga de Empreendedorismo da Praia Vermelha (**LEPV**), tema Educação.
+Trilhas 1 (inclusão e acessibilidade) e 4 (aprendizagem individualizada).
 
-> Time de alunos do IME no hackathon da Liga de Empreendedorismo da Praia Vermelha.
-> **Trilhas:** 1 (Inclusão e acessibilidade) + 4 (Aprendizagem individualizada).
+## Entregas
 
-## Site no ar (a banca abre sem senha)
+| Entrega | Onde |
+|---|---|
+| 1. Vídeo demo (2 min 57 s) | [`pitch/video-demo/prisma-demo.mp4`](pitch/video-demo/prisma-demo.mp4) · roteiro em [`pitch/video-demo/roteiro.md`](pitch/video-demo/roteiro.md) |
+| 2. Plano de negócio | [slides 16:9](pitch/plano-negocio/plano-de-negocio-prisma.pdf) · [documento A4](pitch/plano-negocio/plano-de-negocio-prisma-A4.pdf) · números em [`modelo.py`](pitch/plano-negocio/modelo.py) |
+| 3. Site no ar, sem senha | **`https://SEU-PROJETO.vercel.app`** ← preencher · em **Entrar › Experimentar sem cadastro** |
+| 4. Repositório e sessões de IA | este repositório · conversas em [`prompts/`](prompts/) · decisões em [`CLAUDE.md`](CLAUDE.md) |
 
-**Link fixo:** `https://SEU-PROJETO.vercel.app` (trocar pelo endereço gerado; guia em [`DEPLOY.md`](DEPLOY.md)).
-Em **Entrar**, a caixa **Experimentar sem cadastro** entra com um clique como professora, aluno, família ou escola
-(contas fictícias), e os materiais de teste já estão publicados.
+## Experimente em 1 minuto (site no ar)
 
-## Como rodar do zero (no seu computador)
+1. Abra o site › **Entrar** › **Experimentar sem cadastro**. Não precisa de conta: todas são fictícias.
+2. **Aluna Bia (cores)**: abre os materiais publicados e escolhe a versão (Padrão, Letras grandes, Ouvir).
+   O desenho do ciclo da água tem um símbolo sobre cada cor, para quem não distingue cores. Avalie com estrelas.
+3. **Professora**: envie um arquivo de [`materiais-teste/`](materiais-teste/) (PDF, áudio ou vídeo), acompanhe a
+   produção ao vivo, confira as versões e aprove. Os feedbacks dos alunos aparecem no painel.
+4. **Escola** e **Família**: veja os painéis de cada papel. O cadastro de escola mostra os planos de assinatura.
+
+## O que o PRISMA faz
+
+- **Lê o material como ele é**: PDF (inclusive fórmulas: expoente, fração, raiz, integral, vetor), PowerPoint,
+  texto, áudio e vídeo (a IA transcreve e lista o que aparece na tela).
+- **Cria versões a partir do Manual PRISMA** (`docs/manual/padroes.json`, 10 padrões e 51 critérios verificáveis):
+  - **Padrão** acessível para todos: página limpa, instruções em passos, linhas de resposta, quadro "Hoje vamos".
+  - **Letras grandes e alto contraste** (amarelo no preto, com troca de cores e tamanho pelo aluno).
+  - **Ouvir**: lê em voz alta, inclusive fórmulas e a legenda das cores.
+  - **Leitura Fácil** (IA): frases curtas, fórmulas protegidas, conferência de cada resposta e plano B sem IA.
+  - **Cor sempre com símbolo** (daltonismo): símbolos desenhados sobre as cores das imagens, com legenda.
+- **O professor está no comando**: nada chega ao aluno sem aprovação; descrições de imagem da IA são conferidas.
+- **Papéis**: escola (vê professores, turmas e materiais; assinatura), professor (turmas, envio, revisão,
+  feedbacks), aluno (biblioteca e avaliação de 1 a 5 estrelas), família (vê e pode tirar um material do painel do filho).
+- **Interface acessível**: barra de acessibilidade (letra, alto contraste, fonte para dislexia, 4 modos de daltonismo).
+- **Mini curso e manual** na aba Instruções, com teste final e certificado.
+
+## Como rodar do zero
 
 Precisa de Python 3.10 ou mais novo.
 
 ```bash
 git clone https://github.com/pibic68-stack/hackathon-lep-carcara.git
 cd hackathon-lep-carcara/backend
-python -m pip install -r requirements-nuvem.txt   # o essencial; requirements.txt traz também o transcritor local
-cp .env.exemplo .env                               # e cole a chave gratuita do Gemini em GEMINI_API_KEY=
-python -m adaptador.api                            # abra http://127.0.0.1:8000
-python -m pytest testes                            # opcional: os testes
+python -m pip install -r requirements-nuvem.txt
+cp .env.exemplo .env              # cole a chave gratuita do Gemini em GEMINI_API_KEY= (sem ela, só a IA fica pendente)
+python -m adaptador.api           # abra http://127.0.0.1:8000
+python -m pytest testes           # opcional: os testes automáticos
 ```
 
-No Windows, basta dar dois cliques em `publicar.bat`: ele instala o que faltar, pede a chave e abre o site.
-Com Docker: `docker build -t prisma . && docker run -p 8000:8000 -e GEMINI_API_KEY=... prisma`.
-
-Um servidor só entrega o site (`web/`), a aba Instruções (mini curso e manual), o login e a API.
-Configuração em `backend/.env` (modelo em `backend/.env.exemplo`, que nunca leva segredos):
-
-- `GEMINI_API_KEY`: chave da IA. Sem ela tudo funciona, só a Leitura Fácil e a descrição automática ficam pendentes.
-- `PRISMA_CODIGO_ESCOLA`: código que o professor digita para criar conta. Sem ele, o cadastro fica fechado.
-
-**Materiais de teste e preparo da apresentação:** veja `materiais-teste/LEIA-ME.md`.
-
-**Link público para a banca:** rode `publicar.bat` (Windows). Ele abre a página Compartilhar, com QR code e contas de demonstração. Ele liga o servidor e cria um endereço
-`https://...trycloudflare.com` que qualquer pessoa abre. O link só aparece depois de testado pela internet,
-já vem copiado (Ctrl+V) e fica em `link.txt`. Muda a cada vez e só funciona enquanto este computador
-e a janela estiverem ligados. Se a rede bloquear o túnel, use o celular como roteador; no mesmo Wi-Fi,
-o site também abre em `http://IP-do-computador:8000`. Detalhes em [`backend/README.md`](backend/README.md).
-
-### Quem entra e como
-
-| Perfil | Como entra | O que faz |
-|---|---|---|
-| Professor | e-mail e senha (cria a conta com o código da escola) | cria turmas e alunos fictícios, envia o material, revisa e aprova |
-| Aluno | código da turma + senha de 3 figurinhas | abre os materiais publicados, com as versões do seu jeito primeiro |
-| Família | código da família | vê como o aluno aprende melhor e os materiais da turma |
-
-## A ideia em uma frase
-
-**Ajudar o professor a fazer todos os alunos, inclusive os alunos PCD, aprenderem juntos o mesmo conteúdo**:
-a ferramenta identifica as barreiras de cada aluno, adapta o material da aula e gera um guia prático para o professor e a família.
-
-> Rascunho. Reescrevam esta frase até caber num tweet. Ela é a base do pitch.
-
-## Como funciona (fluxo)
-
-```
-1. PERFIL       2. MATERIAL      3. ADAPTAÇÃO          4. GUIA / RELATÓRIO      5. AVALIAÇÃO
-necessidades -> aula original -> versões acessíveis -> para professor e      -> o aluno dá estrelas
-funcionais      (PDF, slide,     (regras do Manual)    família                   e sugestão; o professor
-do aluno        áudio, vídeo)                                                    ajusta a próxima aula
-```
-
-O **Manual de Acessibilidade** (`docs/manual/`) não é um entregável separado: ele é a **base de regras**
-que a ferramenta aplica. A maioria das regras vira automação no código; as outras pedem IA com revisão
-do professor ou uma pessoa (dos 51 critérios: 31 automáticos, 18 de IA com revisão, 2 manuais).
-
-### O mesmo fluxo com outros nomes (item C3 do relatório)
-
-| Site (5 etapas, na tela) | Manual (6 etapas, no pitch) | Backend (código) |
-|---|---|---|
-| Perfil | (antes de tudo) | turmas e alunos com necessidades (`contas.py`) |
-| Material | Enviar | `POST /api/adaptar` |
-| Adaptação | Analisar + Transformar | `leitores.py` + `transformacoes.py` + `ia.py` |
-| Guia | Revisar + Publicar | fila de revisão, `aprovar`, biblioteca da turma |
-| Mini-check | Acompanhar | ainda não construído |
-
-## Princípios (não negociáveis)
-
-- **Identificar barreiras, não diagnosticar.** A ferramenta não diz se a criança "tem autismo".
-  Ela registra necessidades funcionais (por exemplo, "precisa de instruções em etapas") e, quando for o caso,
-  orienta a família a procurar um profissional.
-- **O professor revisa e aprova** tudo o que a IA gera antes de chegar ao aluno.
-- **Mesmo conteúdo para todos**: muda a forma, não o objetivo de aprendizagem.
-- **Dados de crianças são sensíveis (LGPD)**: na demo, usar só alunos fictícios.
-- **A própria interface precisa ser acessível** (contraste, teclado, leitor de tela).
+- **Windows, sem terminal:** dois cliques em `publicar.bat`. Ele instala o que faltar, pede a chave da IA, abre o site
+  e cria um link público com QR code e contas de demonstração (página Compartilhar).
+- **Docker:** `docker build -t prisma . && docker run -p 8000:8000 -e GEMINI_API_KEY=... prisma`.
+- **Vercel** (site no ar): veja [`DEPLOY.md`](DEPLOY.md).
+- **Antes de uma apresentação:** [`materiais-teste/LEIA-ME.md`](materiais-teste/LEIA-ME.md) deixa as respostas da IA guardadas.
 
 ## Estrutura do repositório
 
-| Pasta | Conteúdo | Responsável |
-|---|---|---|
-| `docs/manual/padroes.json` | **Fonte única**: 10 padrões, 51 critérios, necessidades, dados, glossário e referências | Pesquisa |
-| `docs/manual/manual-prisma-v1.pdf` | Manual em PDF (gerado por `build_manual.py`) | Pesquisa |
-| `docs/pesquisa/` | Catálogo de fontes, lacunas e matriz de barreiras | Pesquisa |
-| `web/prisma-instrucoes/` | Aba **Instruções** do site: mini curso + manual + PDF. Ver o `LEIA-ME.md` da pasta | Pesquisa → Frontend |
-| `backend/` | Python: leitura do material, critérios, IA | IA/Backend |
-| `web/` | Demais telas do site | Frontend |
-| `relatorios/` | Guia para família e perfis fictícios | Dados/Relatórios |
-| `pitch/` | Roteiro da demo e slides | Produto/Pitch |
-| `prompts/` | Registro das conversas com IA para os avaliadores | Todos (automático) |
+| Pasta | Conteúdo |
+|---|---|
+| `backend/adaptador/` | Servidor (FastAPI): leitores por formato, regras do Manual, IA (Gemini), contas, painéis. Guia: [`backend/README.md`](backend/README.md) |
+| `web/` | Site (HTML, CSS e JS puros), painéis e aba Instruções. Guia: [`web/README.md`](web/README.md) |
+| `docs/manual/` | Manual PRISMA: `padroes.json` (fonte única das regras) e o PDF |
+| `docs/pesquisa/` | Fontes lidas, lacunas e matriz de barreiras |
+| `pitch/` | Vídeo demo e plano de negócio |
+| `materiais-teste/` | Materiais do time para testar e demonstrar (ciclo da água, 5º ano) |
+| `prompts/` | Todas as sessões com a IA, exportadas automaticamente |
+| `CLAUDE.md` | Memória do projeto: cada decisão do time, com data |
 
-Divisão detalhada: [`docs/divisao-tarefas.md`](docs/divisao-tarefas.md)
+## Princípios
 
-## Como contribuir
-
-1. `git pull` antes de começar.
-2. Crie sua branch: `git checkout -b seu-nome/o-que-esta-fazendo`
-3. Faça commits pequenos com mensagens claras.
-4. `git push` e abra um **Pull Request** para a `main`. Alguém do time revisa.
-5. **Nunca** suba chaves de API ou arquivos `.env`.
-
-## Time
-
-| Nome | Papel | GitHub |
-|---|---|---|
-| | Pesquisa e Manual | |
-| | IA e Backend | |
-| | Frontend e Acessibilidade | |
-| | Relatórios, Dados e Pitch | |
+- **Identificar barreiras, nunca diagnosticar**: o perfil registra necessidades ("letra grande"), não doenças.
+- **O professor revisa e aprova** tudo o que a IA gera.
+- **Mesmo conteúdo para todos**: muda a forma, não o objetivo de aprendizagem.
+- **LGPD**: só alunos fictícios; nenhum dado real vai para a IA gratuita.
+- **A própria interface é acessível**.

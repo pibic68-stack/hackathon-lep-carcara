@@ -1,4 +1,4 @@
-// Gerado por ferramentas/gerar_icones.py. Não editar à mão.
+// Ícones Pixelarticons (MIT) em texto, para o site abrir com duplo clique.
 // Uso no HTML: <span data-icone="eye"></span>  (decorativo)
 //              <span data-icone="eye" data-rotulo="Ver"></span>  (com nome para leitor de tela)
 window.ICONES = {

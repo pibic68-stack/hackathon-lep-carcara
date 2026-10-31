@@ -11,4 +11,4 @@
 | `vendor/qrcode.js` | qrcode-generator (Kazuhiko Arase, github.com/kazuhikoarase/qrcode-generator) | MIT |
 | Animações em `anim/` | Enviadas pelo time (LottieFiles) | Conferir a licença de cada uma antes de publicar |
 
-Arte do time: escola, personagens e mascote. Logo feito por script (`ferramentas/gerar_logo.py`).
+Arte do time: escola, personagens e mascote.
