@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 4
-- **Exportado em:** 30/10/2026 21:58
+- **Mensagens do time:** 5
+- **Exportado em:** 30/10/2026 22:03
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -382,3 +382,33 @@ python -m http.server 8765 --directory web
 e abra http://localhost:8765 no navegador.
 
 Se você abriu um ZIP ou uma pasta que já tem `css/`, `js/` e `assets/` e continua sem cor, me diga como abriu o arquivo e o navegador, e eu olho de novo. Posso também publicar o site inteiro como uma página compartilhável, para você não depender de arquivos locais.
+
+
+---
+
+## 🧑 Time · 30/10 22:02
+
+quero que realmente publique o site, mas vamos continuar podendo alterar?
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Montar a pasta do site completo para publicar
+- 🔧 `Bash`: Montar a pasta do site completo com tar
+- 🔧 `Bash`: Listar os arquivos do site para publicar
+- 🔧 `Artifact`: Protótipo do site do PRISMA: início, entrar, painéis e aba Instruções com mini curso e manual.
+
+</details>
+
+
+## 🤖 Claude · 30/10 22:03
+
+O site completo está publicado, e dá para continuar alterando: cada mudança que você me pedir entra no mesmo link.
+
+O que está no ar: a página inicial, o entrar, os três painéis e a aba Instruções com o manual em PDF. O link é privado. Para o grupo abrir, use o menu **Compartilhar** da página.
+
+Para atualizar, eu mudo os arquivos na pasta `web/`, envio ao GitHub e republico no mesmo endereço. Alterações que seus colegas subirem no GitHub só aparecem aqui quando eu republicar. Posso fazer isso a cada pedido seu.
+
+O que não funciona nessa versão publicada:
+- **Backend:** as funções que dependem dele (enviar material, aprovar, biblioteca do aluno) mostram erro, porque o servidor do Raphael roda no computador dele. Para a demo completa, abra o site pelo servidor local do backend (`python -m adaptador.api`, que também serve o `web/`).
+- **Menu entre páginas:** não testei se, no visualizador do Claude, os links entre a página inicial e as outras páginas funcionam. Se algum não abrir, me diga qual.
+- **Sem GitHub Pages:** isso não resolve para o grupo todo, porque o repositório é privado e não tenho acesso às configurações dele. Se quiserem um endereço público, o caminho é ativar o Pages no GitHub (em Settings), e eu explico o passo a passo.
