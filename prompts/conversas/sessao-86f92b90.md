@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `86f92b90`
 
 - **Início:** 31/10 00:10
-- **Mensagens do time:** 3
-- **Exportado em:** 31/10/2026 00:31
+- **Mensagens do time:** 4
+- **Exportado em:** 31/10/2026 00:52
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -355,3 +355,31 @@ Para garantir que o guia funciona, apliquei o código dele no site e testei o fl
 - ao trocar de trilha, a caixa some.
 
 Depois desfiz tudo: o site está igual ao que estava.
+
+
+---
+
+## 🧑 Time · 31/10 00:52
+
+Faça o commit das alterações da árvore de trabalho com uma mensagem adequada.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `ccd_turn / update_plan`
+- 🔧 `Bash`: Show status, branch, and scan for secrets
+- 🔧 `Bash`: Stage changes and commit
+- 🔧 `ccd_turn / wrap_up`
+
+</details>
+
+
+## 🤖 Claude · 31/10 00:52
+
+Fiz o commit `6de94ca` na branch `claude/minicurso-completion-certificates-fbe1c8`. A mensagem é "Certificado do mini curso: modelo para as 3 trilhas e guia de implementação".
+
+Entraram 9 arquivos:
+- a pasta `web/certificado/`: o modelo, o `certificado.js`, o `gerar_pdf.py`, o LEIA-ME e os 3 PDFs de exemplo;
+- o guia do Szpigel, em `docs/certificado-como-implementar.md`;
+- a nota da decisão no `CLAUDE.md`.
+
+Antes, conferi que não havia chave nem código da escola nesses arquivos. O commit ainda não foi enviado para o GitHub.
