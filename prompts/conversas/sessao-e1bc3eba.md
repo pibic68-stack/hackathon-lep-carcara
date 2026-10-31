@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 8
-- **Exportado em:** 31/10/2026 07:34
+- **Mensagens do time:** 9
+- **Exportado em:** 31/10/2026 08:46
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -629,3 +629,113 @@ Os nomes reais de vocês, que estão na capa do relatório, vão para o Gemini. 
 Sources:
 - [Gemini API: modelos disponíveis](https://claw.aguidetocloud.com/google/gemini-api/models/)
 - [ai.google.dev: preços e limites](https://ai.google.dev/pricing)
+
+
+---
+
+## 🧑 Time · 31/10 08:36
+
+estamos encarando problemas por questao de o gemini flash nao comportar pdfs muito grandes. ele entra em ciclos de nao conseguir responder nada. pode reparar que mesmo insistindo ela nao pensa. eu imagino que isso seja referente aos materiais que estou usando, como o relatorio que mandei, serem grandes demais. 
+queremos estudar:
+1) criaçao de materiais de teste, um somente de texto pensando na compactaçao em leitura rapida, um com algum audio pra ser transcrito, um com uma imagem pra ser pontuada com os icones e outro com um video pra ser transcrito tambem
+2) pondere sobre a utilizaçao de uma nova ia. o claude nao aguenta?
+3) facilitar o processo de outra pessoa poder acessar o site de fora. nao sei se a soluçao seria referente a tornar o link publico mesmo ou se ha um modo de tornar mais pratico e funcional o compartilhamento do jeito que esta
+
+pode fazer perguntas durante a produçao do prompt. realmente essa parte é fundamental. os materiais de teste, se derem certo, provavelmente serao usados na propria apresentaçao
+
+<details><summary>Ações executadas pelo Claude (34)</summary>
+
+- 🔧 `Bash`: Check repo state and audio/video tools
+- 🔧 `AskUserQuestion`
+- 🔧 `Bash`: Check repo and package availability
+- 🔧 `Bash`: Fetch MIT QR code generator from GitHub
+- 🔧 `Bash`: Locate QR js file
+- 🔧 `Bash`: List account functions
+- 🔧 `Bash`: Read account creation functions
+- 🔧 `Bash`: Check fonts and reportlab
+- 🔧 `Bash`: Test loading site font in Pillow
+- 🔧 `Bash`: Check fontTools and brotli
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/materiais-teste/gerar_materiais.py
+- 🔧 `Bash`: Generate test materials
+- 🔧 `Bash`: Render PDFs for a look
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/mt2-1.png
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/materiais-teste/slides/slide-3.png
+- 🔧 `Bash`: Run test materials through the pipeline
+- 🔧 `Bash`: Screenshot generated test versions
+- 🔧 `Read`: /tmp/mt/saida/2-imagem-cores/imagens/img-001-cores.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/mt-txt-universal.png
+- 🔧 `Bash`: Debug why red arrows lack symbols
+- 🔧 `Bash`: Read current symbol placement loop
+- 🔧 `Bash`: Accept thin arrows, drop blurred edges
+- 🔧 `Bash`: Refine edge-artifact rule
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/c1.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/c2.png
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/materiais-teste/montar_audio_video.py
+- 🔧 `Bash`: Test audio/video assembly with fake voice
+- 🔧 `Bash`: Cap waits; add audio/video bat
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/backend/adaptador/preparar_demo.py
+- 🔧 `Bash`: Add prepare bat and test the prepare loop
+- 🔧 `Bash`: Check constants in contas
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/backend/adaptador/demo.py
+- 🔧 `Bash`: Test demo account creation idempotency
+- 🔧 `Bash`: Vendor QR lib; look at licenses and a simple page
+
+</details>
+
+
+## 🤖 Claude · 31/10 08:44
+
+Now the API route, the share page and the tunnel wiring.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Add share API route; view tunnel main
+- 🔧 `Bash`: Tunnel writes share state; bat opens share page
+
+</details>
+
+
+## 🤖 Claude · 31/10 08:44
+
+Now the share page itself.
+
+<details><summary>Ações executadas pelo Claude (10)</summary>
+
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/web/compartilhar.html
+- 🔧 `Bash`: Stop old servers
+- 🔧 `Bash`: Start server and check share API
+- 🔧 `Bash`: Screenshot share page and log in with demo account
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/compartilhar.png
+- 🔧 `Bash`: Write test materials guide; add share test
+- 🔧 `Bash`: Verify files and run tests
+- 🔧 `Bash`: Write guide and share test, run tests
+- 🔧 `Bash`: Docs, commit, push, zip
+- 🔧 `SendUserFile`
+
+</details>
+
+
+## 🤖 Claude · 31/10 08:46
+
+Os materiais de teste e a página de compartilhar estão prontos no `PRISMA.zip`. A IA ainda depende do Google, mas agora dá para deixar tudo pronto antes da apresentação e não depender dele na hora. Testei aqui com uma IA simulada. Não consegui testar com o Gemini real nem no Windows: o áudio, o vídeo e o preparo da IA precisam rodar no PC de vocês.
+
+**Por que a IA travou.** Não é o tamanho do PDF: cada pedido leva no máximo 6 trechos ou 1 imagem. É o Google sem capacidade no plano gratuito naquela hora (erro 503). O Google mandava esperar 30 s por tentativa. Agora o PRISMA espera no máximo 10 s e passa logo para os modelos reserva.
+
+**1) Materiais de teste** (pasta `materiais-teste`, ciclo da água, 5º ano, texto e desenhos feitos por nós):
+- **`1-texto-leitura-facil.pdf`:** texto longo, sem imagem, para testar a Leitura Fácil, os passos e as linhas de resposta.
+- **`2-imagem-cores.pdf`:** desenho em que só a cor diz o que é cada seta. O `c1.png` mostra como ele sai com os símbolos.
+- **Áudio e vídeo:** ainda precisam ser criados no PC de vocês. Dêem dois cliques em `gerar-audio-e-video.bat`: ele usa a voz em português do Windows e cria `3-audio-aula.wav` e `4-video-aula.mp4` (4 slides narrados). Na primeira vez baixa um programa de vídeo, uns 30 MB. Se o Windows não tiver voz em português, a janela explica como instalar.
+
+**Para a demo não depender do Google na hora:** dêem dois cliques em `preparar-para-apresentacao.bat` (antes disso, gerem o áudio e o vídeo). Ele passa os 4 materiais pela IA com paciência, por até 20 minutos, tentando de novo quando o Google está ocupado, e guarda cada resposta. Na apresentação, os mesmos arquivos saem em segundos. Rodem com antecedência, de preferência num horário com o Google menos ocupado.
+
+**2) Claude como IA.** Seguindo a escolha de vocês, continua só o Gemini. O Claude aguentaria esses pedidos sem dificuldade, mas a API é paga. Se mudarem de ideia, ligar o Claude é trocar uma peça do código. Só a transcrição de áudio e vídeo continuaria com o Gemini, porque o Claude não ouve áudio.
+
+**3) Compartilhar.** O `publicar.bat` agora abre a página Compartilhar (print `compartilhar.png`). Ela tem:
+- um QR code grande do link, para a plateia apontar o celular;
+- um botão para copiar o link;
+- o endereço no Wi-Fi, como reserva;
+- as contas de demonstração prontas: professora, escola e turma "5º ano A" com 3 alunos fictícios (Bia, cores; Caio, texto direto e ouvir; Duda, letra grande), com o código da turma, as figurinhas e os códigos das famílias.
+
+As senhas são criadas no PC de vocês e não vão para o GitHub. A parte das contas só aparece no próprio computador; quem abre pelo link vê só o QR code e o link. A página se atualiza sozinha se o link mudar.
+
+**Para testar:** extraiam o zip numa pasta nova e copiem o `backend\.env` da pasta antiga. Na pasta `materiais-teste`, gerem o áudio e o vídeo e depois rodem o preparo. Então abram o `publicar.bat`, entrem com a professora de demonstração e enviem os materiais. Se algo travar, me mandem um print da janela ou do quadro "Acompanhar a produção".
