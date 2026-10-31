@@ -1,5 +1,9 @@
 # Vídeo demo PRISMA
 
+**O vídeo final está em `final/prisma-demo.mp4`** (2 min 57 s, 1080p, com legenda na imagem).
+A legenda em arquivo, para o site, é `final/prisma-demo.srt`.
+Só a versão final entra no Git: cada versão nova soma mais 30 MB ao histórico para sempre.
+
 O roteiro para gravar está em `roteiro.md` (e `roteiro.pdf`).
 
 ## Como gerar o vídeo
