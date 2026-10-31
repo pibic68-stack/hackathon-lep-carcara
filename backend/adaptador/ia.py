@@ -32,10 +32,13 @@ RAIZ = Path(__file__).resolve().parents[1]
 ARQUIVO_ENV = RAIZ / ".env"
 
 # Conforme a documentação oficial do Google (ai.google.dev/gemini-api/docs, out/2026).
-MODELO_PADRAO = "gemini-3.8-flash"
+# Testado com chave real em 30/10/2026: responde em ~7 s. O gemini-2.5-flash foi desativado para contas novas
+# e o gemini-3.8-flash não respondeu em 60 s.
+MODELO_PADRAO = "gemini-3.1-flash-lite"
 URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/interactions"
 LIMITE_IMAGEM = 15 * 1024 * 1024     # imagem inline: o pedido todo pode ter no máximo 20 MB
 TEXTOS_POR_PEDIDO = 30
+TEMPO_LIMITE = 90                    # segundos esperando a IA responder
 
 
 class ErroIA(RuntimeError):
@@ -106,21 +109,29 @@ class Gemini:
         for tentativa in range(4):
             pedido = urllib.request.Request(URL_GEMINI, data=corpo, headers=cabecalhos, method="POST")
             try:
-                with urllib.request.urlopen(pedido, timeout=120) as resposta:
+                with urllib.request.urlopen(pedido, timeout=TEMPO_LIMITE) as resposta:
                     return _extrair_texto(json.load(resposta))
             except urllib.error.HTTPError as erro:
                 if erro.code in (429, 500, 503) and tentativa < 3:
                     time.sleep(2 ** (tentativa + 1))       # 2 s, 4 s, 8 s
                     continue
-                raise ErroIA(_mensagem_http(erro)) from None
+                raise ErroIA(_mensagem_http(erro, self.modelo)) from None
+            except TimeoutError:
+                if tentativa < 1:
+                    continue                                   # uma segunda chance
+                raise ErroIA(f"A IA demorou demais para responder (modelo {self.modelo}). "
+                             "Tente de novo ou troque PRISMA_IA_MODELO em backend/.env.") from None
             except urllib.error.URLError:
                 raise ErroIA("Não consegui falar com a IA. Confira a internet.") from None
         raise ErroIA("A IA não respondeu.")
 
 
-def _mensagem_http(erro: urllib.error.HTTPError) -> str:
+def _mensagem_http(erro: urllib.error.HTTPError, modelo: str = "") -> str:
     if erro.code in (400, 401, 403):
         return "A IA recusou o pedido. Confira se a chave GEMINI_API_KEY em backend/.env está correta e ativa."
+    if erro.code == 404:
+        return (f"O modelo de IA '{modelo}' não está disponível para a sua chave. "
+                "Troque PRISMA_IA_MODELO em backend/.env (ex.: gemini-3.1-flash-lite).")
     if erro.code == 429:
         return "O limite gratuito da IA foi atingido. Espere um minuto e tente de novo."
     return f"A IA devolveu um erro (código {erro.code})."
@@ -191,8 +202,28 @@ Regras:
 - Sem abreviações (ex., etc.), siglas sem explicação, notas de rodapé nem os caracteres \\ & < § #.
 - Se um texto tiver símbolos entre parênteses, como (▲) ou (■), mantenha-os exatamente onde estão.
 - Palavras difíceis ou técnicas que precisarem ficar: explique-as no glossário.
-Responda SOMENTE com um JSON: {{"textos": [...], "glossario": [{{"termo": "...", "significado": "..."}}]}}.
-"textos" deve ter exatamente o mesmo número de itens da entrada, na mesma ordem."""
+Formato: a entrada é {{"textos": ["texto 0", "texto 1", ...]}}. Cada texto de entrada vira EXATAMENTE UM item de saída, com o mesmo número "i" (a posição dele, começando em 0). Dentro de cada item você pode escrever várias frases curtas, uma depois da outra.
+Responda SOMENTE com um JSON: {{"textos": [{{"i": 0, "texto": "frases curtas do texto 0"}}, ...], "glossario": [{{"termo": "...", "significado": "..."}}]}}."""
+
+
+def _alinhar(novos, quantos: int) -> list[str]:
+    """Casa cada item devolvido pela IA com o texto de entrada. Aceita {"i", "texto"} (ou só a lista de textos)."""
+    erro = ErroIA("A IA não devolveu todos os textos. Tente de novo.")
+    if not isinstance(novos, list):
+        raise erro
+    if novos and all(isinstance(x, dict) for x in novos):
+        por_posicao: dict[int, str] = {}
+        for x in novos:
+            try:
+                por_posicao[int(x["i"])] = str(x["texto"]).strip()
+            except (KeyError, TypeError, ValueError):
+                raise erro from None
+        if sorted(por_posicao) != list(range(quantos)):
+            raise erro
+        return [por_posicao[k] for k in range(quantos)]
+    if len(novos) != quantos or not all(isinstance(x, str) for x in novos):
+        raise erro
+    return [x.strip() for x in novos]
 
 
 def leitura_facil(provedor: Provedor, textos: list[str], nivel: str, max_palavras: int) -> tuple[list[str], list[dict]]:
@@ -203,14 +234,11 @@ def leitura_facil(provedor: Provedor, textos: list[str], nivel: str, max_palavra
         lote = textos[i:i + TEXTOS_POR_PEDIDO]
         entrada = json.dumps({"textos": lote}, ensure_ascii=False)
         resposta = com_cache(
-            f"leitura_facil_v1_{nivel}_{max_palavras}", entrada,
+            f"leitura_facil_v2_{nivel}_{max_palavras}", entrada,
             lambda: provedor.gerar(_sistema_lf(nivel, max_palavras), entrada),
         )
         dados = _extrair_json(resposta)
-        novos = dados.get("textos")
-        if not isinstance(novos, list) or len(novos) != len(lote) or not all(isinstance(t, str) for t in novos):
-            raise ErroIA("A IA não devolveu o mesmo número de textos. Tente de novo.")
-        saida.extend(t.strip() for t in novos)
+        saida.extend(_alinhar(dados.get("textos"), len(lote)))
         for g in dados.get("glossario") or []:
             if isinstance(g, dict) and g.get("termo") and g.get("significado"):
                 glossario.setdefault(str(g["termo"]).strip(), str(g["significado"]).strip())

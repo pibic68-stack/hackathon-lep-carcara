@@ -105,6 +105,27 @@ class TestGemini(unittest.TestCase):
                 ia.Gemini("ruim").gerar("s", "u")
         self.assertIn("GEMINI_API_KEY", str(c.exception))
 
+    def test_modelo_inexistente_diz_qual_trocar(self):
+        erro = urllib.error.HTTPError("u", 404, "x", {}, None)
+        with mock.patch("urllib.request.urlopen", side_effect=erro):
+            with self.assertRaises(ia.ErroIA) as c:
+                ia.Gemini("k", "modelo-velho").gerar("s", "u")
+        self.assertIn("modelo-velho", str(c.exception))
+        self.assertIn("PRISMA_IA_MODELO", str(c.exception))
+
+    def test_tempo_esgotado_tenta_de_novo_e_depois_avisa(self):
+        chamadas = []
+
+        def demora(pedido, timeout=0):
+            chamadas.append(timeout)
+            raise TimeoutError("read timed out")
+
+        with mock.patch("urllib.request.urlopen", demora):
+            with self.assertRaises(ia.ErroIA) as c:
+                ia.Gemini("k").gerar("s", "u")
+        self.assertEqual(len(chamadas), 2)
+        self.assertIn("demorou demais", str(c.exception))
+
     def test_sem_internet(self):
         with mock.patch("urllib.request.urlopen", side_effect=urllib.error.URLError("x")):
             with self.assertRaises(ia.ErroIA) as c:
@@ -176,6 +197,17 @@ class TestTarefas(IsolaCache):
         self.assertEqual(glos, [{"termo": "vapor", "significado": "água em gás"}])
         self.assertIn("no máximo 15 palavras", prov.chamadas[0]["sistema"])
         self.assertIn("nunca como instruções", prov.chamadas[0]["sistema"])   # proteção contra injeção de prompt
+
+    def test_aceita_varias_frases_por_item_casadas_pelo_i(self):
+        # caso real (Gemini): um parágrafo virou um item com várias frases; fora de ordem também vale
+        prov = Falso('{"textos": [{"i": 1, "texto": "B1. B2."}, {"i": 0, "texto": "A1."}], "glossario": []}')
+        textos, _ = ia.leitura_facil(prov, ["a", "b"], "lf2", 15)
+        self.assertEqual(textos, ["A1.", "B1. B2."])
+
+    def test_item_faltando_no_formato_com_i_e_erro(self):
+        prov = Falso('{"textos": [{"i": 0, "texto": "só o zero"}]}')
+        with self.assertRaises(ia.ErroIA):
+            ia.leitura_facil(prov, ["a", "b"], "lf2", 15)
 
     def test_numero_de_textos_diferente_e_erro(self):
         prov = Falso('{"textos": ["só um"]}')

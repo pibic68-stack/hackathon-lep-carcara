@@ -3,6 +3,7 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -28,8 +29,12 @@ class TestAPI(unittest.TestCase):
         self._antigos = (api.SAIDA, api.ENVIOS, cache.PASTA)
         api.SAIDA, api.ENVIOS, cache.PASTA = base / "saida", base / "envios", base / "cache"
         self.c = TestClient(api.app)
+        # os testes nunca podem usar a IA de verdade, mesmo com um .env na pasta
+        self._sem_ia = mock.patch.object(api.ia, "obter_provedor", return_value=None)
+        self._sem_ia.start()
 
     def tearDown(self):
+        self._sem_ia.stop()
         api.SAIDA, api.ENVIOS, cache.PASTA = self._antigos
         self.tmp.cleanup()
 

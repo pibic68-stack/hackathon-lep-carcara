@@ -10,7 +10,7 @@ O que entra no Markdown:
   - uma linha por ferramenta usada (o que foi feito, sem a saída completa)
   - resumos de compactação, marcados como tal
 
-O que NÃO entra: raciocínio interno, saídas brutas de ferramentas, avisos do sistema, e-mails.
+O que NÃO entra: raciocínio interno, saídas brutas de ferramentas, avisos do sistema, e-mails e chaves de API.
 
 O transcript .jsonl guarda o histórico inteiro mesmo depois de uma compactação,
 então reexportar a partir dele não perde nada do que foi conversado.
@@ -30,11 +30,19 @@ BLOCOS_INTERNOS = re.compile(
     re.S,
 )
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
+# chaves de API conhecidas (Google/Gemini, Anthropic/OpenAI "sk-", GitHub): nunca podem ir para o repositório
+SEGREDO = re.compile(
+    r"\b(?:AIza[0-9A-Za-z_-]{30,}|AQ\.[0-9A-Za-z_-]{20,}|sk-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})"
+)
+
+
+def ocultar(texto: str) -> str:
+    return SEGREDO.sub("[chave removida]", EMAIL.sub("[e-mail removido]", texto))
 
 
 def limpar(texto: str) -> str:
     texto = BLOCOS_INTERNOS.sub("", texto)
-    texto = EMAIL.sub("[e-mail removido]", texto)
+    texto = ocultar(texto)
     return texto.strip()
 
 
@@ -61,7 +69,7 @@ def resumo_ferramenta(bloco: dict) -> str:
         or ""
     )
     nome = nome.replace("mcp__", "").replace("__", " / ")
-    detalhe = EMAIL.sub("[e-mail removido]", str(detalhe))
+    detalhe = ocultar(str(detalhe))
     return f"- 🔧 `{nome}`" + (f": {detalhe}" if detalhe else "")
 
 
@@ -120,7 +128,7 @@ def exportar(caminho: Path) -> tuple[str, int]:
                 if bloco.get("type") == "text" and bloco.get("text", "").strip():
                     despejar_ferramentas()
                     linhas.append(f"\n## 🤖 Claude · {hora(reg)}\n")
-                    linhas.append(EMAIL.sub("[e-mail removido]", bloco["text"].strip()) + "\n")
+                    linhas.append(ocultar(bloco["text"].strip()) + "\n")
                 elif bloco.get("type") == "tool_use":
                     ferramentas_pendentes.append(resumo_ferramenta(bloco))
 

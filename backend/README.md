@@ -117,9 +117,14 @@ Ela lê o texto na tela e não gera arquivo de áudio.
   Tudo que a IA responde fica em `backend/cache/`, então **rode a demo antes**: depois disso ela funciona sem internet.
 - **Sem IA, nada quebra:** as versões Padrão, Ampliada e Ouvir continuam saindo. Leitura Fácil fica "pendente".
 - **Revisão obrigatória:** a IA erra. Nada chega ao aluno sem o professor aprovar (P10.1).
-- **Não testado ao vivo:** o código segue a documentação oficial do Google (API `interactions`, out/2026) e passa
-  em testes simulados, mas **ainda não foi executado com uma chave de verdade**. O primeiro teste real é com você.
-- Modelo: padrão `gemini-3.8-flash`; para trocar, `PRISMA_IA_MODELO=` no `.env`.
+- **Testado ao vivo (30/10/2026)** com uma chave gratuita: descreveu corretamente um gráfico de colunas (cores e
+  posições) e reescreveu uma aula em Leitura Fácil II com frases curtas e glossário. Cada chamada leva uns 7 segundos.
+  Só foram testados 2 materiais pequenos; falta experimentar aulas reais e mais longas.
+- **Modelo:** padrão `gemini-3.1-flash-lite`. Nesse teste o `gemini-2.5-flash` estava desativado para contas novas e o
+  `gemini-3.8-flash` não respondeu em 60 s. Os modelos mudam rápido: se der erro de modelo, troque `PRISMA_IA_MODELO=` no `.env`.
+- **Chave:** cada pessoa usa a própria no `.env` dela (ou o time combina por canal privado). **Nunca cole a chave no chat
+  nem no `.env.exemplo`**: o chat é publicado em `prompts/` (o exportador esconde chaves conhecidas, mas não confie só nisso)
+  e o `.env.exemplo` vai para o GitHub. Se uma chave vazar, apague-a em https://aistudio.google.com/apikey e crie outra.
 
 ## Vídeo e áudio
 

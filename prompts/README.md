@@ -35,5 +35,5 @@ O arquivo `.claude/settings.json` deste repositório registra dois hooks:
 
 ## Privacidade
 
-O exportador remove avisos internos do sistema, raciocínio interno, saídas brutas de ferramentas e endereços de e-mail.
+O exportador remove avisos internos do sistema, raciocínio interno, saídas brutas de ferramentas, endereços de e-mail e chaves de API conhecidas (Google, Anthropic/OpenAI, GitHub).
 Mesmo assim, **não colem chaves, senhas ou dados reais de alunos** na conversa.
