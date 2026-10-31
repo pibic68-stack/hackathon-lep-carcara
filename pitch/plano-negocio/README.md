@@ -1,17 +1,21 @@
 # Plano de negócio do PRISMA
 
-O PDF para a banca é `plano-de-negocio-prisma.pdf`: 27 slides em 16:9. Ele é **gerado**: não edite o PDF à mão.
+Dois formatos, com o mesmo conteúdo e os mesmos números. Os dois são **gerados**: não edite os PDFs à mão.
+
+- `plano-de-negocio-prisma.pdf`: **slides** 16:9 (27 slides), para apresentar à banca.
+- `plano-de-negocio-prisma-A4.pdf`: **documento** A4 (14 páginas), para ler e entregar.
 
 | Arquivo | Para que serve |
 |---|---|
 | `modelo.py` | Todos os números: dados com fonte (`DADOS`), hipóteses do time (`HIPOTESES`), planos, cenários e a projeção de 36 meses. |
-| `gerar_pdf.py` | Monta o PDF com os textos, as tabelas e os gráficos. Reaproveita os gráficos do Manual (`docs/manual/build_manual.py`). |
+| `gerar_pdf.py` | Monta os **slides** com os textos, as tabelas e os gráficos. Reaproveita os gráficos do Manual (`docs/manual/build_manual.py`). |
+| `gerar_pdf_a4.py` | Monta o **documento A4** com o mesmo conteúdo. |
 
 ## Como mudar um número
 
 1. Abra `modelo.py` e mude o valor (por exemplo, o preço de um plano em `PLANOS` ou as metas em `NOVAS_POR_ANO`).
 2. Confira o resumo: `python pitch/plano-negocio/modelo.py`
-3. Gere o PDF de novo: `python pitch/plano-negocio/gerar_pdf.py`
+3. Gere os PDFs de novo: `python pitch/plano-negocio/gerar_pdf.py` (slides) e `python pitch/plano-negocio/gerar_pdf_a4.py` (A4)
 
 O PDF usa o pacote `playwright` (`pip install playwright`) e o Microsoft Edge já instalado no Windows.
 
