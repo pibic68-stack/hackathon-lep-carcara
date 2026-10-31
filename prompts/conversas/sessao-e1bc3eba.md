@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 14
-- **Exportado em:** 31/10/2026 11:36
+- **Mensagens do time:** 15
+- **Exportado em:** 31/10/2026 11:56
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -1044,3 +1044,40 @@ O `PRISMA.zip` tem tudo isso e continua com o `publicar.bat`, o QR code, as cont
 Sources:
 - [Vercel: Python runtime](https://vercel.com/docs/functions/runtimes/python?from=graph)
 - [Render: discussão sobre cartão no plano grátis](https://community.render.com/t/use-render-web-service-without-card/23252)
+
+
+---
+
+## 🧑 Time · 31/10 11:55
+
+tentei criar um material e deu isso. acho que a ia nao esta integrada. mas pelo menos dessa vez resolver a questao da base, ou seja, consigo entrar direto na conta dos personagens criados ate entao
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Clear size limit message on Vercel; fix error panel
+- 🔧 `Bash`: Show size limit hint; run tests
+- 🔧 `Bash`: Commit, push, rebuild zip
+- 🔧 `SendUserFile`
+
+</details>
+
+
+## 🤖 Claude · 31/10 11:56
+
+O erro 413 não foi a IA: o vídeo do WhatsApp passava de 4,5 MB, que é o máximo que a Vercel aceita por envio. Ela recusa o arquivo antes de ele chegar ao PRISMA. Que as contas dos personagens agora funcionem confirma que o banco compartilhado resolveu o login.
+
+**O que mudei (já no GitHub; a Vercel atualiza sozinha em 1 a 2 minutos):**
+- **Aviso antes de enviar:** no site público, se o arquivo passar de 4,5 MB, o painel avisa na hora, com o tamanho do arquivo e o que fazer: enviar um trecho menor ou usar o PRISMA do PC. A dica embaixo de "Material da aula" também passa a mostrar o limite.
+- **Mensagem do erro:** se o 413 aparecer mesmo assim, a mensagem explica o motivo, em vez de "Algo deu errado (código 413)".
+- **Quadro da produção:** quando o envio falha, ele mostra "Deu errado" com o motivo. Antes podia mostrar "Pronto".
+
+Não testei na Vercel de verdade; os testes aqui passam.
+
+**Para conferir a IA no site público:**
+1. Entrem como Professora e cliquem em "Testar a IA agora", embaixo de "Enviar material".
+2. Se aparecer que falta a chave, criem `GEMINI_API_KEY` em **Settings › Environment Variables** e cliquem em **Redeploy**.
+3. Depois, enviem um arquivo pequeno, como o `3-audio-aula.wav` (2,2 MB) ou o `4-video-aula.mp4` (0,4 MB) da pasta `materiais-teste`.
+
+No PC, pelo `publicar.bat`, o limite é de 300 MB, então vídeos grandes devem ir por lá.
+
+O `PRISMA.zip` é a versão final para o PC, com o `publicar.bat`, o QR code, as contas de demonstração, os materiais de teste e o cadastro com pagamento. Extraiam numa pasta nova e copiem o `backend\.env` da pasta antiga.
