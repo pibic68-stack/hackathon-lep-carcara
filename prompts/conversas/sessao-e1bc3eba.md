@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 7
-- **Exportado em:** 30/10/2026 23:32
+- **Mensagens do time:** 8
+- **Exportado em:** 31/10/2026 01:47
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -487,3 +487,334 @@ Preciso de uma destas informações:
 O Explorador de Arquivos continua aberto na tela e o controle da tela está liberado.
 
 Uma limitação do Windows: o Explorador só aceita cliques, sem digitar. O `publicar.bat` abre uma janela preta com o link `https://....trycloudflare.com`, e eu consigo ler essa janela se ela ficar visível.
+
+
+---
+
+## 🧑 Time · 31/10 01:14
+
+Acertar a formatação.
+
+Na formatação da página inicial tem alguns problemas: 
+Em protanopia e todas as outras opções de daltonismo quando você clica na seta ao lado de continuar, quando muda de página o tamanho da caixa de texto muda e aí desloca os botões. Você precisa deixar um tamanho padrão que seja grande o suficiente pra os botões ficarem fixos independente da página que estiver. Esse bug eu vi acontecer mais nas opções de dautonismo mas ocorre nas outras tbm. 
+
+Por fim, também nessa sessão, manual de acessibilidade fica sobreposto à linhas com padrão e mini check fica sobreposto à perguntas. Faz eles ficarem separados
+
+tem problemas de formataçao nas versoes padroes e ampliadas, conforme o print q vou mandar. 
+substituir tudo que esta LEP para LEPV (referente a Liga de Empreendedorismo da Praia Vermelha).
+as opçoes de contraste nao estao mudando tanto o texto, a ideia é que ficasse o suficiente pra auxiliar o aluno.
+mandei mais prints comparando uma lista de calculo (a original e a versao padrao que a plataforma mandou). repare que simbolos matematicos sao formatados mt feio, enfase em expoentes e raizes
+mandando tambem um caso em que ele nao conseguiu devolver alguma versao
+precisamos que ele aprimore a rigorosidade da filtraçao. precisamos que o claude leve em consideraçao que a ia que esta sendo usada é o gemini flash, que aguenta mt pouca memoria. entao pode ser que seja bom que ele nos entregue o resultado mais reduzido mas que em troca tenha melhor rigorosidade
+de certa forma os resultados filtrados tao um pouquinho parecidos demais com o original
+sei que estamos exigindo do gemini flash free, mas precisamos resolver o fato de que os resultados estao esdruxulos. nao sei se pra todo alto contraste precisa ser preto e amarelo como é na interface da pagina inicial, mas seria interessante que isso se mantivesse nas versoes filtradas pra quem precisar de alto contraste (verificar se é o caso deixar fundo preto e letras amarelas; nao sabemos se essa é a melhor soluçao, pondere tambem com base na sua base de dados)
+sobre a legenda de simbolos quando necessario (opção de ouvir), esta sendo colocada apenas quando aparece a palavra (quando nem precisava) e nao quando aparece de fato a cor (quando precisava, pro aluno daltônico tentando entender um desenho). revise isso e conserte.
+
+quanto a parte de mini check, pode tirar. Vamos substituir pela seguinte dinâmica: cada aluno de uma dada turma pode avaliar a aula que recebeu (escala de 1 a 5 e adicionar uma sugestão em forma de comentário) para que o professor receba esse feedback do aluno. A avaliação deve ser em sistema de estrelas (5 estrelas apagadas ao lado do arquivo que o aluno clica para acessar o PDF da aula, de modo que ao passar o mouse por cima elas fiquem acesas da primeira estrela até a correspondente onde o cursor do mouse parou, e fique com elas acesas quando o aluno clicar na estrela do cursor). A opção "sugestão: " deve ficar também próximo ao link do PDF da aula, mas abaixo dele, e deve permitir comentários de até 150 palavras. Para o professor, na região onde fica o atual mini check (a ser removido), coloque a área de "feedbacks", onde estarão disponibilizadas as notas e sugestões de cada aluno que avaliou o PDF (mostrando o nome do aluno). tanto a em estrela quanto a em texto devem ser opcionais e deve haver a opçao de pular avaliaçao. 
+
+preciso que use algo que um colega meu criou, ele criou ja no git o esquema pra acrescentar certificados pra quem completar o minicurso, as instruçoes ja estao la em "certificado-como-implementar.md"
+
+precisamos que crie uma forma tambem de cadastrar escolas, pra que facilite a gestao de codigos de escola. queremos que escola apenas veja listas de prof, alunos e materiais no seu painel e crie seu codigo (senha) no ato de cadastrar. prof cria material e ve feedback. familia ve material e apaga material apenas do painel do aluno (nao de todos os alunos ou escola). aluno ve material e avalia
+
+tambem procure erros da plataforma, pode perguntar o que for necessario durante a realizaçao do prompt e a ideia é refinar ainda mais
+
+
+## 🤖 Claude · 31/10 01:14
+
+Vou começar puxando o que o time subiu e lendo o código atual da plataforma. É muita coisa, então organizo uma lista de tarefas e já trago perguntas pontuais logo no início.
+
+<details><summary>Ações executadas pelo Claude (48)</summary>
+
+- 🔧 `Bash`: Atualizar repositório e ver estrutura atual
+- 🔧 `Bash`: Ler guia de certificado e tamanho dos arquivos
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/backend/adaptador/api.py
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/backend/adaptador/contas.py
+- 🔧 `AskUserQuestion`
+- 🔧 `TaskCreate`: pipeline, leitores, transformacoes, renderizador, ia, regras; painéis web e JS
+- 🔧 `TaskCreate`: Botões não podem pular ao trocar etapa (todos os modos); separar 'Manual de acessibilidade'/'Linhas com padrão' e 'Mini-check'/'Perguntas'; trocar mini-check por avaliação
+- 🔧 `TaskCreate`: Leitor do PDF detecta sobrescrito/subscrito, frações empilhadas, raiz com barra, limites de integral; renderizar com MathML/HTML
+- 🔧 `TaskCreate`: Fundo creme, Atkinson, seletor amarelo-no-preto / branco-no-preto / preto-no-branco; contraste que realmente muda o texto
+- 🔧 `TaskCreate`: Leitura Fácil em lotes pequenos com validação, novas tentativas e resultado mais enxuto e realmente simplificado; nunca 'não saiu' inteiro
+- 🔧 `TaskCreate`: Detectar texto colorido e desenhos coloridos no PDF/PPT em vez da palavra 'vermelho'
+- 🔧 `TaskCreate`: 1-5 estrelas com hover/clique, sugestão até 150 palavras, ambos opcionais, pular; professor vê nome, nota e sugestão; remover mini-check
+- 🔧 `TaskCreate`: Escola: e-mail+senha e código para professores; painel com listas de professores, alunos e materiais. Família oculta material só do painel do filho.
+- 🔧 `TaskCreate`: Seguir docs/certificado-como-implementar.md; renomear mini-check do curso para Teste final
+- 🔧 `TaskCreate`: Trocar em todo o repo; atualizar padroes.json, PDF, aba; CLAUDE.md
+- 🔧 `TaskCreate`: Rodar testes, subir servidor, testar fluxos de cada perfil com Playwright; corrigir; enviar
+- 🔧 `TaskUpdate`
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/backend/adaptador/leitores.py
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/backend/adaptador/modelo.py
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/backend/adaptador/pipeline.py
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/backend/adaptador/transformacoes.py
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/backend/adaptador/ia.py
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/backend/adaptador/renderizador.py
+- 🔧 `Bash`: Ler painéis e scripts da biblioteca
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/web/js/professor.js
+- 🔧 `Bash`: Ler cliente da API, auth e tela de entrar
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/web/entrar.html
+- 🔧 `Bash`: Ver dependências do backend e exemplos
+- 🔧 `Bash`: Instalar dependências do backend
+- 🔧 `Bash`: Ver o estado do proxy para instalar pacotes
+- 🔧 `Bash`: Instalar pacotes forçando o proxy
+- 🔧 `Bash`: Ver pacotes Python disponíveis
+- 🔧 `Bash`: Baixar FastAPI e multipart do GitHub e ver wheels do PyMuPDF
+- 🔧 `Bash`: Instalar FastAPI a partir do código-fonte
+- 🔧 `Bash`: Ligar FastAPI e multipart por caminho
+- 🔧 `Bash`: Baixar dependência annotated-doc
+- 🔧 `Bash`: Conferir importação do FastAPI
+- 🔧 `Bash`: Procurar bibliotecas de PDF já instaladas
+- 🔧 `SendUserMessage`
+- 🔧 `Bash`: Ler o diagrama radial da home
+- 🔧 `Bash`: Subir o servidor do PRISMA localmente
+- 🔧 `Bash`: Medir o pulo dos botões do diagrama da home
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/prot-etapa4.png
+- 🔧 `Bash`: Ver caderno, etapa mini-check e CSS dos rótulos
+- 🔧 `Bash`: Fixar a altura do caderno e afastar rótulos do diagrama
+- 🔧 `Bash`: Procurar todas as menções a mini-check
+- 🔧 `Bash`: Ver trechos da home que citam mini-check
+- 🔧 `Bash`: Trocar mini-check por avaliação na home e medir de novo
+
+</details>
+
+
+## 🤖 Claude · 31/10 01:19
+
+Os botões não pulam mais (mesma posição nas 5 etapas). Agora confiro se os rótulos ainda se encostam.
+
+<details><summary>Ações executadas pelo Claude (45)</summary>
+
+- 🔧 `Bash`: Testar sobreposição dos rótulos em vários modos
+- 🔧 `Bash`: Melhorar o afastamento dos rótulos e cair para lista quando não couber
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/radial-estreito.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/radial-dislexia-letra.png
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `Bash`: Ver testes da API e rodar a suíte atual
+- 🔧 `Bash`: Contas: escola, avaliações e materiais ocultos pela família
+- 🔧 `Bash`: API: escola, feedbacks, avaliação e ocultar material
+- 🔧 `Bash`: Testar escola, avaliação e ocultar
+- 🔧 `Bash`: Tela de entrar: perfil Escola e cadastro da escola
+- 🔧 `Bash`: Página e configuração do painel da escola
+- 🔧 `Bash`: Painel da escola (só leitura) e funções novas da API
+- 🔧 `Bash`: Biblioteca: estrelas, sugestão e tirar do painel
+- 🔧 `Bash`: Painel do professor: área de feedbacks
+- 🔧 `Bash`: Reiniciar o servidor com banco de teste
+- 🔧 `Bash`: Subir o servidor de novo
+- 🔧 `Bash`: Cadastro aberto quando há escola cadastrada
+- 🔧 `Bash`: Testar o fluxo completo pelas telas
+- 🔧 `Bash`: Subir o servidor guardando o número do processo
+- 🔧 `Bash`: Rodar o fluxo completo pelas telas
+- 🔧 `Write`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/fluxo.js
+- 🔧 `Bash`: Rodar o fluxo completo pelas telas
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/aluno-hover.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/prof-feedbacks.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/escola-cheia.png
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `Bash`: Ver regras e versões do manual
+- 🔧 `Bash`: Ver ferramentas para gerar PDFs de teste com matemática
+- 🔧 `Bash`: Gerar PDFs de teste com matemática (Word e LaTeX)
+- 🔧 `Bash`: Ver como o LibreOffice gravou as equações
+- 🔧 `Read`: /tmp/mat/cal-1.png
+- 🔧 `Bash`: Gerar PDFs de teste em LaTeX
+- 🔧 `Bash`: Ver cache e como o pdfminer lê a matemática do LaTeX
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/backend/adaptador/leitor_pdf.py
+- 🔧 `Bash`: Testar o leitor de matemática nos PDFs de teste
+- 🔧 `Bash`: Calibrar posições das frações no PDF de teste
+- 🔧 `Bash`: Ver posições dos acentos de vetor e integrais
+- 🔧 `Bash`: Corrigir acentos de vetor, integrais e frações; testar
+- 🔧 `Bash`: Testar de novo o leitor de matemática
+- 🔧 `Bash`: Gerar PDF estilo Word com MathML e cores e testar
+- 🔧 `Bash`: Ajustar cor em títulos e guardar cores no documento
+
+</details>
+
+
+## 🤖 Claude · 31/10 01:33
+
+Agora ligo o leitor novo na leitura de PDF, com divisão de questões e itens (a), b)…).
+
+<details><summary>Ações executadas pelo Claude (7)</summary>
+
+- 🔧 `Bash`: Ligar o leitor novo e ver os blocos gerados
+- 🔧 `Bash`: P1 pela cor real; PowerPoint colorido; etapas sem quebrar contas
+- 🔧 `Bash`: Ver testes atuais da IA
+- 🔧 `Bash`: Ler testes da Leitura Fácil
+- 🔧 `Bash`: IA mais rigorosa: lotes pequenos, conferência, nova tentativa e plano B
+- 🔧 `Bash`: Simplificar o tratamento de falhas da IA e rodar testes
+- 🔧 `Bash`: Ver testes antigos de cor
+
+</details>
+
+
+## 🤖 Claude · 31/10 01:36
+
+Atualizo os testes antigos para o comportamento novo (que o grupo pediu) e acrescento testes da matemática e da IA.
+
+<details><summary>Ações executadas pelo Claude (28)</summary>
+
+- 🔧 `Bash`: Atualizar testes antigos e rodar a suíte
+- 🔧 `Bash`: Ajustar teste da API e rodar tudo
+- 🔧 `Bash`: Temas de contraste e estilos de matemática no gerador de HTML
+- 🔧 `Bash`: Página gerada: ajustes de leitura, fórmulas em MathML e fala
+- 🔧 `Bash`: Testes de matemática (marcação, MathML, fala e PDF real)
+- 🔧 `Bash`: Ver a fala gerada
+- 🔧 `Bash`: Ler operadores em voz alta e rodar testes
+- 🔧 `Bash`: Gerar versões dos PDFs de teste e tirar capturas
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/gerado-fracoes-universal.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/gerado-fracoes-ampliada.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/gerado-calculo-universal.png
+- 🔧 `Bash`: Frações com números do tamanho do texto
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/gerado-word-audio.png
+- 🔧 `Bash`: Espaços ao redor de sinais de conta e testes
+- 🔧 `Bash`: Sem espaço antes do expoente; testes
+- 🔧 `Bash`: Ver a função que monta o texto da linha
+- 🔧 `Bash`: Depurar o espaço antes do expoente
+- 🔧 `Bash`: Ver papéis das letras na primeira linha
+- 🔧 `Bash`: Corrigir ordem do espaço depois do expoente
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `Bash`: Conferir envios dos colegas no meio do trabalho
+- 🔧 `Bash`: Salvar e enviar o progresso ao GitHub
+- 🔧 `Bash`: Ver os módulos 9 e 10 do mini curso
+- 🔧 `Bash`: Ver perguntas do teste e etapas do ciclo
+
+</details>
+
+
+## 🤖 Claude · 31/10 01:40
+
+Agora o mini curso: troco o mini-check por avaliação, renomeio o teste final e ligo o certificado conforme o guia do Ricardo.
+
+<details><summary>Ações executadas pelo Claude (2)</summary>
+
+- 🔧 `Bash`: Mini curso: avaliação no lugar do mini-check e teste final
+- 🔧 `Bash`: Gráfico de barras aceita escala de estrelas
+
+</details>
+
+
+## 🤖 Claude · 31/10 01:40
+
+Agora o certificado, seguindo o guia do Ricardo passo a passo.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Ler o script do certificado
+- 🔧 `Bash`: Ligar o certificado ao fim do teste final
+- 🔧 `Bash`: Ver P1, P9 e fluxo no manual, e onde aparece LEP
+- 🔧 `Bash`: Trocar LEP por LEPV em todo o repositório
+
+</details>
+
+
+## 🤖 Claude · 31/10 01:41
+
+Agora atualizo o manual (P1 com cor real, P9 com avaliação por estrelas, etapa Acompanhar) e gero de novo o PDF e a aba.
+
+<details><summary>Ações executadas pelo Claude (31)</summary>
+
+- 🔧 `Bash`: Atualizar o manual: P1 por cor real e P9 com estrelas
+- 🔧 `Bash`: Procurar mini-check restante no manual
+- 🔧 `Bash`: Ver contexto das duas menções restantes
+- 🔧 `Bash`: Gerar de novo o PDF e a aba e rodar testes
+- 🔧 `Bash`: Testar o certificado no fim do teste final
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/estrelas-curso.png
+- 🔧 `Bash`: Eixo do gráfico de estrelas sem sobreposição
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `SendUserMessage`
+- 🔧 `Bash`: Ver o que os testes de PDF (PyMuPDF) esperam
+- 🔧 `Bash`: Ler os testes de PDF
+- 🔧 `Bash`: Ver se há biblioteca para criar PDFs de teste
+- 🔧 `Bash`: Recriar os casos dos testes de PDF com reportlab
+- 🔧 `Bash`: Testes de PDF que rodam com qualquer leitor
+- 🔧 `Bash`: Sessão sem erro 401 nas páginas públicas
+- 🔧 `Bash`: Ajustar testes de sessão e ver o menu do celular
+- 🔧 `Bash`: Menu recolhido quando a letra grande não cabe; ver CSS do entrar
+- 🔧 `Bash`: Medir estouro em 320 px e menu com letra grande
+- 🔧 `Bash`: Achar a lista que estoura com letra grande
+- 🔧 `Bash`: Ver CSS da legenda da ficha
+- 🔧 `Bash`: Corrigir estouros e medir de novo
+- 🔧 `Bash`: Ver a documentação da API no README do backend
+- 🔧 `Bash`: Ler as tabelas da API e da IA no README
+- 🔧 `Bash`: Documentar rotas novas, matemática e IA
+- 🔧 `Bash`: Registrar as decisões novas na memória do projeto
+- 🔧 `Bash`: Rodar testes finais e ver o que mudou
+- 🔧 `Bash`: Fluxo completo de novo, enviando um PDF com matemática
+- 🔧 `Bash`: Conferir o material gerado pela plataforma e limpar
+- 🔧 `Bash`: Commitar e enviar a segunda parte
+
+</details>
+
+
+## 🤖 Claude · 31/10 01:46
+
+Agora atualizo o site publicado (a cópia estática) no mesmo link.
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Montar a cópia do site para publicar
+- 🔧 `Artifact`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/site/index.html
+- 🔧 `TaskUpdate`
+- 🔧 `Bash`: Desligar o servidor de teste
+
+</details>
+
+
+## 🤖 Claude · 31/10 01:47
+
+Fiz tudo o que você listou e enviei ao GitHub. Para ver na plataforma, deem `git pull` e abram o `publicar.bat` de novo. Rodei os testes automáticos (87 passaram) e testei o caminho completo nas telas: escola → professor → aluno → família → feedback, sem nenhum erro no navegador. Três coisas não consegui testar aqui, e estão no fim.
+
+**Página inicial**
+- **Caixa do "Como funciona":** agora tem sempre a altura da etapa mais longa. Os botões ficam no mesmo lugar nas 5 etapas, em todos os modos de daltonismo.
+- **Rótulos que se encostavam:** "Manual de Acessibilidade" e "Linhas com padrão" agora se afastam sozinhos. Quando não cabem, por letra grande ou tela estreita, viram uma lista no caderno ao lado.
+- **Mini-check:** saiu da home. A etapa 5 virou "Avaliação".
+
+**Matemática nos PDFs**
+- **Leitura da fórmula:** a plataforma agora monta expoentes, raízes, frações empilhadas, integral com o C embaixo e vetores (F⃗). Na página eles aparecem formatados como no original. No Ouvir, são lidos por extenso ("x ao quadrado", "3 sobre 2").
+- **Questões e itens na mesma linha:** "1-) … a) … b) … 2-)" agora vira questões separadas, com os itens em lista.
+
+**Contraste nas versões**
+- Toda versão tem agora a barra "Ajustes de leitura", com quatro opções de cor (creme, amarelo no preto, branco no preto, preto no branco) e letra maior ou menor.
+- A versão de letras grandes abre em amarelo no preto e em negrito. Como vocês escolheram, cada aluno pode trocar, porque a preferência de quem tem baixa visão varia.
+
+**IA (Gemini Flash Lite)**
+- **Pedidos menores:** a IA recebe até 6 trechos por vez, e as fórmulas não vão para ela, para não serem estragadas.
+- **Conferência de cada resposta:** o código rejeita fórmula perdida, frase longa e texto quase igual ao original.
+- **Quando falha:** o trecho volta para a IA sozinho. Se falhar de novo, fica só com as frases divididas e o professor recebe um aviso. A mensagem "não saiu, a IA não devolveu todos os textos" não deve mais aparecer.
+
+**Legenda de cores**
+- Agora só aparece quando o material tem cor de verdade, como texto colorido. A palavra "vermelho" escrita em preto não ganha mais símbolo.
+- Quando o material tem imagem ou desenho colorido, o professor recebe um aviso para a descrição dizer o que cada cor significa. A IA também passa a descrever isso nas imagens.
+
+**Novidades nos painéis**
+- **Aluno:** 5 estrelas ao lado de cada material, que acendem até onde o mouse está e ficam acesas no clique. Embaixo vem a "Sugestão:" com até 150 palavras. As duas são opcionais e há o botão "Pular avaliação".
+- **Professor:** a área "Feedbacks dos alunos" mostra a média, o apelido de quem avaliou, as estrelas e a sugestão.
+- **Escola:** novo perfil em Entrar, com cadastro e um painel só de leitura (professores, turmas, alunos e materiais). O código para os professores é separado da senha do painel. O código "123" do `.env` continua valendo.
+- **Família:** pode "Tirar do painel" um material só do painel do próprio aluno, e devolver depois.
+
+**Mini curso e manual**
+- **Certificado:** liguei seguindo o guia do Ricardo. O passo 10 virou "Teste final" e, ao terminar, aparece a caixa para baixar o certificado.
+- **Manual 1.1:** a regra P9 agora usa as estrelas e a regra de cor segue a cor de verdade. O PDF e a aba Instruções foram gerados de novo.
+- **LEP → LEPV:** trocado em tudo.
+
+**Outros erros que achei e corrigi**
+- O menu do topo passava por cima da logo com letra grande ou fonte para dislexia.
+- Havia rolagem para o lado em celular estreito.
+- Aparecia um erro no navegador em toda página pública.
+
+**O que não consegui testar aqui**
+- **Os PDFs reais de vocês:** os prints não vieram com os arquivos. Testei com PDFs que imitam as mesmas listas (cálculo e frações).
+- **A biblioteca de PDF que vocês usam (PyMuPDF):** não existe neste ambiente, então testei a leitura com outra biblioteca. Rodem `python -m pytest testes` dentro de `backend` num PC do time para conferir.
+- **O Gemini de verdade:** não tenho a chave aqui; testei com respostas simuladas. Gerem uma versão de Leitura Fácil para conferir.
+
+Materiais já enviados não mudam sozinhos: reenviem para pegar a nova leitura de fórmulas e as cores.
+
+Se me mandarem a lista de cálculo e a de frações em PDF, confiro com os arquivos de verdade. Atualizei também o site publicado no mesmo link, que segue privado e sem o backend.
