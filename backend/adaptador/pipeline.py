@@ -34,7 +34,8 @@ def _identificador(nome: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", nome.lower()).strip("-") or "material"
 
 
-def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small") -> tuple[Documento, Path]:
+def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
+             descricoes: dict | None = None) -> tuple[Documento, Path]:
     """Lê o arquivo (usando o cache se já foi lido) e aplica as regras comuns a todos."""
     chave = cache.arquivo(caminho, extras=modelo_audio)
     pasta = cache.pasta_de(chave)
@@ -45,6 +46,11 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small") 
         doc = leitores.ler(caminho, pasta, modelo_audio)
         cache.gravar(chave, "documento", doc.para_dict())
 
+    # descrições escritas pelo professor (chave = caminho da imagem, ex.: "imagens/img-001.png")
+    for b in doc.blocos:
+        if b.tipo == "imagem" and descricoes and descricoes.get(b.arquivo, "").strip():
+            b.alt = descricoes[b.arquivo].strip()
+
     doc = t.cor_com_simbolo(doc)                      # P1
     doc = t.instrucoes_em_etapas(doc)                 # P6
     doc = t.sinalizar_linguagem_figurada(doc)         # P6 (só avisa)
@@ -54,12 +60,13 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small") 
 
 
 def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRAO,
-            ia=None, modelo_audio: str = "small") -> dict:
+            ia=None, modelo_audio: str = "small", descricoes: dict | None = None,
+            nome_pasta: str | None = None) -> dict:
     caminho = Path(caminho)
     manual = regras.carregar_manual()
-    doc, pasta_trabalho = preparar(caminho, manual, ia, modelo_audio)
+    doc, pasta_trabalho = preparar(caminho, manual, ia, modelo_audio, descricoes)
 
-    pasta = Path(saida) / _identificador(caminho.stem)
+    pasta = Path(saida) / (nome_pasta or _identificador(caminho.stem))
     pasta.mkdir(parents=True, exist_ok=True)
 
     versoes: dict[str, dict] = {}

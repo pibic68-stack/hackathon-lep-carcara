@@ -14,6 +14,38 @@ python -m adaptador exemplos/aula-ciclo-da-agua.txt --perfil exemplos/perfil-exe
 Saída em `backend/saida/<material>/`: `universal.html`, `ampliada.html` e `revisao.json`.
 Testes (não precisam instalar nada): `python -m unittest discover -s testes -v`
 
+## API para o site
+
+```bash
+cd backend
+python -m adaptador.api        # http://127.0.0.1:8000  (o mesmo servidor entrega o site de web/)
+```
+
+Documentação interativa (testar pelo navegador): http://127.0.0.1:8000/docs
+
+| Rota | Quem usa | O que faz |
+|---|---|---|
+| `POST /api/adaptar` | professor | Envia o arquivo (`arquivo`) e o perfil (`perfil`, JSON opcional). Cria um **rascunho** e devolve versões, transformações, pendências e `pode_publicar`. |
+| `GET /api/materiais` · `GET /api/materiais/{id}` | professor | Lista e detalha os materiais (fila de revisão). |
+| `GET /api/previa/{id}/{arquivo}` | professor | Abre qualquer versão para revisar, publicada ou não. |
+| `POST /api/materiais/{id}/descricoes` | professor | Escreve as descrições das imagens (`{"imagens": {"imagens/img-001.png": "texto"}}`). Gera as versões de novo. |
+| `POST /api/materiais/{id}/aprovar` | professor | Publica. Recusa (409) se ainda há imagem sem descrição (P4.1). |
+| `GET /api/biblioteca` · `GET /api/biblioteca/{id}/{arquivo}` | aluno e família | Só o que foi **publicado** (P10.1). Rascunho dá 404. |
+
+Exemplo (o que o JavaScript do site faz):
+
+```js
+const form = new FormData();
+form.append("arquivo", inputArquivo.files[0]);
+form.append("perfil", JSON.stringify({ necessidades: ["baixa_visao"] }));
+const r = await fetch("http://127.0.0.1:8000/api/adaptar", { method: "POST", body: form });
+const material = await r.json();   // material.versoes.universal.url -> abrir num <iframe> ou link
+```
+
+**Cuidados:** ainda **não há login**: qualquer um que alcance o servidor pode aprovar, então use só em rede local
+na demo. Arquivos enviados ficam em `backend/envios/` e resultados em `backend/saida/` (ambos fora do Git).
+Limite de 300 MB por arquivo. Vídeos longos podem levar minutos para transcrever (a requisição espera).
+
 ## Como funciona
 
 ```
@@ -38,7 +70,7 @@ arquivo ──► leitores.py ──► Documento (blocos) ──► transformac
 - [x] Ler `.txt` · [x] critérios P1.1, P6.1 a P6.3 e P4.1 · [x] HTML padrão e ampliado · [x] fila de revisão · [x] cache
 - [x] Ler PDF e PowerPoint (testado com arquivos criados nos testes) · [ ] testar com **PDFs e PowerPoints reais** de aula (layouts complicados, colunas, escaneados)
 - [ ] Testar vídeo (precisa `faster-whisper`)
-- [ ] API para o site enviar arquivos (FastAPI)
+- [x] API para o site enviar arquivos (FastAPI, ver seção acima) · [ ] ligar o site (`web/js`) à API · [ ] login de verdade
 - [ ] IA: simplificar texto (Leitura Fácil), descrever imagens, roteiro de áudio
 - [ ] Mover `PEDE_VERSAO` (em `pipeline.py`, qual necessidade pede qual versão) para o `padroes.json`; versão `braille` ainda não tratada
 

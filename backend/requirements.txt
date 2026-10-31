@@ -5,7 +5,8 @@ python-pptx>=1.0     # ler PowerPoint
 # Só para vídeo/áudio (baixa um modelo de voz na primeira vez; depois funciona offline):
 # faster-whisper>=1.0
 
-# Próxima etapa (API para o site enviar arquivos):
-# fastapi
-# uvicorn
-# python-multipart
+# API para o site enviar arquivos:
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+httpx>=0.27          # só para os testes da API
