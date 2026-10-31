@@ -58,6 +58,12 @@ class TestEtapas(unittest.TestCase):
         d = Documento("x", [Bloco("paragrafo", texto="A água evapora e depois forma nuvens.")])
         self.assertEqual(t.instrucoes_em_etapas(d).blocos[0].tipo, "paragrafo")
 
+    def test_hoje_vamos_respeita_o_maximo_do_manual(self):
+        d = Documento("x", [Bloco("titulo", f"T{i}") for i in range(7)])
+        r = t.quadro_hoje_vamos(d, regras.maximo_etapas_hoje_vamos(regras.carregar_manual()))
+        self.assertEqual(len(r.blocos[0].itens), 5)
+        self.assertTrue(any("P6.1" in p for p in r.pendencias))
+
     def test_hoje_vamos(self):
         d = Documento("x", [Bloco("titulo", "A"), Bloco("paragrafo", texto="..."), Bloco("titulo", "B")])
         r = t.quadro_hoje_vamos(d)
@@ -82,6 +88,8 @@ class TestManual(unittest.TestCase):
         p = regras.parametros_p2(regras.carregar_manual())
         self.assertEqual(p["caracteres_por_linha"], 60)
         self.assertEqual((p["pt_padrao"], p["pt_ampliada"]), (14, 18))
+        self.assertEqual((p["contraste_padrao"], p["contraste_ampliada"]), (4.5, 7))
+        self.assertEqual(p["espacamento_minimo"], 1.5)
 
     def test_contraste_das_cores_cumpre_o_manual(self):
         p = regras.parametros_p2(regras.carregar_manual())
@@ -110,12 +118,18 @@ class TestPipeline(unittest.TestCase):
             self.assertEqual(r["versoes"]["ampliada"]["status"], "gerada")
             self.assertEqual(r["versoes"]["audio"]["status"], "pendente_ia")
             self.assertEqual(r["status"], "aguardando_aprovacao_do_professor")
+            self.assertTrue(r["pode_publicar"])
             pagina = (pasta / "ampliada.html").read_text(encoding="utf-8")
             self.assertIn('lang="pt-BR"', pagina)
             self.assertIn("font-size:18.0pt", pagina)
             self.assertIn("azul (■)", pagina)
             self.assertIn('<ol class="etapas">', pagina)
             self.assertTrue((pasta / "revisao.json").exists())
+
+    def test_imagem_sem_descricao_bloqueia_publicacao(self):
+        d = Documento("x", [Bloco("imagem", arquivo="imagens/a.png")])
+        d = t.imagens_com_descricao(d)
+        self.assertTrue(any(p.startswith("P4.1") for p in d.pendencias))
 
     def test_formato_nao_suportado(self):
         with tempfile.TemporaryDirectory() as tmp:

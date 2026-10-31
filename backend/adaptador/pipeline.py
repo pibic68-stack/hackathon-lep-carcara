@@ -49,7 +49,7 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small") 
     doc = t.instrucoes_em_etapas(doc)                 # P6
     doc = t.sinalizar_linguagem_figurada(doc)         # P6 (só avisa)
     doc = t.imagens_com_descricao(doc, ia.descrever_imagem if ia else None)  # P4
-    doc = t.quadro_hoje_vamos(doc)                    # P6
+    doc = t.quadro_hoje_vamos(doc, regras.maximo_etapas_hoje_vamos(manual))  # P6.1
     return doc, pasta
 
 
@@ -73,10 +73,14 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
         (pasta / f"{v}.html").write_text(html, encoding="utf-8")
         versoes[v] = {"status": "gerada", "arquivo": f"{v}.html"}
 
+    # P4.1: imagem sem descrição bloqueia a publicação
+    bloqueios = [p for p in doc.pendencias if p.startswith("P4.1")]
     revisao = {
         "material": doc.origem,
         "aluno": (perfil or {}).get("aluno"),
-        "status": "aguardando_aprovacao_do_professor",   # P7: nada chega ao aluno sem aprovar
+        "status": "aguardando_aprovacao_do_professor",   # P10.1: nada chega ao aluno sem aprovar
+        "pode_publicar": not bloqueios,
+        "bloqueios": bloqueios,
         "versoes": versoes,
         "transformacoes_aplicadas": doc.aplicados,
         "pendencias_para_o_professor": doc.pendencias,

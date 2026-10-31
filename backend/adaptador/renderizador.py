@@ -41,7 +41,8 @@ def _css(estilo: str, params: dict) -> str:
          --quadro:{cor['quadro_fundo']}; --borda:{cor['borda']}; }}
 * {{ box-sizing: border-box; }}
 body {{ margin:0; background:var(--fundo); color:var(--texto); font-family:{FONTE};
-        font-size:{pt}pt; line-height:{1.8 if estilo == 'ampliada' else 1.6}; }}
+        font-size:{pt}pt; line-height:{max(params['espacamento_minimo'], 1.8 if estilo == 'ampliada' else 1.6)};
+        text-align:left; hyphens:none; font-style:normal; }}
 main {{ max-width:{params['caracteres_por_linha']}ch; margin:0 auto; padding:1.5rem 1rem 4rem; }}
 h1, h2, h3 {{ line-height:1.25; color:var(--destaque); }}
 h1 {{ font-size:1.7em; }} h2 {{ font-size:1.35em; margin-top:2rem; }} h3 {{ font-size:1.15em; }}
@@ -53,7 +54,7 @@ aside.quadro {{ background:var(--quadro); border:3px solid var(--borda); border-
                 padding:.6rem 1.2rem; margin:1.2rem 0; }}
 aside.quadro h2 {{ margin:.4rem 0; font-size:1.1em; }}
 figure {{ margin:1.2rem 0; }} img {{ max-width:100%; height:auto; }}
-.pendente {{ border:2px dashed var(--borda); padding:.5rem; font-style:italic; }}
+.pendente {{ border:2px dashed var(--borda); padding:.5rem; }}
 .pular {{ position:absolute; left:-999px; }} .pular:focus {{ left:1rem; top:1rem; background:#fff; padding:.5rem; }}
 :focus-visible {{ outline:4px solid var(--destaque); outline-offset:2px; }}
 @media print {{ section.pagina {{ break-before:page; }} }}

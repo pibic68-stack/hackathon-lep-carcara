@@ -2,7 +2,7 @@
 
 Cada função recebe um `Documento` e devolve uma cópia nova com a regra aplicada.
 O que mudou fica em `doc.aplicados` e o que precisa de gente fica em `doc.pendencias`
-(é isso que o professor vê na fila de aprovação, padrão P7).
+(é isso que o professor vê na fila de aprovação, critério P10.1).
 """
 from __future__ import annotations
 
@@ -66,10 +66,10 @@ def cor_com_simbolo(doc: Documento) -> Documento:
                         [f"{cor} = {simb}" for cor, simb in usadas.items()])
         novo.blocos.insert(0, legenda)
         novo.aplicados.append(
-            f"P1 Cor nunca sozinha: {len(usadas)} cor(es) ganharam símbolo e uma legenda no topo."
+            f"P1.1 Cor nunca sozinha: {len(usadas)} cor(es) ganharam símbolo e uma legenda no topo."
         )
         novo.pendencias.append(
-            "P1: confira se as palavras de cor marcadas realmente se referem a cores "
+            "P1.1: confira se as palavras de cor marcadas realmente se referem a cores "
             "(ex.: \"rosa\" pode ser a flor)."
         )
     return novo
@@ -120,20 +120,25 @@ def instrucoes_em_etapas(doc: Documento) -> Documento:
     novo.blocos = saida
     if convertidos:
         novo.aplicados.append(
-            f"P6 Estrutura previsível: {convertidos} instrução(ões) viraram passos numerados, um por ação."
+            f"P6.2 Estrutura previsível: {convertidos} instrução(ões) viraram passos numerados, um por ação."
         )
     return novo
 
 
-def quadro_hoje_vamos(doc: Documento) -> Documento:
-    """Abre o material dizendo o que vai acontecer (usa os títulos da aula)."""
+def quadro_hoje_vamos(doc: Documento, maximo: int = 5) -> Documento:
+    """P6.1: abre o material dizendo o que vai acontecer (usa os títulos da aula; até `maximo` etapas)."""
     novo = copy.deepcopy(doc)
     titulos = [b.texto for b in novo.blocos if b.tipo == "titulo" and b.nivel <= 2]
     if len(titulos) >= 2:
         # fica depois da legenda de cores (se houver), mas antes do conteúdo
         pos = sum(1 for b in novo.blocos[:1] if b.tipo == "quadro")
-        novo.blocos.insert(pos, Bloco("quadro", "Hoje vamos", titulos))
-        novo.aplicados.append("P6: quadro \"Hoje vamos\" acrescentado no começo, com os assuntos da aula.")
+        novo.blocos.insert(pos, Bloco("quadro", "Hoje vamos", titulos[:maximo]))
+        novo.aplicados.append("P6.1: quadro \"Hoje vamos\" acrescentado no começo, com os assuntos da aula.")
+        if len(titulos) > maximo:
+            novo.pendencias.append(
+                f"P6.1: a aula tem {len(titulos)} assuntos e o quadro aceita no máximo {maximo}. "
+                "Escolha quais mostrar ou divida a aula."
+            )
     return novo
 
 
@@ -145,7 +150,7 @@ def sinalizar_linguagem_figurada(doc: Documento) -> Documento:
     achadas = sorted({e for b in novo.blocos if b.texto for e in expressoes if e in b.texto.lower()})
     if achadas:
         novo.pendencias.append(
-            "P6: expressões de sentido figurado encontradas (" + ", ".join(achadas)
+            "P6.3: expressões de sentido figurado encontradas (" + ", ".join(achadas)
             + "). Considere trocar por linguagem literal."
         )
     return novo
@@ -162,11 +167,11 @@ def imagens_com_descricao(doc: Documento, descrever=None) -> Documento:
             texto = descrever(b.arquivo) if descrever else None
             if texto:
                 b.alt = texto
-                novo.aplicados.append(f"P4: descrição gerada por IA para {b.arquivo} (precisa de revisão).")
+                novo.aplicados.append(f"P4.2: descrição gerada por IA para {b.arquivo} (precisa de revisão).")
             else:
                 sem += 1
     if sem:
         novo.pendencias.append(
-            f"P4: {sem} imagem(ns) sem descrição. O professor precisa escrever o texto alternativo."
+            f"P4.1: {sem} imagem(ns) sem descrição. O professor precisa escrever o texto alternativo."
         )
     return novo

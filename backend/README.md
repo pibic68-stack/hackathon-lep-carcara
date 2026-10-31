@@ -1,7 +1,7 @@
 # Backend: IA e Backend (Pessoa 2)
 
 Recebe o material da aula + o perfil do aluno e devolve versões adaptadas em HTML acessível,
-mais um arquivo `revisao.json` para o professor aprovar (padrão P7 do Manual).
+mais um arquivo `revisao.json` para o professor aprovar (critério P10.1 do Manual).
 
 ## Rodar agora
 
@@ -26,8 +26,8 @@ arquivo ──► leitores.py ──► Documento (blocos) ──► transformac
 |---|---|
 | `modelo.py` | Formato interno (`Documento`, `Bloco`). É o "contrato" entre as peças. |
 | `leitores.py` | Um leitor por formato. Vídeo/áudio usa `faster-whisper` (roda no computador, sem internet). |
-| `regras.py` | Lê números do Manual (`docs/manual/padroes.json`: 60 caracteres, 14/18 pt, contraste). Não ficam fixos no código. |
-| `transformacoes.py` | Regras determinísticas: **P1** cor + símbolo, **P6** passos numerados e "Hoje vamos", **P4** imagem sem descrição vira pendência. |
+| `regras.py` | Lê os limites dos critérios do Manual (`docs/manual/padroes.json`: P2.1 contraste, P2.2 e P2.4 tamanho e linha, P6.1 etapas). Não ficam fixos no código. |
+| `transformacoes.py` | Regras determinísticas: **P1.1** cor + símbolo, **P6.1/P6.2** "Hoje vamos" e passos numerados, **P6.3** avisa linguagem figurada, **P4.1** imagem sem descrição bloqueia a publicação. |
 | `renderizador.py` | Gera o HTML acessível (idioma, pular para o conteúdo, foco visível, contraste conferido nos testes). |
 | `cache.py` | Guarda o que é lento (transcrição, respostas da IA) em `backend/cache/`. Esta pasta **é versionada** de propósito, para a demo funcionar sem internet. |
 | `ia.py` | Ponto de ligação da IA. **Ainda sem provedor.** |
@@ -35,12 +35,12 @@ arquivo ──► leitores.py ──► Documento (blocos) ──► transformac
 
 ## O que já está feito e o que falta
 
-- [x] Ler `.txt` · [x] regras P1, P6, P4 (pendência) · [x] HTML padrão e ampliado · [x] fila de revisão · [x] cache
+- [x] Ler `.txt` · [x] critérios P1.1, P6.1 a P6.3 e P4.1 · [x] HTML padrão e ampliado · [x] fila de revisão · [x] cache
 - [ ] Testar PDF e PowerPoint com materiais reais (código escrito, **ainda não executado**)
 - [ ] Testar vídeo (precisa `faster-whisper`)
 - [ ] API para o site enviar arquivos (FastAPI)
 - [ ] IA: simplificar texto (Leitura Fácil), descrever imagens, roteiro de áudio
-- [ ] Migrar `PEDE_VERSAO` (em `pipeline.py`) para `docs/manual/regras.json` quando a Pessoa 1 entregar
+- [ ] Mover `PEDE_VERSAO` (em `pipeline.py`, qual necessidade pede qual versão) para o `padroes.json`; versão `braille` ainda não tratada
 
 ## Limites conhecidos das regras sem IA
 
@@ -58,4 +58,4 @@ arquivo ──► leitores.py ──► Documento (blocos) ──► transformac
 3. **Onde entra aqui**: as três tarefas do manual que regra fixa não resolve: reescrever em Leitura Fácil (P3),
    descrever imagens (P4) e roteiro de áudio (P5). Tudo passa por `ia.py` e por `cache.com_cache()`,
    então cada pedido é pago/esperado uma vez só e a demo roda offline.
-4. **Segurança**: o professor aprova tudo (P7); a IA nunca recebe nome real de aluno (LGPD).
+4. **Segurança**: o professor aprova tudo (P10); a IA nunca recebe nome real de aluno (LGPD).
