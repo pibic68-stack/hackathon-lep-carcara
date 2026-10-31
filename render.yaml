@@ -1,0 +1,10 @@
+# Plano B do site público: Render (render.com › New › Blueprint › este repositório). Usa o mesmo Dockerfile.
+services:
+  - type: web
+    name: prisma
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/saude
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false

@@ -118,6 +118,22 @@
     menu.addEventListener("click", function (e) {
       if (e.target.closest("a")) { menu.classList.remove("aberto"); botao.setAttribute("aria-expanded", "false"); }
     });
+    // Com letra grande ou fonte para dislexia, o menu não cabe ao lado da logo e passava por cima dela.
+    // Mede de verdade: se não couber, usa o mesmo menu recolhido do celular.
+    var topo = document.querySelector(".topo"), marca = topo && topo.querySelector(".marca");
+    if (!topo || !marca) return;
+    function ajustar() {
+      topo.classList.remove("menu-compacto");
+      var cab = topo.querySelector(".conteiner");
+      if (getComputedStyle(botao).display !== "none") return;          // já está no modo celular
+      var m = marca.getBoundingClientRect(), n = menu.getBoundingClientRect();
+      if (cab.scrollWidth > cab.clientWidth + 1 || n.left < m.right + 8 || n.height > 80) topo.classList.add("menu-compacto");
+    }
+    ajustar();
+    if ("ResizeObserver" in window) new ResizeObserver(ajustar).observe(topo);
+    new MutationObserver(function () { requestAnimationFrame(ajustar); })
+      .observe(raiz, { attributes: true, attributeFilter: ["style", "data-fonte"] });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustar);
   }
 
   document.addEventListener("DOMContentLoaded", function () { montar(); menuCelular(); });

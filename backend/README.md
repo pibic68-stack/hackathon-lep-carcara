@@ -30,7 +30,13 @@ Documentação interativa (testar pelo navegador): http://127.0.0.1:8000/docs
 | `GET /api/previa/{id}/{arquivo}` | professor | Abre qualquer versão para revisar, publicada ou não. |
 | `POST /api/materiais/{id}/descricoes` | professor | Escreve as descrições das imagens (`{"imagens": {"imagens/img-001.png": "texto"}}`). Gera as versões de novo. |
 | `POST /api/materiais/{id}/aprovar` | professor | Publica. Recusa (409) se ainda há imagem sem descrição (P4.1). |
-| `GET /api/biblioteca` · `GET /api/biblioteca/{id}/{arquivo}` | aluno e família | Só o que foi **publicado** (P10.1). Rascunho dá 404. |
+| `GET /api/biblioteca` · `GET /api/biblioteca/{id}/{arquivo}` | aluno e família | Só o que foi **publicado** (P10.1). Rascunho dá 404. Para o aluno, cada item traz a avaliação que ele já deu. |
+| `POST /api/biblioteca/{id}/avaliacao` | aluno | `{"estrelas": 1..5 ou null, "sugestao": "até 150 palavras", "pular": false}`. As duas coisas são opcionais; `pular: true` registra que o aluno pulou. |
+| `POST /api/biblioteca/{id}/ocultar` | família | `{"ocultar": true/false}`. Tira (ou devolve) o material só do painel do próprio aluno. A turma continua vendo. |
+| `GET /api/feedbacks` | professor | Para cada material: média de estrelas, total e a lista (apelido do aluno, estrelas, sugestão). |
+| `POST /api/contas/escola` | público | Cadastra a escola: nome, e-mail, senha do painel e o **código para os professores** (diferente da senha; guardado só como impressão digital). |
+| `GET /api/escola` | escola | Só leitura: professores (com turmas e alunos) e materiais da escola. |
+| `GET /api/eu` | todos | Quem está logado, ou `null` (sem erro 401). |
 
 Exemplo (o que o JavaScript do site faz):
 
@@ -46,6 +52,24 @@ const material = await r.json();   // material.versoes.universal.url -> abrir nu
 na demo. Arquivos enviados ficam em `backend/envios/` e resultados em `backend/saida/` (ambos fora do Git).
 Limite de 300 MB por arquivo. Vídeos longos podem levar minutos para transcrever (a requisição espera).
 
+## Matemática e cor no PDF (`leitor_pdf.py`)
+
+O texto "puro" de um PDF perde a posição das letras: x² vira "x2", uma fração empilhada vira "3 2 3 1".
+O leitor olha cada letra (tamanho e altura na linha) e os traços desenhados (barra de fração e de raiz) e remonta:
+
+| No PDF | Marcação interna | Na página | No Ouvir |
+|---|---|---|---|
+| x² | `x⟦^{2}⟧` | `<sup>` | "x ao quadrado" |
+| a₁ | `a⟦_{1}⟧` | `<sub>` | "a índice 1" |
+| 3 sobre 2 | `⟦\frac{3}{2}⟧` | MathML `<mfrac>` | "3 sobre 2" |
+| √(x²+y²) | `⟦\sqrt{x⟦^{2}⟧+y⟦^{2}⟧}⟧` | MathML `<msqrt>` | "raiz quadrada de…" |
+| F⃗ | `⟦\vec{F}⟧` | MathML `<mover>` | "vetor F" |
+| ∫ com C embaixo | `∫⟦_{C}⟧` | `<sub>` | "integral índice C" |
+
+Também separa "1-) … a) … b) … 2-) …" escritos na mesma linha em questões e itens, e marca o **texto colorido**
+com a forma da cor (P1.1) e as **imagens coloridas** (P1.2: a descrição precisa dizer o que cada cor representa).
+Usa PyMuPDF; sem ele, usa pdfminer.six (os testes rodam com qualquer um).
+
 ## Como funciona
 
 ```
@@ -57,7 +81,8 @@ arquivo ──► leitores.py ──► Documento (blocos) ──► transformac
 | Arquivo | Papel |
 |---|---|
 | `modelo.py` | Formato interno (`Documento`, `Bloco`). É o "contrato" entre as peças. |
-| `leitores.py` | Um leitor por formato. Vídeo/áudio usa `faster-whisper` (roda no computador, sem internet). |
+| `leitores.py` | Um leitor por formato. Vídeo/áudio usa `faster-whisper` se instalado; senão, a IA transcreve. |
+| `simbolos_imagem.py` | P1.1 dentro de imagens coloridas: símbolo preto sobre cada região de cor + legenda (Pillow). |
 | `regras.py` | Lê os limites dos critérios do Manual (`docs/manual/padroes.json`: P2.1 contraste, P2.2 e P2.4 tamanho e linha, P6.1 etapas). Não ficam fixos no código. |
 | `transformacoes.py` | Regras determinísticas: **P1.1** cor + símbolo, **P6.1/P6.2** "Hoje vamos" e passos numerados, **P6.3** avisa linguagem figurada, **P4.1** imagem sem descrição bloqueia a publicação. |
 | `renderizador.py` | Gera o HTML acessível (idioma, pular para o conteúdo, foco visível, contraste conferido nos testes). |
@@ -104,7 +129,7 @@ que fica só neste computador, no arquivo `.env`, nunca no site nem no GitHub.
 | Tarefa | Critério | Como funciona |
 |---|---|---|
 | Descrever imagens | P4.2, P4.5 | A IA escreve; o professor **confere e corrige** no painel antes de aprovar. Se achar que é só enfeite, avisa. |
-| Leitura Fácil I e II | P3.1 a P3.5 | A IA reescreve com os limites do manual (palavras por frase vêm de `padroes.json`). Depois o **código confere** frases longas e abreviações e avisa o professor. Uma frase por linha e glossário de palavras difíceis. |
+| Leitura Fácil I e II | P3.1 a P3.5 | A IA reescreve com os limites do manual (palavras por frase vêm de `padroes.json`). Feito para o Gemini Flash Lite gratuito, que guarda pouco contexto: **lotes de até 6 trechos**, fórmulas trocadas por `[M1]` antes de ir para a IA, e **cada resposta é conferida** (fórmula perdida, frase longa, texto parecido demais com o original, nível I que não encurtou). O que voltou com problema vai de novo, **um trecho por vez**, com a instrução reforçada. Se ainda falhar, o trecho fica só com as frases divididas e o professor recebe um aviso: a versão nunca sai pela metade. |
 
 A versão **Ouvir** (P5) **não usa IA**: usa a voz do navegador (Chrome e Edge têm voz em português), sem internet.
 Ela lê o texto na tela e não gera arquivo de áudio.
@@ -126,7 +151,22 @@ Ela lê o texto na tela e não gera arquivo de áudio.
   nem no `.env.exemplo`**: o chat é publicado em `prompts/` (o exportador esconde chaves conhecidas, mas não confie só nisso)
   e o `.env.exemplo` vai para o GitHub. Se uma chave vazar, apague-a em https://aistudio.google.com/apikey e crie outra.
 
+## Acompanhar a produção e a IA
+
+- `GET /api/ia/teste` (professor): pergunta curtinha, sem cache. Diz se a IA respondeu, em quantos segundos e com qual modelo.
+- `GET /api/progresso/{codigo}`: o site manda o cabeçalho `X-Prisma-Acompanhar: codigo` em `/api/adaptar`, `/refazer` e
+  `/descricoes` e pergunta este endereço a cada segundo (etapa, passos, diário, pedidos à IA, novas tentativas, modelo).
+- Erro 503 do Google (modelo sobrecarregado): o PRISMA tenta de novo, troca de caminho da API e depois usa os modelos
+  reserva (`PRISMA_IA_RESERVA` no `.env`). Só desiste quando todos falham, e diz isso ao professor.
+
 ## Vídeo e áudio
+
+Dois caminhos, nesta ordem (31/10):
+1. **`faster-whisper` instalado** (`pip install faster-whisper`): transcreve no próprio computador, sem internet depois de baixar o modelo.
+2. **Sem ele, a IA (Gemini) ouve o arquivo** (`ia.transcrever_midia`): até 15 MB vai junto no pedido; acima disso sobe pela
+   Files API do Google (apagado por ele em 48 h). Em vídeo, a IA também lista "O que aparece na tela" (slide, fórmula no quadro).
+   O professor confere antes de aprovar. É o caminho do `publicar.bat`, que não instala o `faster-whisper` (pesado).
+Sem nenhum dos dois, a plataforma explica como ligar a IA.
 
 `pip install -r requirements.txt` já inclui o `faster-whisper`. Na primeira vez ele baixa o modelo de voz
 (`small`, ~460 MB). Testado com um `.mp4` e um `.wav` em português: transcrição correta e, na segunda vez, 1 segundo (cache).

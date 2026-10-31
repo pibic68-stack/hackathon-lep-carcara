@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel da escola · PRISMA</title>
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/componentes.css">
+  <link rel="stylesheet" href="../css/entrar.css">
+  <link rel="stylesheet" href="../css/painel-api.css">
+  <script src="../js/acessibilidade.js"></script>
+</head>
+<body data-perfil="escola">
+  <a class="pular-link" href="#conteudo">Pular para o conteúdo</a>
+  <div id="barra-acessibilidade"></div>
+  <header class="topo">
+    <div class="conteiner">
+      <a class="marca" href="../index.html" aria-label="PRISMA, página inicial">
+        <img class="pixel" src="../assets/img/prisma-logo.svg" alt="" width="45" height="27">
+        <span>PRISMA</span>
+      </a>
+      <button class="botao botao--secundario botao--pequeno menu-botao" type="button" aria-expanded="false" aria-controls="menu">
+        <span data-icone="menu"></span> Menu
+      </button>
+      <nav class="menu" id="menu" aria-label="Principal">
+        <ul>
+          <li><a href="../index.html">Início</a></li>
+          <li><a href="../prisma-instrucoes/index.html">Instruções</a></li>
+          <li><a href="escola.html" aria-current="page">Painel da escola</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main id="conteudo" class="conteiner painel">
+    <div id="painel"></div>
+  </main>
+  <footer class="rodape">
+    <div class="conteiner">
+      <div>
+        <a class="marca" href="../index.html"><img class="pixel" src="../assets/img/prisma-logo.svg" alt="" width="45" height="27"><span>PRISMA</span></a>
+        <p>Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis.</p>
+      </div>
+      <div>
+        <h3>Navegar</h3>
+        <ul>
+          <li><a href="../index.html">Página inicial</a></li>
+          <li><a href="../prisma-instrucoes/index.html">Instruções: mini curso e manual</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>O time</h3>
+        <ul>
+          <li>Carcará 3301, do IME</li>
+          <li>Hackathon LEPV de Educação</li>
+          <li><a href="https://github.com/pibic68-stack/hackathon-lep-carcara">Código no GitHub</a></li>
+        </ul>
+      </div>
+      <p class="fim">Demonstração. Todos os alunos e dados são fictícios.</p>
+    </div>
+  </footer>
+  <script src="../js/icones.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/painel.js"></script>
+  <script src="../js/escola.js"></script>
+</body>
+</html>

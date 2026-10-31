@@ -4,8 +4,10 @@ Rodar (de dentro de backend/):   python -m adaptador.api      -> http://127.0.0.
 Documentação interativa:         http://127.0.0.1:8000/docs
 
 Quem pode o quê:
-  - professor: cria turmas e alunos fictícios, envia materiais, revisa, descreve imagens e aprova;
-  - aluno e família: veem só os materiais PUBLICADOS da própria turma.
+  - escola: cadastra-se com o código que passa aos professores; só VÊ professores, turmas, alunos e materiais;
+  - professor: cria turmas e alunos fictícios, envia materiais, revisa, descreve imagens, aprova e lê os feedbacks;
+  - aluno: vê os materiais PUBLICADOS da própria turma e avalia (estrelas e sugestão, as duas opcionais);
+  - família: vê os mesmos materiais e pode tirar um material do painel do próprio aluno (não da turma).
 Ciclo de vida (critério P10.1: nada chega ao aluno sem aprovação):
     POST /api/adaptar -> "rascunho" -> POST .../aprovar -> "publicado"
 Imagem sem descrição bloqueia a aprovação (P4.1).
@@ -17,6 +19,7 @@ limite de tentativas de login e de envios por hora.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import time
@@ -31,12 +34,18 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from . import progresso
 from . import contas, ia, pipeline, regras
 from .leitores import EXT_MIDIA, EXT_PDF, EXT_PPT, EXT_TEXTO
 
 RAIZ = Path(__file__).resolve().parents[1]
-SAIDA = RAIZ / "saida"
-ENVIOS = RAIZ / "envios"
+_DADOS = Path(os.environ["PRISMA_DADOS"]) if os.environ.get("PRISMA_DADOS") else None   # volume na nuvem
+SAIDA = (_DADOS or RAIZ) / "saida"
+ENVIOS = (_DADOS or RAIZ) / "envios"
+# Nuvem (Railway): PRISMA_DEMO_PUBLICA=1 mostra "Entrar sem senha" com as contas de demonstração
+# e publica sozinha os materiais de teste. A banca abre o site e usa, sem cadastro.
+DEMO_PUBLICA = os.environ.get("PRISMA_DEMO_PUBLICA", "").strip() in ("1", "sim", "true")
+NA_VERCEL = bool(os.environ.get("VERCEL"))          # funções sem servidor: sem disco fixo nem tarefa de fundo
 SITE = RAIZ.parent / "web"
 
 LIMITE_BYTES = 300 * 1024 * 1024   # 300 MB (vídeos grandes devem ser comprimidos antes)
@@ -162,18 +171,29 @@ def _detalhe(id_: str, pasta: Path) -> dict:
     }
 
 
-def _processar(id_: str, arquivo: Path, perfil: dict | None, descricoes: dict | None) -> dict:
+def _processar(id_: str, arquivo: Path, perfil: dict | None, descricoes: dict | None,
+               request: Request | None = None, dono: int | None = None, usar_ia: bool = True) -> dict:
+    # o site manda um código para acompanhar a produção ao vivo (GET /api/progresso/{codigo})
+    codigo = request.headers.get("X-Prisma-Acompanhar") if request is not None else None
+    progresso.comecar(codigo, dono)
+    erro_final = None
     try:
-        return pipeline.adaptar(arquivo, perfil, SAIDA, ia.obter_provedor(),
+        return pipeline.adaptar(arquivo, perfil, SAIDA, ia.obter_provedor() if usar_ia else None,
                                 descricoes=descricoes, nome_pasta=id_)
     except ia.ErroIA as erro:                  # IA fora do ar, chave recusada, limite gratuito...
+        erro_final = str(erro)
         raise HTTPException(502, str(erro))
     except ValueError as erro:                 # formato não suportado
+        erro_final = str(erro)
         raise HTTPException(415, str(erro))
     except RuntimeError as erro:               # biblioteca opcional não instalada
+        erro_final = str(erro)
         raise HTTPException(501, str(erro))
     except Exception:                          # arquivo corrompido, protegido etc.
-        raise HTTPException(422, "Não consegui ler este arquivo. Ele pode estar corrompido ou protegido por senha.")
+        erro_final = "Não consegui ler este arquivo. Ele pode estar corrompido ou protegido por senha."
+        raise HTTPException(422, erro_final)
+    finally:
+        progresso.terminar(erro_final)
 
 
 def _servir(pasta: Path, caminho: str) -> FileResponse:
@@ -205,8 +225,64 @@ def _limitar_envios(professor_id: int) -> None:
 
 @app.get("/api/saude")
 def saude() -> dict:
-    return {"ok": True, "ia_ligada": ia.configurada(), "cadastro_aberto": bool(contas.codigo_escola()),
-            "formatos": sorted(EXTENSOES)}
+    return {"ok": True, "ia_ligada": ia.configurada(), "cadastro_aberto": bool(contas.codigo_escola()) or contas.ha_escolas(),
+            "formatos": sorted(EXTENSOES), "demo_publica": DEMO_PUBLICA}
+
+
+ARQUIVO_COMPARTILHAR = Path(__file__).resolve().parents[2] / "compartilhar.json"   # escrito pelo tunel.py
+
+
+def _do_proprio_computador(request: Request) -> bool:
+    """Pedido feito no computador que roda o PRISMA (não pelo link público nem por outro aparelho do Wi-Fi).
+    O túnel da Cloudflare chega como 127.0.0.1, mas sempre traz os cabeçalhos do visitante."""
+    if any(h in request.headers for h in ("cf-connecting-ip", "x-forwarded-for", "cf-ray")):
+        return False
+    return bool(request.client) and request.client.host in ("127.0.0.1", "::1", "localhost")
+
+
+@app.get("/api/compartilhar")
+def compartilhar(request: Request) -> dict:
+    """Link público, endereço no Wi-Fi e (só no próprio computador) as contas de demonstração."""
+    try:
+        info = json.loads(ARQUIVO_COMPARTILHAR.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        info = {}
+    local = _do_proprio_computador(request)
+    saida = {"link": info.get("link"), "rede": info.get("rede"), "estado": info.get("estado", "sem túnel"),
+             "local": local, "demo": None}
+    if local:
+        from . import demo
+        try:
+            saida["demo"] = demo.garantir()
+        except Exception as erro:              # banco travado etc.: a página segue sem as contas
+            saida["demo"] = {"erro": str(erro)}
+    return saida
+
+
+class EntradaDemo(BaseModel):
+    perfil: str                 # professor, escola, aluno, familia
+    aluno: int = 0              # qual aluno da turma de demonstração (0, 1, 2)
+
+
+@app.post("/api/demo/entrar")
+def entrar_demo(corpo: EntradaDemo, request: Request, resposta: Response) -> dict:
+    """Só no site público (PRISMA_DEMO_PUBLICA=1): entra com uma conta fictícia, sem senha."""
+    if not DEMO_PUBLICA:
+        raise HTTPException(404, "Não encontrado.")
+    if corpo.perfil not in ("professor", "escola", "aluno", "familia"):
+        raise HTTPException(422, "Perfil desconhecido.")
+    from . import demo
+    if NA_VERCEL:
+        demo.semear_rapido()           # sem processo de fundo na Vercel: publica os PDFs de teste agora (segundos)
+    token, duracao, info = demo.abrir_sessao(corpo.perfil, corpo.aluno)
+    return _abrir_sessao(request, resposta, token, duracao, False, info)
+
+
+@app.on_event("startup")
+def _semear_demo() -> None:
+    if DEMO_PUBLICA and not NA_VERCEL:
+        from . import demo
+        demo.semear_em_segundo_plano()
 
 
 @app.get("/api/opcoes")
@@ -222,6 +298,14 @@ class NovoProfessor(BaseModel):
     email: str
     senha: str
     codigo_escola: str
+    lembrar: bool = False
+
+
+class NovaEscola(BaseModel):
+    nome: str
+    email: str
+    senha: str
+    codigo: str
     lembrar: bool = False
 
 
@@ -242,11 +326,19 @@ def cadastrar_professor(corpo: NovoProfessor, request: Request, resposta: Respon
     return _abrir_sessao(request, resposta, token, duracao, corpo.lembrar, info)
 
 
+@app.post("/api/contas/escola", status_code=201)
+def cadastrar_escola(corpo: NovaEscola, request: Request, resposta: Response) -> dict:
+    token, duracao, info = contas.criar_escola(corpo.nome, corpo.email, corpo.senha, corpo.codigo, _ip(request), corpo.lembrar)
+    return _abrir_sessao(request, resposta, token, duracao, corpo.lembrar, info)
+
+
 @app.post("/api/entrar")
 def entrar(corpo: Entrada, request: Request, resposta: Response) -> dict:
     ip = _ip(request)
     if corpo.perfil == "professor":
         token, duracao, info = contas.entrar_professor(corpo.email, corpo.senha, ip, corpo.lembrar)
+    elif corpo.perfil == "escola":
+        token, duracao, info = contas.entrar_escola(corpo.email, corpo.senha, ip, corpo.lembrar)
     elif corpo.perfil == "aluno":
         token, duracao, info = contas.entrar_aluno(corpo.turma, corpo.figuras, ip, corpo.lembrar)
     elif corpo.perfil == "familia":
@@ -264,8 +356,10 @@ def sair(request: Request, resposta: Response) -> dict:
 
 
 @app.get("/api/eu")
-def eu(request: Request) -> dict:
-    return exigir(request)
+def eu(request: Request) -> dict | None:
+    """Quem está logado, ou null. Sem 401 aqui: as páginas públicas perguntam isso o tempo todo
+    e um erro no console a cada visita assusta quem abre o F12."""
+    return usuario(request)
 
 
 # ---------- turmas e alunos (professor) ----------
@@ -331,7 +425,13 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
         "preferencias": sorted(set(perfil_turma["preferencias"]) | set(extra.get("preferencias") or [])),
     }
     _limitar_envios(prof["id"])
+    return criar_material(prof["id"], turma_id, perfil_turma, perfil_final, nome, arquivo.file, request)
 
+
+def criar_material(prof_id: int, turma_id: int, perfil_turma: dict, perfil_final: dict, nome: str, origem,
+                   request: Request | None = None, usar_ia: bool = True) -> dict:
+    """Guarda o arquivo, gera as versões e cria o rascunho. `origem` é um arquivo aberto (bytes)."""
+    ext = Path(nome).suffix.lower()
     id_ = uuid.uuid4().hex[:12]
     pasta_envio = ENVIOS / id_
     pasta_envio.mkdir(parents=True)
@@ -340,7 +440,7 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
 
     total = 0
     with caminho.open("wb") as saida:
-        while bloco := arquivo.file.read(1024 * 1024):
+        while bloco := origem.read(1024 * 1024):
             total += len(bloco)
             if total > LIMITE_BYTES:
                 saida.close()
@@ -349,7 +449,7 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
             saida.write(bloco)
 
     try:
-        _processar(id_, caminho, perfil_final, None)
+        _processar(id_, caminho, perfil_final, None, request, prof_id, usar_ia)
     except HTTPException:
         shutil.rmtree(pasta_envio, ignore_errors=True)
         shutil.rmtree(SAIDA / id_, ignore_errors=True)
@@ -358,7 +458,7 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
     _gravar(pasta, "estado.json", {
         "estado": "rascunho", "criado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "envio": f"{id_}/{caminho.name}", "perfil": perfil_final,
-        "professor_id": prof["id"], "turma_id": turma_id, "turma_nome": perfil_turma["turma"],
+        "professor_id": prof_id, "turma_id": turma_id, "turma_nome": perfil_turma["turma"],
     })
     return _detalhe(id_, pasta)
 
@@ -381,6 +481,7 @@ def apagar_material(id_: str, request: Request) -> dict:
     pasta = _do_professor(id_, exigir(request, "professor"))
     shutil.rmtree(pasta, ignore_errors=True)
     shutil.rmtree(ENVIOS / id_, ignore_errors=True)
+    contas.apagar_avaliacoes(id_)
     return {"ok": True}
 
 
@@ -398,7 +499,55 @@ def escrever_descricoes(id_: str, corpo: Descricoes, request: Request) -> dict:
     anteriores = _ler(pasta, "descricoes.json") if (pasta / "descricoes.json").exists() else {}
     todas = {**anteriores, **{k: v.strip()[:1000] for k, v in corpo.imagens.items() if v.strip()}}
     _gravar(pasta, "descricoes.json", todas)
-    _processar(id_, ENVIOS / estado["envio"], estado.get("perfil"), todas)
+    _processar(id_, ENVIOS / estado["envio"], estado.get("perfil"), todas, request, prof_id(request))
+    return _detalhe(id_, pasta)
+
+
+def prof_id(request: Request) -> int | None:
+    u = usuario(request)
+    return u["id"] if u else None
+
+
+@app.get("/api/progresso/{codigo}")
+def ver_progresso(codigo: str, request: Request) -> dict:
+    """Como está a produção que o professor pediu (etapa, passos, diário, números da IA)."""
+    prof = exigir(request, "professor")
+    a = progresso.obter(codigo)
+    if not a or (a.dono is not None and a.dono != prof["id"]):
+        return {"codigo": codigo, "etapa": "Esperando o servidor começar", "passo": 0, "passos": 0,
+                "segundos": 0, "terminou": False, "erro": None, "diario": [], "ia": {}}
+    return a.para_dict()
+
+
+@app.get("/api/ia/teste")
+def testar_ia(request: Request) -> dict:
+    """Pergunta curtinha à IA, sem cache: mostra se ela está respondendo agora, em quanto tempo e com qual modelo."""
+    exigir(request, "professor")
+    try:
+        provedor = ia.obter_provedor()
+    except RuntimeError as erro:
+        return {"ligada": False, "ok": False, "erro": str(erro)}
+    if not provedor:
+        return {"ligada": False, "ok": False,
+                "erro": "A chave do Gemini não foi colocada neste computador. Abra o publicar.bat e cole a chave."}
+    inicio = time.time()
+    try:
+        resposta = provedor.gerar("Responda só com a palavra: ok", "Teste de conexão do PRISMA.")
+    except ia.ErroIA as erro:
+        return {"ligada": True, "ok": False, "erro": str(erro), "segundos": round(time.time() - inicio, 1)}
+    return {"ligada": True, "ok": True, "modelo": getattr(provedor, "modelo", ""),
+            "segundos": round(time.time() - inicio, 1), "resposta": resposta[:40]}
+
+
+@app.post("/api/materiais/{id_}/refazer")
+def refazer(id_: str, request: Request) -> dict:
+    """Gera as versões de novo com o mesmo arquivo (ex.: a IA foi ligada depois, ou a Leitura Fácil falhou)."""
+    pasta = _do_professor(id_, exigir(request, "professor"))
+    estado = _ler(pasta, "estado.json")
+    if estado["estado"] == "publicado":
+        raise HTTPException(409, "Material já publicado. Envie de novo para alterar.")
+    descricoes = _ler(pasta, "descricoes.json") if (pasta / "descricoes.json").exists() else None
+    _processar(id_, ENVIOS / estado["envio"], estado.get("perfil"), descricoes, request, prof_id(request))
     return _detalhe(id_, pasta)
 
 
@@ -421,6 +570,46 @@ def previa(id_: str, caminho: str, request: Request) -> FileResponse:
     return _servir(_do_professor(id_, exigir(request, "professor")), caminho)
 
 
+# ---------- feedbacks dos alunos (professor) ----------
+
+@app.get("/api/feedbacks")
+def feedbacks(request: Request) -> list[dict]:
+    """Para cada material do professor: média, quantos avaliaram e a lista (apelido, estrelas, sugestão)."""
+    prof = exigir(request, "professor")
+    saida = []
+    for id_, pasta in _todos_materiais():
+        estado = _ler(pasta, "estado.json")
+        if estado.get("professor_id") != prof["id"]:
+            continue
+        lista = contas.avaliacoes_do_material(id_)
+        notas = [a["estrelas"] for a in lista if a["estrelas"]]
+        saida.append({"id": id_, "titulo": _resumo(id_, pasta)["titulo"], "turma": estado.get("turma_nome"),
+                      "estado": estado["estado"], "publicado": estado.get("publicado"),
+                      "media": round(sum(notas) / len(notas), 1) if notas else None,
+                      "total": len(lista), "avaliacoes": lista})
+    return sorted(saida, key=lambda m: m.get("publicado") or "", reverse=True)
+
+
+# ---------- painel da escola (só leitura) ----------
+
+@app.get("/api/escola")
+def painel_escola(request: Request) -> dict:
+    escola = exigir(request, "escola")
+    dados = contas.resumo_da_escola(escola["id"])
+    nomes = {p["id"]: p["nome"] for p in dados["professores"]}
+    materiais = []
+    for id_, pasta in _todos_materiais():
+        estado = _ler(pasta, "estado.json")
+        if estado.get("professor_id") not in nomes:
+            continue
+        materiais.append({"titulo": _resumo(id_, pasta)["titulo"], "professor": nomes[estado["professor_id"]],
+                          "turma": estado.get("turma_nome"), "estado": estado["estado"],
+                          "criado": estado.get("criado"), "publicado": estado.get("publicado")})
+    dados["materiais"] = sorted(materiais, key=lambda m: m.get("criado") or "", reverse=True)
+    dados["escola"] = escola["nome"]
+    return dados
+
+
 # ---------- biblioteca (aluno e família) ----------
 
 def _recomendadas(u: dict) -> set[str]:
@@ -430,22 +619,65 @@ def _recomendadas(u: dict) -> set[str]:
 
 @app.get("/api/biblioteca")
 def biblioteca(request: Request) -> list[dict]:
-    """Só o que foi publicado para a turma de quem está logado."""
+    """Só o que foi publicado para a turma de quem está logado.
+    O aluno não vê o que a família tirou do painel dele; a família vê esses itens marcados como "oculto"
+    (para poder devolver). Para o aluno, cada item traz a avaliação que ele já deu."""
     u = exigir(request, "aluno", "familia")
     recomendadas = _recomendadas(u)
+    ocultos = contas.ocultos_do_aluno(u["aluno_id"])
+    avaliacoes = contas.avaliacoes_do_aluno(u["aluno_id"]) if u["perfil"] == "aluno" else {}
     saida = []
     for id_, pasta in _todos_materiais():
         estado = _ler(pasta, "estado.json")
         if estado["estado"] != "publicado" or estado.get("turma_id") != u["turma_id"]:
             continue
+        if id_ in ocultos and u["perfil"] == "aluno":
+            continue
         item = _resumo(id_, pasta)
         saida.append({
             "id": id_, "material": item["material"], "titulo": item["titulo"], "publicado": estado.get("publicado"),
+            "oculto": id_ in ocultos,
+            **({"avaliacao": avaliacoes.get(id_)} if u["perfil"] == "aluno" else {}),
             "versoes": {n: {"url": f"/api/biblioteca/{id_}/{v['arquivo']}", "rotulo": v["rotulo"],
                             "recomendada": n in recomendadas}
                         for n, v in item["versoes"].items() if v["status"] == "gerada"},
         })
     return sorted(saida, key=lambda i: i.get("publicado") or "", reverse=True)
+
+
+def _publicado_da_turma(id_: str, u: dict) -> Path:
+    pasta = _pasta(id_)
+    estado = _ler(pasta, "estado.json")
+    if estado["estado"] != "publicado" or estado.get("turma_id") != u.get("turma_id"):
+        raise HTTPException(404, "Material não encontrado.")
+    return pasta
+
+
+class Avaliacao(BaseModel):
+    estrelas: int | None = None
+    sugestao: str = ""
+    pular: bool = False
+
+
+@app.post("/api/biblioteca/{id_}/avaliacao")
+def avaliar(id_: str, corpo: Avaliacao, request: Request) -> dict:
+    """Só o aluno avalia. Estrelas (1 a 5) e sugestão (até 150 palavras) são opcionais; dá para pular."""
+    u = exigir(request, "aluno")
+    _publicado_da_turma(id_, u)
+    return contas.avaliar(u["aluno_id"], id_, corpo.estrelas, corpo.sugestao, corpo.pular)
+
+
+class Ocultar(BaseModel):
+    ocultar: bool = True
+
+
+@app.post("/api/biblioteca/{id_}/ocultar")
+def ocultar(id_: str, corpo: Ocultar, request: Request) -> dict:
+    """A família tira (ou devolve) um material do painel do próprio aluno. A turma continua vendo."""
+    u = exigir(request, "familia")
+    _publicado_da_turma(id_, u)
+    contas.ocultar(u["aluno_id"], id_, corpo.ocultar)
+    return {"ok": True, "oculto": corpo.ocultar}
 
 
 @app.get("/api/biblioteca/{id_}/{caminho:path}")
@@ -467,4 +699,8 @@ if SITE.exists():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000, proxy_headers=True, forwarded_allow_ips="127.0.0.1")
+    # 0.0.0.0: outro aparelho no mesmo Wi-Fi também abre (http://IP-do-computador:8000). O Windows pode
+    # perguntar sobre o firewall na primeira vez: "Permitir". PRISMA_HOST=127.0.0.1 deixa só neste computador.
+    uvicorn.run(app, host=os.environ.get("PRISMA_HOST", "0.0.0.0"), port=int(os.environ.get("PORT", "8000")),
+                # na nuvem, o proxy do serviço (Railway) traz o IP de quem acessa: PRISMA_PROXY_CONFIAVEL=*
+                proxy_headers=True, forwarded_allow_ips=os.environ.get("PRISMA_PROXY_CONFIAVEL", "127.0.0.1"))

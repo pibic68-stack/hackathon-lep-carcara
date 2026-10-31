@@ -1,0 +1,6 @@
+# Dependências do site na nuvem (Railway). Sem faster-whisper: lá a IA (Gemini) transcreve áudio e vídeo.
+pymupdf>=1.24
+python-pptx>=1.0
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9

@@ -12,7 +12,7 @@
 @font-face { font-family: "OpenDyslexic"; src: url("../assets/fontes/opendyslexic-400.woff2") format("woff2"); font-display: swap; }
 
 :root {
-  /* paleta base (contraste conferido: ver docs/plano-site.md) */
+  /* paleta base (contraste conferido) */
   --papel: #FBF7EE;
   --papel-2: #F3EDDF;
   --branco: #FFFFFF;

@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificado PRISMA</title>
+<meta name="description" content="Modelo do certificado de conclusão do mini curso PRISMA. Preenche o nome e vira PDF.">
+<link rel="icon" href="../assets/img/favicon.png">
+<!--
+  Modelo do certificado do mini curso PRISMA.
+  Como preencher (tudo depois do #, que não sai do computador):
+    modelo.html#papel=prof&nome=Ana%20Souza&data=2026-10-31
+    papel: prof | fam | est   (também aceita professor, familia, aluno, estudante)
+    data:  AAAA-MM-DD (sem data = hoje)
+    imprimir=1  abre a janela de salvar em PDF sozinho
+  Guia completo: LEIA-ME.md
+
+  A ideia do desenho: a logo (o prisma) fica no centro. Um feixe cinza entra
+  pela esquerda e sai pela direita em seis cores que se abrem em leque:
+  uma aula entra, várias versões saem.
+-->
+<style>
+/* números nunca na Pixelify (o 5 parece S): os algarismos caem na Atkinson */
+@font-face { font-family: "Pixelify Sans"; src: url("../assets/fontes/pixelify-700.woff2") format("woff2"); font-weight: 700; unicode-range: U+0000-002F, U+003A-10FFFF; }
+@font-face { font-family: "Atkinson Hyperlegible Next"; src: url("../assets/fontes/atkinson-400.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Atkinson Hyperlegible Next"; src: url("../assets/fontes/atkinson-700.woff2") format("woff2"); font-weight: 700; }
+@font-face { font-family: "Departure Mono"; src: url("../assets/fontes/departure-mono.woff2") format("woff2"); }
+
+:root {
+  --papel: #FBF7EE;
+  --tinta: #1E2235;
+  --tinta-2: #3A3F5C;
+  --tinta-3: #5B6078;
+  --branco: #FFFFFF;
+  --fonte-titulo: "Pixelify Sans", "Atkinson Hyperlegible Next", sans-serif;
+  --fonte-texto: "Atkinson Hyperlegible Next", system-ui, "Segoe UI", sans-serif;
+  --fonte-mono: "Departure Mono", ui-monospace, monospace;
+  /* P2.2: nenhum texto abaixo de 14 pt */
+  --letra-min: 14pt;
+  /* cor da trilha (trocada pelo atributo data-papel): moldura, selo do topo, PRISMA, linha do nome */
+  --trilha: #1F6FB2;       /* céu escuro */
+}
+[data-papel="fam"] { --trilha: #A3401F; } /* laranja-escuro */
+[data-papel="est"] { --trilha: #2E7D32; } /* grama escura */
+
+@page { size: 297mm 210mm; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #D9D4C7; }
+body { font-family: var(--fonte-texto); color: var(--tinta); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* ---------- a folha (A4 deitada); medidas em mm a partir do canto de cima ---------- */
+.palco { padding: 24px 16px 40px; display: flex; justify-content: center; }
+.folha {
+  position: relative; width: 297mm; height: 210mm; overflow: hidden;
+  background: var(--papel); flex: none; transform-origin: top center;
+}
+svg.deco { position: absolute; inset: 0; width: 297mm; height: 210mm; }
+.folha > p, .folha > div, .folha > h1, .folha > img { position: absolute; }
+.centro { left: 0; right: 0; text-align: center; }
+
+.selo {
+  top: 22mm; left: 50%; transform: translateX(-50%);
+  font-family: var(--fonte-mono); font-size: max(var(--letra-min), 15pt); letter-spacing: .5mm;
+  color: var(--branco); background: var(--trilha);
+  border: .8mm solid var(--tinta); box-shadow: 1.2mm 1.2mm 0 var(--tinta);
+  padding: 1.4mm 5mm 1.2mm; white-space: nowrap;
+}
+.curso { top: 36mm; font-family: var(--fonte-titulo); font-weight: 700; font-size: 40pt; line-height: 1; letter-spacing: .4mm; }
+.curso span { color: var(--trilha); }
+
+/* logo no centro: 1 pixel da logo = 2,4 mm (30 × 18 pixels) */
+.logo { left: 111.3mm; top: 66mm; width: 72mm; height: 43.2mm; image-rendering: pixelated; }
+
+
+/* canto de cima à esquerda: mascote da trilha (a direita fica livre para o leque de cores) */
+.mascote {
+  left: 20.6mm; top: 22mm; width: 26mm; height: 26mm;
+  border: .8mm solid var(--tinta); box-shadow: 1.2mm 1.2mm 0 var(--tinta); background: var(--papel);
+}
+.mascote img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+.mascote-rot { left: 20.6mm; top: 51mm; font-family: var(--fonte-mono); font-size: var(--letra-min); color: var(--tinta-2); white-space: nowrap; }
+
+.para { top: 118mm; font-size: max(var(--letra-min), 16pt); color: var(--tinta-2); }
+.nome {
+  /* preso por baixo: nome em duas linhas cresce para cima */
+  bottom: 69mm; left: 50%; transform: translateX(-50%); width: 170mm;
+  text-align: center; font-weight: 700; font-size: 32pt; line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.motivo { top: 149mm; font-size: max(var(--letra-min), 16pt); color: var(--tinta-2); }
+
+/* rodapé: duas pontas (o separador tracejado está no SVG) */
+.emitido { left: 26mm; top: 174mm; font-weight: 700; font-size: max(var(--letra-min), 16pt); }
+.codigo { right: 26mm; top: 174.6mm; font-size: var(--letra-min); color: var(--tinta-2); }
+.codigo b { color: var(--tinta); }
+.sigla { top: 181.4mm; font-size: var(--letra-min); color: var(--tinta-3); }
+
+/* ---------- barra de preencher (só na tela, não sai no PDF) ---------- */
+.barra {
+  display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: end; justify-content: center;
+  padding: 16px; background: var(--papel); border-bottom: 3px solid var(--tinta);
+  font-size: max(1.1875rem, 14pt);
+}
+.barra label { display: flex; flex-direction: column; gap: 4px; font-weight: 700; }
+.barra input, .barra select, .barra button {
+  font: inherit; font-weight: 400; padding: 8px 12px; border: 3px solid var(--tinta);
+  background: var(--branco); color: var(--tinta); border-radius: 0; min-height: 48px;
+}
+.barra input[type="text"] { width: min(22em, 80vw); }
+.barra button { background: #FFC93C; font-weight: 700; box-shadow: 4px 4px 0 var(--tinta); cursor: pointer; }
+.barra button:focus-visible, .barra input:focus-visible, .barra select:focus-visible { outline: 4px solid #1F6FB2; outline-offset: 2px; }
+
+@media print {
+  html, body { background: none; }
+  .barra { display: none; }
+  .palco { padding: 0; display: block; }
+  .folha { transform: none !important; margin: 0; }
+}
+</style>
+</head>
+<body data-papel="prof">
+
+<form class="barra" id="barra" aria-label="Preencher o certificado">
+  <label>Nome de quem recebe
+    <input type="text" id="c-nome" autocomplete="name" maxlength="80">
+  </label>
+  <label>Trilha
+    <select id="c-papel">
+      <option value="prof">Professores</option>
+      <option value="fam">Famílias</option>
+      <option value="est">Estudantes</option>
+    </select>
+  </label>
+  <label>Data
+    <input type="date" id="c-data">
+  </label>
+  <button type="button" id="c-salvar">Salvar em PDF</button>
+</form>
+
+<div class="palco" id="palco">
+<article class="folha" id="folha" aria-label="Certificado de conclusão">
+  <svg class="deco" viewBox="0 0 297 210" aria-hidden="true" shape-rendering="crispEdges">
+    <defs>
+      <pattern id="pontos" width="6" height="6" patternUnits="userSpaceOnUse">
+        <rect x="2.6" y="2.6" width=".8" height=".8" fill="#1E2235" fill-opacity=".14"/>
+      </pattern>
+      <pattern id="traco-trilha" width="4.8" height="1.2" patternUnits="userSpaceOnUse"><rect width="2.4" height="1.2" fill="var(--trilha)"/></pattern>
+      <pattern id="traco-tinta" width="3.2" height=".8" patternUnits="userSpaceOnUse"><rect width="1.6" height=".8" fill="#1E2235" fill-opacity=".45"/></pattern>
+    </defs>
+    <!-- moldura pixel com cantos em degrau: sombra, tinta, cor da trilha, tinta, papel -->
+    <polygon fill="#1E2235" transform="translate(2.4 2.4)" points="12.8,8 284.2,8 284.2,12.8 289,12.8 289,197.2 284.2,197.2 284.2,202 12.8,202 12.8,197.2 8,197.2 8,12.8 12.8,12.8"/>
+    <polygon fill="#1E2235" points="12.8,8 284.2,8 284.2,12.8 289,12.8 289,197.2 284.2,197.2 284.2,202 12.8,202 12.8,197.2 8,197.2 8,12.8 12.8,12.8"/>
+    <polygon fill="var(--trilha)" points="14,9.2 283,9.2 283,14 287.8,14 287.8,196 283,196 283,200.8 14,200.8 14,196 9.2,196 9.2,14 14,14"/>
+    <polygon fill="#1E2235" points="18.2,13.4 278.8,13.4 278.8,18.2 283.6,18.2 283.6,191.8 278.8,191.8 278.8,196.6 18.2,196.6 18.2,191.8 13.4,191.8 13.4,18.2 18.2,18.2"/>
+    <polygon fill="#FBF7EE" points="19.4,14.6 277.6,14.6 277.6,19.4 282.4,19.4 282.4,190.6 277.6,190.6 277.6,195.4 19.4,195.4 19.4,190.6 14.6,190.6 14.6,19.4 19.4,19.4"/>
+    <polygon fill="url(#pontos)" points="19.4,14.6 277.6,14.6 277.6,19.4 282.4,19.4 282.4,190.6 277.6,190.6 277.6,195.4 19.4,195.4 19.4,190.6 14.6,190.6 14.6,19.4 19.4,19.4"/>
+
+    <!-- feixe que entra (cinza, mesma linha do feixe da logo; passa por baixo da logo para não ter emenda) -->
+    <rect x="14.6" y="90" width="120.7" height="4.8" fill="#8A8FA8"/>
+    <!-- seis cores que saem em leque: cada raio continua um raio da logo até a moldura, em degraus de 1 pixel (2,4 mm) -->
+    <g fill="#E5533D"><rect x="178.5" y="66.0" width="4.8" height="2.4"/><rect x="183.3" y="63.6" width="7.2" height="2.4"/><rect x="190.5" y="61.2" width="9.6" height="2.4"/><rect x="200.1" y="58.8" width="7.2" height="2.4"/><rect x="207.3" y="56.4" width="9.6" height="2.4"/><rect x="216.9" y="54.0" width="7.2" height="2.4"/><rect x="224.1" y="51.6" width="9.6" height="2.4"/><rect x="233.7" y="49.2" width="7.2" height="2.4"/><rect x="240.9" y="46.8" width="7.2" height="2.4"/><rect x="248.1" y="44.4" width="9.6" height="2.4"/><rect x="257.7" y="42.0" width="7.2" height="2.4"/><rect x="264.9" y="39.6" width="9.6" height="2.4"/><rect x="274.5" y="37.2" width="7.9" height="2.4"/></g>
+    <g fill="#FFAD60"><rect x="183.3" y="73.2" width="7.2" height="2.4"/><rect x="190.5" y="70.8" width="14.4" height="2.4"/><rect x="204.9" y="68.4" width="12.0" height="2.4"/><rect x="216.9" y="66.0" width="14.4" height="2.4"/><rect x="231.3" y="63.6" width="14.4" height="2.4"/><rect x="245.7" y="61.2" width="14.4" height="2.4"/><rect x="260.1" y="58.8" width="12.0" height="2.4"/><rect x="272.1" y="56.4" width="10.3" height="2.4"/></g>
+    <g fill="#FFC93C"><rect x="183.3" y="82.8" width="16.8" height="2.4"/><rect x="200.1" y="80.4" width="36.0" height="2.4"/><rect x="236.1" y="78.0" width="33.6" height="2.4"/><rect x="269.7" y="75.6" width="12.7" height="2.4"/></g>
+    <g fill="#7BD389"><rect x="183.3" y="94.8" width="36.0" height="2.4"/><rect x="219.3" y="97.2" width="63.1" height="2.4"/></g>
+    <g fill="#57B3F9"><rect x="183.3" y="104.4" width="7.2" height="2.4"/><rect x="190.5" y="106.8" width="16.8" height="2.4"/><rect x="207.3" y="109.2" width="14.4" height="2.4"/><rect x="221.7" y="111.6" width="14.4" height="2.4"/><rect x="236.1" y="114.0" width="16.8" height="2.4"/><rect x="252.9" y="116.4" width="14.4" height="2.4"/><rect x="267.3" y="118.8" width="15.1" height="2.4"/></g>
+    <g fill="#B89AF0"><rect x="173.7" y="106.8" width="4.8" height="2.4"/><rect x="178.5" y="109.2" width="7.2" height="2.4"/><rect x="185.7" y="111.6" width="9.6" height="2.4"/><rect x="195.3" y="114.0" width="7.2" height="2.4"/><rect x="202.5" y="116.4" width="9.6" height="2.4"/><rect x="212.1" y="118.8" width="7.2" height="2.4"/><rect x="219.3" y="121.2" width="9.6" height="2.4"/><rect x="228.9" y="123.6" width="7.2" height="2.4"/><rect x="236.1" y="126.0" width="9.6" height="2.4"/><rect x="245.7" y="128.4" width="7.2" height="2.4"/><rect x="252.9" y="130.8" width="9.6" height="2.4"/><rect x="262.5" y="133.2" width="7.2" height="2.4"/><rect x="269.7" y="135.6" width="9.6" height="2.4"/><rect x="279.3" y="138.0" width="3.1" height="2.4"/></g>
+
+    <!-- linha pixel embaixo do nome e separador do rodapé -->
+    <rect x="82.5" y="143" width="134.4" height="1.2" fill="url(#traco-trilha)"/>
+    <rect x="26" y="168" width="246.4" height=".8" fill="url(#traco-tinta)"/>
+  </svg>
+
+  <p class="selo">certificado de conclusão</p>
+  <h1 class="curso centro">Mini curso <span>PRISMA</span></h1>
+
+  <img class="logo" src="../assets/img/prisma-logo.svg" alt="">
+
+  <div class="mascote"><img id="c-mascote" src="../assets/img/professor.png" alt=""></div>
+  <p class="mascote-rot" id="c-trilha">trilha professores</p>
+
+  <p class="para centro">Conferido a</p>
+  <p class="nome" id="c-nome-saida">Nome da pessoa</p>
+  <p class="motivo centro" id="c-motivo">por concluir os dez passos e o teste final da trilha para professores</p>
+
+  <p class="emitido" id="c-emitido">Emitido em 31 de outubro de 2026</p>
+  <p class="codigo">Código <b id="c-codigo">prisma-prof-0000-0000</b></p>
+  <p class="sigla centro">Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis</p>
+</article>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  /* Tudo o que muda por papel fica aqui. */
+  var PAPEIS = {
+    prof: { canto: "trilha professores", motivo: "trilha para professores", mascote: "../assets/img/professor.png", rotulo: "professores" },
+    fam:  { canto: "trilha famílias",    motivo: "trilha para famílias",    mascote: "../assets/img/familia.png",   rotulo: "famílias" },
+    est:  { canto: "trilha estudantes",  motivo: "trilha para estudantes",  mascote: "../assets/img/aluno.png",     rotulo: "estudantes" }
+  };
+  var APELIDOS = { prof: "prof", professor: "prof", professora: "prof", fam: "fam", familia: "fam", "família": "fam",
+                   est: "est", aluno: "est", aluna: "est", estudante: "est" };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function lerHash() {
+    var p = new URLSearchParams(location.hash.replace(/^#/, ""));
+    return { papel: p.get("papel"), nome: p.get("nome"), data: p.get("data"), imprimir: p.get("imprimir") === "1" };
+  }
+  function hoje() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function dataPorExtenso(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+    if (!m) return "";
+    return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
+  }
+  /* código curto e sempre igual para a mesma pessoa, trilha e data (FNV-1a) */
+  function codigo(papel, nome, data) {
+    var s = papel + "|" + nome.trim().toLowerCase() + "|" + data, h = 0x811c9dc5;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    var x = h.toString(16).padStart(8, "0");
+    return "prisma-" + papel + "-" + x.slice(0, 4) + "-" + x.slice(4);
+  }
+  /* diminui a letra do nome até caber em uma linha; se ainda não couber, quebra em duas */
+  function ajustaNome() {
+    var el = $("c-nome-saida"), t = 32;
+    el.style.whiteSpace = "nowrap"; el.style.fontSize = t + "pt";
+    while (el.scrollWidth > el.clientWidth + 1 && t > 20) { t -= 1; el.style.fontSize = t + "pt"; }
+    if (el.scrollWidth > el.clientWidth + 1) el.style.whiteSpace = "normal";
+  }
+
+  function preencher(d) {
+    var papel = APELIDOS[(d.papel || "").toLowerCase()] || "prof";
+    var nome = (d.nome || "").trim() || "Nome da pessoa";
+    var data = /^\d{4}-\d{2}-\d{2}$/.test(d.data || "") ? d.data : hoje();
+    var P = PAPEIS[papel];
+
+    document.body.dataset.papel = papel;
+    $("c-mascote").src = P.mascote;
+    $("c-trilha").textContent = P.canto;
+    $("c-motivo").textContent = "por concluir os dez passos e o teste final da " + P.motivo;
+    $("c-nome-saida").textContent = nome;
+    $("c-emitido").textContent = "Emitido em " + dataPorExtenso(data);
+    $("c-codigo").textContent = codigo(papel, nome, data);
+    $("folha").setAttribute("aria-label", "Certificado de conclusão do mini curso PRISMA, " + P.motivo + ", conferido a " + nome);
+    /* o título vira o nome do arquivo ao salvar em PDF */
+    document.title = "Certificado PRISMA - " + P.rotulo + " - " + nome;
+
+    $("c-nome").value = d.nome || ""; $("c-papel").value = papel; $("c-data").value = data;
+    ajustaNome();
+    return { papel: papel, nome: nome, data: data };
+  }
+
+  /* na tela, a folha encolhe para caber na janela */
+  function encaixa() {
+    var f = $("folha"), w = f.offsetWidth, h = f.offsetHeight;
+    var s = Math.min(1, (window.innerWidth - 32) / w);
+    f.style.transform = "scale(" + s + ")";
+    $("palco").style.height = (h * s + 64) + "px";
+  }
+
+  var estado = lerHash();
+  function daBarra() {
+    estado = { papel: $("c-papel").value, nome: $("c-nome").value, data: $("c-data").value };
+    preencher(estado);
+  }
+  ["c-nome", "c-papel", "c-data"].forEach(function (id) { $(id).addEventListener("input", daBarra); });
+  $("c-salvar").addEventListener("click", function () { window.print(); });
+  $("barra").addEventListener("submit", function (e) { e.preventDefault(); window.print(); });
+  window.addEventListener("hashchange", function () { estado = lerHash(); preencher(estado); });
+  window.addEventListener("resize", encaixa);
+  window.addEventListener("beforeprint", function () { $("folha").style.transform = "none"; });
+  window.addEventListener("afterprint", encaixa);
+
+  /* para usar de outra página: PrismaCertificadoModelo.preencher({ papel, nome, data }) */
+  window.PrismaCertificadoModelo = { preencher: preencher };
+
+  preencher(estado); encaixa();
+  var pronto = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+  pronto.then(function () {
+    ajustaNome(); encaixa();
+    document.documentElement.dataset.pronto = "1";
+    if (estado.imprimir) setTimeout(function () { window.print(); }, 300);
+  });
+})();
+</script>
+</body>
+</html>

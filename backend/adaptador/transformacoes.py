@@ -44,33 +44,31 @@ def _base(cor: str) -> str:
 
 
 def cor_com_simbolo(doc: Documento) -> Documento:
+    """P1.1 (decisão do time, 31/10): a legenda entra quando o material USA cor para passar informação,
+    não quando aparece a palavra "vermelho". O leitor já marcou cada trecho de texto colorido com a forma
+    da cor (ex.: "as barras em vermelho (▲)") e listou as figuras coloridas. Aqui entram a legenda e os avisos."""
     novo = copy.deepcopy(doc)
-    usadas: dict[str, str] = {}
-
-    def marcar(m: re.Match) -> str:
-        base = _base(m.group(1))
-        simbolo = SIMBOLOS.get(base)
-        if not simbolo:
-            return m.group(0)
-        usadas[base] = simbolo
-        return f"{m.group(0)} ({simbolo})"
-
-    for b in novo.blocos:
-        if b.tipo in ("paragrafo", "titulo"):
-            b.texto = COR.sub(marcar, b.texto)
-        elif b.tipo in ("lista", "etapas", "quadro"):
-            b.itens = [COR.sub(marcar, i) for i in b.itens]
-
-    if usadas:
+    if novo.cores:
         legenda = Bloco("quadro", "Legenda das cores",
-                        [f"{cor} = {simb}" for cor, simb in usadas.items()])
+                        [f"{SIMBOLOS.get(c, '■')} = trecho que no original estava em {c}" for c in novo.cores])
         novo.blocos.insert(0, legenda)
         novo.aplicados.append(
-            f"P1.1 Cor nunca sozinha: {len(usadas)} cor(es) ganharam símbolo e uma legenda no topo."
+            f"P1.1 Cor nunca sozinha: {len(novo.cores)} cor(es) de texto ganharam símbolo e uma legenda no topo."
         )
+    imagens = [f for f in novo.figuras_coloridas if f.startswith("imagens/")]
+    desenhos = [f for f in novo.figuras_coloridas if not f.startswith("imagens/")]
+    if imagens:
         novo.pendencias.append(
-            "P1.1: confira se as palavras de cor marcadas são mesmo cores. "
-            "Por exemplo, \"rosa\" pode ser a flor."
+            f"P1.2: {len(imagens)} imagem(ns) colorida(s). Na descrição, diga o que cada cor representa "
+            "(por exemplo: \"barras vermelhas: meninas\"). É assim que o aluno daltônico e a versão Ouvir entendem o desenho."
+        )
+        for b in novo.blocos:
+            if b.tipo == "imagem" and b.arquivo in imagens:
+                b.colorida = True
+    if desenhos:
+        novo.pendencias.append(
+            "P1.2: o material tem desenho colorido feito no próprio arquivo (" + "; ".join(desenhos) + "). "
+            "Ele não vira imagem: confira se o texto explica o que cada cor significa."
         )
     return novo
 
@@ -110,7 +108,9 @@ def instrucoes_em_etapas(doc: Documento) -> Documento:
     saida: list[Bloco] = []
     convertidos = 0
     for b in novo.blocos:
-        if b.tipo == "paragrafo" and INICIA_COM_ORDEM.match(b.texto):
+        # conta e expressão não se dividem em passos: "mmc (20 ; 30)" tem ";" mas não é lista de ações
+        com_conta = "⟦" in b.texto or re.search(r"\([^)]*;[^)]*\)", b.texto)
+        if b.tipo == "paragrafo" and not com_conta and INICIA_COM_ORDEM.match(b.texto):
             passos = _passos(b.texto)
             if len(passos) >= 2:
                 saida.append(Bloco("etapas", itens=passos))
@@ -197,11 +197,134 @@ ABREVIACAO = re.compile(r"\b(?:ex|etc|obs|p\.ex|cf|aprox)\.|[\\&<§#]", re.I)
 
 
 def _frases(texto: str) -> list[str]:
-    return [f.strip() for f in re.split(r"(?<=[.!?])\s+", texto.strip()) if f.strip()]
+    """Frases do texto. Pedaço sem letra nem número ("." de linha pontilhada) não é frase."""
+    return [f.strip() for f in re.split(r"(?<=[.!?])\s+", texto.strip()) if TEM_CONTEUDO.search(f)]
+
+
+# ---------- estrutura: sumário, subtítulos numerados, marcadores ----------
+
+NOMES_SUMARIO = {"sumário", "sumario", "índice", "indice", "conteúdo", "conteudo", "conteúdos", "lista de figuras",
+                 "lista de tabelas"}
+ENTRADA_SUMARIO = re.compile(r"^(?:\d+(?:\.\d+)*\s+)?[^\d=×].{0,90}?(?:\s*(?:[._…·]\s?){2,}\s*|\s+)\d{1,3}$")
+SUBTITULO_NUMERADO = re.compile(r"^(\d{1,2}(?:\.\d{1,2}){1,2})\s+([A-ZÁÉÍÓÚÂÊÔÃÕÇ][^=×<>]{2,80})$")
+MARCADOR = re.compile(r"^\s*[•▪●◦‣⁃■□➢✓–-]\s+(.+)$", re.S)
+
+
+def _setas(texto: str) -> str:
+    """Setas de equação química que o LaTeX desenha com pedaços ("−↽−−⇀−", "−−→") viram um símbolo só."""
+    texto = re.sub(r"[−-]*↽[−-]*⇀[−-]*|[−-]*⇀[−-]*↽[−-]*", " ⇌ ", texto)
+    texto = re.sub(r"[−-]{2,}\s*(⟦\^\{[^}]*\}⟧)\s*→", r" →\1 ", texto)
+    texto = re.sub(r"[−-]{2,}→", " → ", texto)
+    return re.sub(r"\s{2,}", " ", texto).strip()
+
+
+def arrumar_estrutura(doc: Documento) -> Documento:
+    """Ajustes de estrutura que muitos PDFs (relatórios, apostilas em LaTeX/Word) pedem:
+    - o sumário sai: os números de página não valem na versão adaptada, e o quadro "Hoje vamos" já lista os assuntos;
+    - "2.1 Materiais e reagentes" em letra comum vira subtítulo (P6: estrutura previsível);
+    - parágrafos seguidos que começam com "•" viram uma lista."""
+    novo = copy.deepcopy(doc)
+    saida: list[Bloco] = []
+    blocos = novo.blocos
+    i, sumario = 0, 0
+    while i < len(blocos):
+        b = blocos[i]
+        texto = (b.texto or "").strip()
+        if b.tipo in ("titulo", "paragrafo") and texto.lower().rstrip(":") in NOMES_SUMARIO:
+            j = i + 1
+            while j < len(blocos) and blocos[j].tipo in ("titulo", "paragrafo") \
+                    and ENTRADA_SUMARIO.match((blocos[j].texto or "").strip()):
+                j += 1
+            if j - i >= 3:                      # pelo menos 2 entradas: é sumário mesmo
+                sumario += j - i - 1
+                i = j
+                continue
+        if b.tipo == "paragrafo" and (m := SUBTITULO_NUMERADO.match(texto)) and not texto.endswith((".", ":", ";")) \
+                and len(texto.split()) <= 14:
+            saida.append(Bloco("titulo", texto=texto, nivel=3))
+            i += 1
+            continue
+        if b.tipo == "paragrafo" and MARCADOR.match(texto):
+            itens = []
+            while i < len(blocos) and blocos[i].tipo == "paragrafo" and (m := MARCADOR.match((blocos[i].texto or "").strip())):
+                itens.append(m.group(1).strip())
+                i += 1
+            if len(itens) >= 2:
+                saida.append(Bloco("lista", itens=itens))
+            else:
+                saida.append(Bloco("paragrafo", texto=texto))
+            continue
+        if b.tipo == "paragrafo":
+            b.texto = _setas(b.texto)
+            anterior = saida[-1] if saida else None
+            # parágrafo cortado pela troca de página: "...com água" + "dura. Ao término..."
+            if anterior is not None and anterior.tipo == "paragrafo" and re.match(r"[a-zà-ú]", texto) \
+                    and not re.search(r"[.!?:;)]$", anterior.texto.strip()):
+                anterior.texto = anterior.texto.rstrip() + " " + b.texto.lstrip()
+                i += 1
+                continue
+        saida.append(b)
+        i += 1
+    novo.blocos = saida
+    if sumario:
+        novo.aplicados.append(f"P6: o sumário ({sumario} linhas) saiu, porque os números de página não valem "
+                              "na versão adaptada. O quadro \"Hoje vamos\" mostra os assuntos.")
+    return novo
+
+
+# ---------- linhas para o aluno escrever a resposta ----------
+
+TEM_CONTEUDO = re.compile(r"[^\W_]")                     # letra ou número
+PREENCHER = re.compile(r"(?:[._…·\-–—]\s?){5,}")       # "..........", "_____", "-----"
+
+
+def linhas_de_resposta(doc: Documento) -> Documento:
+    """Linha pontilhada ou sublinhada (espaço para o aluno escrever) vira um bloco "resposta":
+    na página aparece como pauta, e a IA e o leitor de voz não recebem pontinhos.
+    Dentro de uma frase ("Nome: ______"), a linha fica curta e igual em todo lugar."""
+    novo = copy.deepcopy(doc)
+    saida: list[Bloco] = []
+
+    def resposta(n: int) -> None:
+        if saida and saida[-1].tipo == "resposta":
+            saida[-1].nivel += n
+        else:
+            saida.append(Bloco("resposta", nivel=n))         # nivel = quantas linhas
+
+    def so_preencher(t: str) -> bool:
+        return bool(t.strip()) and not TEM_CONTEUDO.search(t)
+
+    def encurtar(t: str) -> str:
+        return re.sub(r"\s{2,}", " ", PREENCHER.sub(" ______ ", t)).strip()
+
+    for b in novo.blocos:
+        if b.tipo == "paragrafo":
+            if so_preencher(b.texto):
+                resposta(max(1, b.texto.count("\n") + 1, round(len(re.sub(r"\s", "", b.texto)) / 80)))
+                continue
+            # título seguido de pontilhado na mesma linha ("3.1 Ação do Sabão ........")
+            b.texto = re.sub(r"\s*(?:[.…·]\s?){5,}\s*$", "", b.texto)
+            b.texto = encurtar(b.texto)
+            saida.append(b)
+        elif b.tipo in ("lista", "etapas", "quadro"):
+            vazios = sum(1 for x in b.itens if so_preencher(x) or not x.strip())
+            b.itens = [encurtar(x) for x in b.itens if x.strip() and not so_preencher(x)]
+            if b.itens or b.tipo == "quadro":
+                saida.append(b)
+            if vazios:
+                resposta(vazios)
+        elif b.tipo == "titulo":
+            b.texto = re.sub(r"[\s._…·]+$", "", b.texto) or b.texto     # título não termina em ponto
+            saida.append(b)
+        else:
+            saida.append(b)
+    novo.blocos = saida
+    return novo
 
 
 def _palavras(frase: str) -> int:
-    return len(re.findall(r"\w+", frase))
+    # fórmula (⟦…⟧) conta como uma palavra só
+    return len(re.findall(r"\w+", re.sub(r"⟦(?:[^⟦⟧]|⟦[^⟧]*⟧)*⟧", " F ", frase)))
 
 
 def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> Documento:
@@ -209,19 +332,23 @@ def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> 
     novo = copy.deepcopy(doc)
     alvos = []  # (bloco, índice do item ou None, texto)
     for b in novo.blocos:
-        if b.tipo == "paragrafo":
+        if b.tipo == "paragrafo" and TEM_CONTEUDO.search(b.texto):
             alvos.append((b, None, b.texto))
         elif b.tipo in ("lista", "etapas"):
-            alvos.extend((b, i, x) for i, x in enumerate(b.itens))
+            alvos.extend((b, i, x) for i, x in enumerate(b.itens) if TEM_CONTEUDO.search(x))
     if not alvos:
         return novo
 
-    textos, glossario = reescrever([a[2] for a in alvos])
+    resultado = reescrever([a[2] for a in alvos])
+    textos, glossario = resultado[0], resultado[1]
+    avisos = list(resultado[2]) if len(resultado) > 2 else []
 
     # P3.1: trecho com frase longa volta para a IA uma vez, com a instrução reforçada
     refazer = [k for k, t in enumerate(textos) if any(_palavras(f) > max_palavras for f in _frases(t))]
     if refazer:
-        novos, glos2 = reescrever([textos[k] for k in refazer], refazer=True)
+        segundo = reescrever([textos[k] for k in refazer], refazer=True)
+        novos, glos2 = segundo[0], segundo[1]
+        avisos += list(segundo[2]) if len(segundo) > 2 else []
         for k, t in zip(refazer, novos):
             antes = sum(_palavras(f) > max_palavras for f in _frases(textos[k]))
             if sum(_palavras(f) > max_palavras for f in _frases(t)) < antes:
@@ -230,7 +357,9 @@ def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> 
         glossario = glossario + [g for g in glos2 if g["termo"] not in nomes]
         novo.aplicados.append(f"P3.1: {len(refazer)} trecho(s) com frase longa voltaram para a IA reescrever.")
 
-    for (b, i, _), texto in zip(alvos, textos):
+    for (b, i, original), texto in zip(alvos, textos):
+        if not TEM_CONTEUDO.search(texto or ""):
+            texto = original                  # a IA devolveu só pontuação: fica o texto original
         if i is None:
             b.texto = texto
         else:
@@ -253,8 +382,9 @@ def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> 
     todas = [f for b in novo.blocos if b.tipo in ("paragrafo", "lista", "etapas")
              for f in (_frases(b.texto) if b.tipo == "paragrafo" else b.itens)]
     longas = [f for f in todas if _palavras(f) > max_palavras]
-    sujas = [f for f in todas if ABREVIACAO.search(f)]
+    sujas = [f for f in todas if ABREVIACAO.search(re.sub(r"⟦(?:[^⟦⟧]|⟦[^⟧]*⟧)*⟧", " ", f))]
     rotulo = {"lf2": "Leitura Fácil II", "lf1": "Leitura Fácil I"}.get(nivel, nivel)
+    novo.pendencias.extend(avisos)
     novo.aplicados.append(f"P3 ({rotulo}): {len(textos)} texto(s) reescrito(s) por IA, uma frase por linha.")
     novo.pendencias.append(
         f"P3.7 ({rotulo}): a IA reescreveu o texto. Confira se todos os conceitos da aula foram conservados."

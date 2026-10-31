@@ -8,9 +8,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
-PASTA = Path(__file__).resolve().parents[1] / "cache"
+PASTA = (Path(os.environ["PRISMA_DADOS"]) / "cache" if os.environ.get("PRISMA_DADOS")
+         else Path(__file__).resolve().parents[1] / "cache")
 
 
 def impressao_digital(*partes: bytes | str) -> str:

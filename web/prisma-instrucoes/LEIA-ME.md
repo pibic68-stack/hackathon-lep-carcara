@@ -15,7 +15,6 @@ Abra `web/prisma-instrucoes/index.html` com duplo clique, ou pelo menu **Instru�
 |---|---|
 | `index.html` | A página pronta. **Gerada**, não edite à mão. Usa `../css/`, `../js/` e `../assets/` do site. |
 | `manual-prisma-v1.pdf` | O PDF que o botão "Baixar o manual" entrega. |
-| `padroes.json` | Os padrões e critérios em formato de dados. O backend pode ler daqui. |
 | `src/pagina.html` | Estrutura e código da página. Edite aqui. |
 | `src/estilo.css` | O visual próprio da aba. Só usa as cores e fontes do site (`web/css/tokens.css`). |
 | `build.py` | Junta modelo, estilo e dados e gera o `index.html`. |

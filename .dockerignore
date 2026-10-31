@@ -1,0 +1,17 @@
+.git
+.claude
+prompts
+pitch
+relatorios
+ferramentas
+link.txt
+compartilhar.json
+**/__pycache__
+**/*.pyc
+backend/.env
+backend/dados
+backend/saida
+backend/envios
+backend/testes
+web/prisma-instrucoes/_previa
+docs/manual/*.pdf

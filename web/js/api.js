@@ -57,17 +57,31 @@ Prisma.api = (function () {
     mudarAluno: function (alunoId, dados) { return chamar("/api/alunos/" + alunoId, json("PATCH", dados)); },
     apagarAluno: function (alunoId) { return chamar("/api/alunos/" + alunoId, { method: "DELETE" }); },
     apagarMaterial: function (id) { return chamar("/api/materiais/" + id, { method: "DELETE" }); },
-    adaptar: function (arquivo, turmaId, perfil) {
+    // `acompanhar`: código para ver a produção ao vivo em progresso(codigo)
+    adaptar: function (arquivo, turmaId, perfil, acompanhar) {
       var f = new FormData();
       f.append("arquivo", arquivo);
       f.append("turma_id", String(turmaId));
       if (perfil) f.append("perfil", JSON.stringify(perfil));
-      return chamar("/api/adaptar", { method: "POST", body: f });
+      return chamar("/api/adaptar", { method: "POST", body: f, headers: acompanhar ? { "X-Prisma-Acompanhar": acompanhar } : {} });
     },
+    progresso: function (codigo) { return chamar("/api/progresso/" + encodeURIComponent(codigo)); },
+    testarIA: function () { return chamar("/api/ia/teste"); },
     materiais: function () { return chamar("/api/materiais"); },
     material: function (id) { return chamar("/api/materiais/" + id); },
-    descrever: function (id, imagens) { return chamar("/api/materiais/" + id + "/descricoes", json("POST", { imagens: imagens })); },
+    descrever: function (id, imagens, acompanhar) {
+      var o = json("POST", { imagens: imagens });
+      if (acompanhar) o.headers["X-Prisma-Acompanhar"] = acompanhar;
+      return chamar("/api/materiais/" + id + "/descricoes", o);
+    },
+    refazer: function (id, acompanhar) {
+      return chamar("/api/materiais/" + id + "/refazer", { method: "POST", headers: acompanhar ? { "X-Prisma-Acompanhar": acompanhar } : {} });
+    },
     aprovar: function (id) { return chamar("/api/materiais/" + id + "/aprovar", { method: "POST" }); },
-    biblioteca: function () { return chamar("/api/biblioteca"); }
+    biblioteca: function () { return chamar("/api/biblioteca"); },
+    avaliar: function (id, dados) { return chamar("/api/biblioteca/" + id + "/avaliacao", json("POST", dados)); },
+    ocultar: function (id, sim) { return chamar("/api/biblioteca/" + id + "/ocultar", json("POST", { ocultar: sim })); },
+    feedbacks: function () { return chamar("/api/feedbacks"); },
+    escola: function () { return chamar("/api/escola"); }
   };
 })();

@@ -39,10 +39,71 @@
     linhas += '<g class="rastro"><rect width="8" height="8" opacity=".25"/><rect width="8" height="8" opacity=".5"/></g><rect class="pacote" width="12" height="12"/>';
     svg.innerHTML = linhas;
     raiz.querySelector(".externos").innerHTML = externos;
+    afastarRotulos();
     pacote = svg.querySelector(".pacote");
     rastro = svg.querySelectorAll(".rastro rect");
     marcarAtivo();
     posicionarPacote(ang(ativo));
+  }
+
+  /* Rótulos de fora do anel não podem se encostar (nem nos botões das etapas), em nenhum tamanho
+     de letra ou fonte. Mede as caixas de verdade e empurra cada rótulo pelo menor caminho (para o lado
+     ou para cima/baixo). Se mesmo assim não couber (letra muito grande, tela estreita), os rótulos saem
+     do desenho e aparecem como lista no caderno, ao lado: nenhuma informação se perde. */
+  function afastarRotulos() {
+    var caixa = raiz.querySelector(".externos");
+    if (!caixa) return;
+    raiz.classList.remove("radial--lista");
+    if (!caixa.offsetWidth) return;
+    var rotulos = Array.prototype.slice.call(caixa.querySelectorAll(".no-ext"));
+    rotulos.forEach(function (r) { r.style.marginTop = "0px"; r.style.marginLeft = "0px"; });
+    var base = caixa.getBoundingClientRect(), FOLGA = 6;
+    var fixos = Array.prototype.map.call(raiz.querySelectorAll(".no, .centro-caixa"), function (n) { return n.getBoundingClientRect(); });
+    function penetra(a, b) {
+      var dx = Math.min(a.right, b.right) - Math.max(a.left, b.left) + FOLGA;
+      var dy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) + FOLGA;
+      return dx > 0 && dy > 0 ? { dx: dx, dy: dy } : null;
+    }
+    function mover(r, x, y) {
+      var a = r.getBoundingClientRect();
+      // não deixa sair do quadro
+      x = Math.max(base.left + 2 - a.left, Math.min(x, base.right - 2 - a.right));
+      y = Math.max(base.top + 2 - a.top, Math.min(y, base.bottom - 2 - a.bottom));
+      r.style.marginLeft = (parseFloat(r.style.marginLeft) + x) + "px";
+      r.style.marginTop = (parseFloat(r.style.marginTop) + y) + "px";
+      return Math.abs(x) + Math.abs(y) >= 0.5;
+    }
+    function empurrar(r, a, b, p, sempre) {
+      var cx = (a.left + a.right) / 2 - (b.left + b.right) / 2, cy = (a.top + a.bottom) / 2 - (b.top + b.bottom) / 2;
+      if (p.dy <= p.dx) return mover(r, 0, (cy >= 0 ? 1 : -1) * p.dy * (sempre ? 1 : 0.5));
+      return mover(r, (cx >= 0 ? 1 : -1) * p.dx * (sempre ? 1 : 0.5), 0);
+    }
+    var sobra = true;
+    for (var volta = 0; volta < 80 && sobra; volta++) {
+      sobra = false;
+      rotulos.forEach(function (r, i) {
+        fixos.forEach(function (b) {
+          var a = r.getBoundingClientRect(), p = penetra(a, b);
+          if (p) { sobra = true; empurrar(r, a, b, p, true); }
+        });
+        rotulos.forEach(function (o, j) {
+          if (j <= i) return;
+          var a = r.getBoundingClientRect(), b = o.getBoundingClientRect(), p = penetra(a, b);
+          if (!p) return;
+          sobra = true;
+          // os dois se afastam pela metade, cada um para o seu lado
+          empurrar(r, a, b, p, false);
+          empurrar(o, b, r.getBoundingClientRect(), penetra(b, r.getBoundingClientRect()) || p, false);
+        });
+      });
+    }
+    // conferência final: sobrou algum encostando? então vira lista no caderno
+    var caixas = rotulos.map(function (r) { return r.getBoundingClientRect(); });
+    var ruim = caixas.some(function (a, i) {
+      return caixas.some(function (b, j) { return j > i && penetra(a, b) && penetra(a, b).dx > FOLGA && penetra(a, b).dy > FOLGA; }) ||
+        fixos.some(function (b) { var p = penetra(a, b); return p && p.dx > FOLGA && p.dy > FOLGA; });
+    });
+    if (ruim) raiz.classList.add("radial--lista");
   }
 
   function montar() {
@@ -73,6 +134,14 @@
 
     document.addEventListener("prisma:necessidade", function () { desenhar(); atualizarCaderno(); });
     document.addEventListener("prisma:movimento", function () { atualizarBotaoPausa(); });
+
+    if ("ResizeObserver" in window) {
+      var espera;
+      new ResizeObserver(function () { clearTimeout(espera); espera = setTimeout(afastarRotulos, 60); }).observe(raiz);
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(afastarRotulos);
+    new MutationObserver(function () { setTimeout(afastarRotulos, 30); })
+      .observe(document.documentElement, { attributes: true, attributeFilter: ["data-fonte", "style", "data-contraste"] });
 
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (ents) { visivel = ents[0].isIntersecting; }, { threshold: 0.2 }).observe(raiz);
@@ -138,13 +207,31 @@
     }
   }
 
+  /* O caderno guarda as 5 etapas empilhadas na mesma célula da grade e mostra só a ativa.
+     Assim a caixa sempre tem a altura da etapa mais longa e os botões nunca mudam de lugar,
+     em qualquer modo (daltonismo, dislexia, letra maior). */
+  var necessidadeDesenhada = null;
   function atualizarCaderno() {
     var n = P.necessidadePorId(P.necessidadeAtual), e = P.ETAPAS[ativo];
     document.getElementById("caderno-aluno").textContent = n.aluno;
     document.getElementById("caderno-passo").textContent = "Etapa " + e.num + " de 5";
     var corpo = document.getElementById("caderno-corpo");
-    corpo.innerHTML = '<p class="rotulo">' + e.num + ".0 · " + e.nome + "</p><h3>" + e.titulo + "</h3><p>" + e.texto(n) + "</p>" + e.detalhe(n);
-    if (window.aplicarIcones) window.aplicarIcones(corpo);
+    if (necessidadeDesenhada !== P.necessidadeAtual || corpo.children.length !== P.ETAPAS.length) {
+      necessidadeDesenhada = P.necessidadeAtual;
+      corpo.innerHTML = P.ETAPAS.map(function (x, i) {
+        return '<div class="caderno-etapa" data-etapa="' + i + '"><p class="rotulo">' + x.num + ".0 · " + x.nome + "</p><h3>" + x.titulo +
+          "</h3><p>" + x.texto(n) + "</p>" + x.detalhe(n) +
+          '<ul class="caderno-ligados" aria-label="Ligado a esta etapa">' + externosDe(i).map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul></div>";
+      }).join("");
+      if (window.aplicarIcones) window.aplicarIcones(corpo);
+    }
+    Array.prototype.forEach.call(corpo.children, function (d, i) {
+      var sim = i === ativo;
+      d.classList.toggle("ativa", sim);
+      if (sim) d.removeAttribute("aria-hidden"); else d.setAttribute("aria-hidden", "true");
+    });
+    var anuncio = document.getElementById("caderno-anuncio");
+    if (anuncio) anuncio.textContent = "Etapa " + e.num + " de 5: " + e.nome + ". " + e.titulo;
   }
 
   document.addEventListener("DOMContentLoaded", montar);

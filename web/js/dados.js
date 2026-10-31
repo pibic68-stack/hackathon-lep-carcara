@@ -163,12 +163,12 @@ Prisma.ETAPAS = [
     }
   },
   {
-    id: "minicheck", num: "5", nome: "Mini-check", icone: "checklist",
-    externos: ["3 perguntas", "Ajusta o perfil"],
-    titulo: "Mede de novo: todo mundo aprendeu?",
-    texto: function () { return "Três perguntas rápidas no fim da aula. Se o aluno ainda tropeçar, o perfil é ajustado e o ciclo recomeça."; },
+    id: "avaliacao", num: "5", nome: "Avaliação", icone: "trophy",
+    externos: ["De 1 a 5 estrelas", "Sugestão do aluno"],
+    titulo: "Os alunos avaliam a aula",
+    texto: function () { return "Cada aluno pode dar de 1 a 5 estrelas e deixar uma sugestão. O professor lê os feedbacks e ajusta a próxima versão."; },
     detalhe: function () {
-      return '<div class="minicheck"><span class="mc ok">✓ 1</span><span class="mc ok">✓ 2</span><span class="mc nao">✗ 3</span></div><p class="suave">2 de 3 certas · sugestão: manter a adaptação e revisar “condensação”.</p>';
+      return '<p class="estrelas-exemplo" role="img" aria-label="Exemplo: 4 de 5 estrelas">★★★★<span class="apagada">★</span> <strong>4 de 5</strong></p><p class="balao"><strong>Sugestão:</strong> “As setas com nome me ajudaram. Queria o áudio mais devagar.”</p>';
     }
   }
 ];

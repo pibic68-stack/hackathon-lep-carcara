@@ -258,3 +258,9 @@ web/prisma-instrucoes/_previa/
 backend/saida/
 backend/envios/
 backend/dados/
+ferramentas/
+.env.tmp
+ferramentas/
+link.txt
+web/certificado/exemplos/
+compartilhar.json

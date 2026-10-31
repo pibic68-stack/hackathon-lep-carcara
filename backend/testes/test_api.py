@@ -84,7 +84,7 @@ class TestContas(Base):
         self.assertEqual(c.post("/api/contas/professor", json={"nome": "Ypsilon", "email": "prof@escola.br", "senha": "outra-senha",
                                                                "codigo_escola": CODIGO}).status_code, 409)
         c.post("/api/sair")
-        self.assertEqual(c.get("/api/eu").status_code, 401)
+        self.assertIsNone(c.get("/api/eu").json())          # saiu: ninguém logado
         r = c.post("/api/entrar", json={"perfil": "professor", "email": "PROF@escola.br", "senha": "senha-forte-1"})
         self.assertEqual(r.json()["destino"], "painel/professor.html")
         self.assertEqual(c.get("/api/eu").json()["nome"], "Prof. Teste")
@@ -169,7 +169,7 @@ class TestTurmas(Base):
         aluno = self.cliente()
         aluno.post("/api/entrar", json={"perfil": "aluno", "turma": t["codigo"], "figuras": a["figuras"]})
         c.delete(f"/api/alunos/{a['id']}")
-        self.assertEqual(aluno.get("/api/eu").status_code, 401)
+        self.assertIsNone(aluno.get("/api/eu").json())
 
 
 class TestMateriais(Base):
@@ -205,7 +205,7 @@ class TestMateriais(Base):
         self.assertFalse(lib[0]["versoes"]["universal"]["recomendada"])
         pagina = aluno.get(lib[0]["versoes"]["universal"]["url"])
         self.assertEqual(pagina.status_code, 200)
-        self.assertIn("azul (■)", pagina.text)
+        self.assertNotIn("(■)", pagina.text)          # palavra de cor sem cor de verdade não ganha legenda
 
     def test_outra_turma_e_outro_professor_nao_veem(self):
         c = self.professor("a@escola.br")

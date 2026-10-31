@@ -22,6 +22,7 @@ e abra http://localhost:8765.
 |---|---|
 | `index.html` | Página inicial: escola pixel, diagrama radial, antes e depois, públicos, princípios |
 | `entrar.html` | Login: escolher perfil → formulário (professor, família, aluno com senha de figurinhas) |
+| `painel/escola.html` | Painel da escola (só leitura): professores, turmas, alunos e materiais |
 | `painel/*.html` | Painel de cada perfil, ainda "em construção" |
 | `prisma-instrucoes/index.html` | Aba **Instruções**: mini curso interativo + manual com PDF para baixar. Usa o CSS e a barra de acessibilidade do site. Gerada por `prisma-instrucoes/build.py` a partir de `docs/manual/padroes.json` (ver `prisma-instrucoes/LEIA-ME.md`) |
 
@@ -59,7 +60,6 @@ Rodar dentro de `web/`, com Python e Pillow (`pip install pillow`):
 |---|---|
 | `python ferramentas/gerar_logo.py` | Logo e favicon |
 | `python ferramentas/gerar_icones.py` | `js/icones.js` a partir de `assets/icones/*.svg` |
-| `python ferramentas/adaptar_animacoes.py` | Animações na paleta do site (`assets/anim/*.js`) a partir de `assets/anim/originais/` |
 
 As animações ficam com cara de pixel art no navegador: `js/lottie-pixel.js` desenha em baixa resolução,
 troca cada pixel pela cor da paleta que mais aparece em volta dele e amplia sem suavizar, sempre por um número

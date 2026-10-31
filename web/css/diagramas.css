@@ -97,9 +97,13 @@
 @media (max-width: 1000px) { .caderno { border-left: 0; border-top: 3px solid var(--cor-borda); } }
 .caderno-cab { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 14px 16px 14px 52px; border-bottom: 2px dashed var(--cor-linha); background: var(--cor-superficie); }
 .caderno-passo { font-family: var(--fonte-mono); font-size: max(var(--letra-min), .8rem); color: var(--cor-texto-suave); white-space: nowrap; }
-.caderno-corpo { flex: 1; padding: 18px 18px 8px 52px; min-height: 320px; font-size: max(var(--letra-min), 1rem); }
+.caderno-corpo { flex: 1; padding: 18px 18px 8px 52px; font-size: max(var(--letra-min), 1rem); display: grid; }
+/* as 5 etapas ocupam a mesma célula: a caixa tem a altura da maior e os botões não pulam */
+.caderno-etapa { grid-area: 1 / 1; visibility: hidden; }
+.caderno-etapa.ativa { visibility: visible; }
 .caderno-corpo h3 { font-size: max(var(--letra-min), 1.3rem); }
-.caderno-acoes { display: flex; gap: 10px; padding: 10px 16px 14px 52px; flex-wrap: wrap; }
+.caderno-acoes { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 16px 14px 52px; }
+.caderno-acoes #etapa-pausa { justify-content: center; white-space: nowrap; }
 .caderno-acoes .botao { margin-bottom: 7px; }
 .lista-check, .lista-regras { list-style: none; padding: 0; margin: .5rem 0 0; display: grid; gap: 8px; }
 .lista-check li::before { content: "✓ "; font-weight: 700; color: var(--grama-escuro); }
@@ -109,6 +113,9 @@
 .caderno-cab { flex-wrap: wrap; }
 .arquivo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: var(--fonte-mono); font-size: max(var(--letra-min), .9rem); }
 .balao { background: var(--grama-claro); padding: 10px 12px; box-shadow: 0 0 0 2px var(--cor-borda); }
+.estrelas-exemplo { font-size: max(var(--letra-min), 1.6rem); color: var(--laranja-escuro); letter-spacing: .08em; margin: .5rem 0; }
+.estrelas-exemplo .apagada { color: var(--cor-linha); }
+.estrelas-exemplo strong { font-size: max(var(--letra-min), 1rem); color: var(--cor-texto); letter-spacing: 0; margin-left: .4em; }
 .minicheck { display: flex; gap: 8px; margin: .5rem 0; }
 .mc { padding: 4px 10px; font-family: var(--fonte-mono); box-shadow: 0 0 0 2px var(--cor-borda); }
 .mc.ok { background: var(--grama-claro); }
@@ -163,3 +170,9 @@
   .fluxo-linha--fim { grid-template-columns: 1fr; margin-top: 24px; }
   .regras-cartao { margin-right: 9px; }
 }
+
+/* quando os rótulos não cabem no desenho (letra muito grande ou tela estreita), viram lista no caderno */
+.caderno-ligados { display: none; list-style: none; padding: 0; margin: .8rem 0 0; flex-wrap: wrap; gap: 8px; }
+.caderno-ligados li { padding: 2px 10px; background: var(--cor-superficie); box-shadow: 0 0 0 2px var(--cor-borda); font-size: max(var(--letra-min), .95rem); }
+.radial--lista .externos, .radial--lista .l-ext { display: none; }
+.radial-corpo:has(.radial--lista) .caderno-ligados { display: flex; }

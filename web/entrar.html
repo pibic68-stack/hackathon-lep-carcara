@@ -38,6 +38,20 @@
         <h1 id="titulo-perfil">Quem está chegando?</h1>
         <p class="suave">Cada pessoa tem a sua entrada. Escolha a sua.</p>
         <p class="aviso" id="ja-entrou" hidden></p>
+        <!-- site público (nuvem): experimentar com contas fictícias, sem senha -->
+        <section class="demo-publica cartao" id="demo-publica" aria-labelledby="titulo-demo" hidden>
+          <h2 id="titulo-demo">Experimentar sem cadastro</h2>
+          <p class="dica">Contas fictícias de demonstração, já com materiais publicados. Um clique e você entra.</p>
+          <div class="demo-botoes">
+            <button type="button" class="botao" data-demo="professor">Professora</button>
+            <button type="button" class="botao botao--secundario" data-demo="aluno" data-aluno="0">Aluna Bia (cores)</button>
+            <button type="button" class="botao botao--secundario" data-demo="aluno" data-aluno="1">Aluno Caio (texto direto)</button>
+            <button type="button" class="botao botao--secundario" data-demo="aluno" data-aluno="2">Aluna Duda (letra grande)</button>
+            <button type="button" class="botao botao--secundario" data-demo="familia" data-aluno="0">Família da Bia</button>
+            <button type="button" class="botao botao--secundario" data-demo="escola">Escola</button>
+          </div>
+          <p class="erro" id="erro-demo" role="alert" hidden></p>
+        </section>
         <ul class="perfis">
           <li><button type="button" class="perfil" data-perfil="professor">
             <img class="pixel" src="assets/img/professor.png" alt="">
@@ -50,6 +64,10 @@
           <li><button type="button" class="perfil" data-perfil="aluno">
             <img class="pixel" src="assets/img/aluno.png" alt="">
             <span class="perfil-texto"><strong>Aluno(a)</strong><span>Minhas atividades</span></span>
+            <span data-icone="arrow-right"></span></button></li>
+          <li><button type="button" class="perfil perfil--escola" data-perfil="escola">
+            <img class="pixel" src="assets/img/escola.jpg" alt="">
+            <span class="perfil-texto"><strong>Escola</strong><span>Professores, turmas e materiais</span></span>
             <span data-icone="arrow-right"></span></button></li>
         </ul>
       </section>
@@ -82,7 +100,7 @@
           </div>
           <label class="lembrar"><input type="checkbox" name="lembrar" id="lembrar"> Lembrar de mim neste computador</label>
           <button type="submit" class="botao botao--largo"><span data-icone="login"></span> Entrar</button>
-          <p class="links"><button type="button" class="link" id="esqueci">Esqueci a senha</button><span id="criar-conta"> · <button type="button" class="link" id="abrir-cadastro">Criar conta de professor</button></span></p>
+          <p class="links"><button type="button" class="link" id="esqueci">Esqueci a senha</button><span id="criar-conta"> · <button type="button" class="link" id="abrir-cadastro">Criar conta de professor</button></span><span id="criar-escola"> · <button type="button" class="link" id="abrir-cadastro-escola">Cadastrar a escola</button></span></p>
         </form>
 
         <!-- professor: criar conta (precisa do código da escola) -->
@@ -113,6 +131,36 @@
           <label class="lembrar"><input type="checkbox" id="lembrar_novo"> Lembrar de mim neste computador</label>
           <button type="submit" class="botao botao--largo"><span data-icone="plus"></span> Criar conta</button>
           <p class="links"><button type="button" class="link" id="voltar-entrar">Já tenho conta</button></p>
+        </form>
+
+        <!-- escola: cadastro (cria a senha do painel e o código para os professores) -->
+        <form id="form-escola" class="form" novalidate hidden>
+          <h2 class="form-titulo">Cadastrar a escola</h2>
+          <div class="campo">
+            <label for="escola_nome">Nome da escola</label>
+            <input id="escola_nome" name="escola_nome" type="text" autocomplete="organization" aria-describedby="erro-escola_nome">
+            <p class="erro" id="erro-escola_nome" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="escola_email">E-mail da coordenação</label>
+            <input id="escola_email" name="escola_email" type="email" autocomplete="email" inputmode="email" aria-describedby="erro-escola_email">
+            <p class="erro" id="erro-escola_email" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="escola_senha">Senha do painel da escola</label>
+            <p class="dica" id="dica-escola_senha">Só a coordenação usa. Pelo menos 8 letras ou números.</p>
+            <input id="escola_senha" name="escola_senha" type="password" autocomplete="new-password" aria-describedby="dica-escola_senha erro-escola_senha">
+            <p class="erro" id="erro-escola_senha" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="escola_codigo">Código para os professores</label>
+            <p class="dica" id="dica-escola_codigo">Os professores digitam este código para criar a conta. Precisa ser diferente da senha. Pelo menos 6 letras ou números.</p>
+            <input id="escola_codigo" name="escola_codigo" type="text" autocomplete="off" autocapitalize="characters" aria-describedby="dica-escola_codigo erro-escola_codigo">
+            <p class="erro" id="erro-escola_codigo" hidden></p>
+          </div>
+          <label class="lembrar"><input type="checkbox" id="lembrar_escola"> Lembrar de mim neste computador</label>
+          <button type="submit" class="botao botao--largo"><span data-icone="plus"></span> Cadastrar a escola</button>
+          <p class="links"><button type="button" class="link" id="voltar-entrar-escola">A escola já tem conta</button></p>
         </form>
 
         <!-- família: código enviado pela escola -->
@@ -154,5 +202,25 @@
   <script src="js/icones.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/entrar.js"></script>
+  <script>
+  (function () {
+    var caixa = document.getElementById("demo-publica");
+    fetch("/api/saude").then(function (r) { return r.json(); }).then(function (s) {
+      if (!s.demo_publica) return;
+      caixa.hidden = false;
+      caixa.addEventListener("click", function (ev) {
+        var b = ev.target.closest("[data-demo]");
+        if (!b) return;
+        b.disabled = true;
+        fetch("/api/demo/entrar", { method: "POST", credentials: "same-origin",
+          headers: { "Content-Type": "application/json", "X-Prisma": "1" },
+          body: JSON.stringify({ perfil: b.dataset.demo, aluno: Number(b.dataset.aluno || 0) }) })
+          .then(function (r) { return r.json().then(function (c) { if (!r.ok) throw new Error((c.detail && (c.detail.erro || c.detail)) || "Não deu para entrar."); return c; }); })
+          .then(function (c) { location.href = c.destino; })
+          .catch(function (e) { var p = document.getElementById("erro-demo"); p.textContent = e.message; p.hidden = false; b.disabled = false; });
+      });
+    }).catch(function () { /* sem servidor: sem demonstração */ });
+  })();
+  </script>
 </body>
 </html>

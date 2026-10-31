@@ -2,18 +2,32 @@
 
 > **Uma aula entra e várias versões saem.** A Sala de Materiais é a biblioteca que os alunos acessam.
 
-Time **Carcará 3301** · Hackathon LEP (Educação)
+Time **Carcará 3301** · Hackathon LEPV (Educação)
 
 > Time de alunos do IME no hackathon da Liga de Empreendedorismo da Praia Vermelha.
 > **Trilhas:** 1 (Inclusão e acessibilidade) + 4 (Aprendizagem individualizada).
 
-## Como rodar (tudo junto: site, manual, login e IA)
+## Site no ar (a banca abre sem senha)
+
+**Link fixo:** `https://SEU-PROJETO.vercel.app` (trocar pelo endereço gerado; guia em [`DEPLOY.md`](DEPLOY.md)).
+Em **Entrar**, a caixa **Experimentar sem cadastro** entra com um clique como professora, aluno, família ou escola
+(contas fictícias), e os materiais de teste já estão publicados.
+
+## Como rodar do zero (no seu computador)
+
+Precisa de Python 3.10 ou mais novo.
 
 ```bash
-cd backend
-python -m pip install -r requirements.txt
-python -m adaptador.api          # abra http://127.0.0.1:8000
+git clone https://github.com/pibic68-stack/hackathon-lep-carcara.git
+cd hackathon-lep-carcara/backend
+python -m pip install -r requirements-nuvem.txt   # o essencial; requirements.txt traz também o transcritor local
+cp .env.exemplo .env                               # e cole a chave gratuita do Gemini em GEMINI_API_KEY=
+python -m adaptador.api                            # abra http://127.0.0.1:8000
+python -m pytest testes                            # opcional: os testes
 ```
+
+No Windows, basta dar dois cliques em `publicar.bat`: ele instala o que faltar, pede a chave e abre o site.
+Com Docker: `docker build -t prisma . && docker run -p 8000:8000 -e GEMINI_API_KEY=... prisma`.
 
 Um servidor só entrega o site (`web/`), a aba Instruções (mini curso e manual), o login e a API.
 Configuração em `backend/.env` (modelo em `backend/.env.exemplo`, que nunca leva segredos):
@@ -21,9 +35,13 @@ Configuração em `backend/.env` (modelo em `backend/.env.exemplo`, que nunca le
 - `GEMINI_API_KEY`: chave da IA. Sem ela tudo funciona, só a Leitura Fácil e a descrição automática ficam pendentes.
 - `PRISMA_CODIGO_ESCOLA`: código que o professor digita para criar conta. Sem ele, o cadastro fica fechado.
 
-**Link público para a banca:** rode `publicar.bat` (Windows). Ele liga o servidor e cria um endereço
-`https://...trycloudflare.com` que qualquer pessoa abre. O endereço muda a cada vez e só funciona
-enquanto este computador estiver ligado. Detalhes em [`backend/README.md`](backend/README.md).
+**Materiais de teste e preparo da apresentação:** veja `materiais-teste/LEIA-ME.md`.
+
+**Link público para a banca:** rode `publicar.bat` (Windows). Ele abre a página Compartilhar, com QR code e contas de demonstração. Ele liga o servidor e cria um endereço
+`https://...trycloudflare.com` que qualquer pessoa abre. O link só aparece depois de testado pela internet,
+já vem copiado (Ctrl+V) e fica em `link.txt`. Muda a cada vez e só funciona enquanto este computador
+e a janela estiverem ligados. Se a rede bloquear o túnel, use o celular como roteador; no mesmo Wi-Fi,
+o site também abre em `http://IP-do-computador:8000`. Detalhes em [`backend/README.md`](backend/README.md).
 
 ### Quem entra e como
 
@@ -43,10 +61,10 @@ a ferramenta identifica as barreiras de cada aluno, adapta o material da aula e 
 ## Como funciona (fluxo)
 
 ```
-1. PERFIL       2. MATERIAL      3. ADAPTAÇÃO          4. GUIA / RELATÓRIO      5. MEDIR DE NOVO
-necessidades -> aula original -> versões acessíveis -> para professor e      -> mini-check: todos
-funcionais      (PDF, texto,     (regras do Manual)    família                   aprenderam?
-do aluno        slide)                                                           ajusta o perfil
+1. PERFIL       2. MATERIAL      3. ADAPTAÇÃO          4. GUIA / RELATÓRIO      5. AVALIAÇÃO
+necessidades -> aula original -> versões acessíveis -> para professor e      -> o aluno dá estrelas
+funcionais      (PDF, slide,     (regras do Manual)    família                   e sugestão; o professor
+do aluno        áudio, vídeo)                                                    ajusta a próxima aula
 ```
 
 O **Manual de Acessibilidade** (`docs/manual/`) não é um entregável separado: ele é a **base de regras**

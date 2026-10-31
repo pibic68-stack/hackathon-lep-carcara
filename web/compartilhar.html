@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compartilhar · PRISMA</title>
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <link rel="stylesheet" href="css/painel-api.css">
+  <script src="js/acessibilidade.js"></script>
+  <style>
+    .compartilhar { display: grid; gap: 24px; padding-block: 32px 64px; }
+    .qr-cartao { display: grid; gap: 16px; justify-items: start; }
+    .qr { background: #fff; padding: 16px; border: 3px solid var(--tinta); line-height: 0; }
+    .qr img { width: min(320px, 70vw); height: auto; image-rendering: pixelated; }
+    .link-grande { font-size: max(var(--letra-min), 1.4rem); font-weight: 700; word-break: break-all; margin: 0; }
+    .acoes-link { display: flex; flex-wrap: wrap; gap: 12px; }
+    .contas table { border-collapse: collapse; width: 100%; }
+    .contas th, .contas td { text-align: left; padding: 8px 10px; border-bottom: 2px solid var(--tinta-3, #ccc); vertical-align: top; }
+    .contas code { font-size: max(var(--letra-min), 1.05rem); }
+    .estado { margin: 0; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <a class="pular-link" href="#conteudo">Pular para o conteúdo</a>
+  <div id="barra-acessibilidade"></div>
+  <header class="topo">
+    <div class="conteiner">
+      <a class="marca" href="index.html" aria-label="PRISMA, página inicial">
+        <img class="pixel" src="assets/img/prisma-logo.svg" alt="" width="45" height="27">
+        <span>PRISMA</span>
+      </a>
+      <nav class="menu" id="menu" aria-label="Principal">
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="entrar.html">Entrar</a></li>
+          <li><a href="compartilhar.html" aria-current="page">Compartilhar</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo" class="conteiner compartilhar">
+    <div>
+      <p class="rotulo">Apresentação</p>
+      <h1>Abrir o PRISMA em outro aparelho</h1>
+      <p class="suave">Aponte a câmera do celular para o código ou mande o link. Esta página se atualiza sozinha.</p>
+    </div>
+
+    <section class="cartao qr-cartao" aria-labelledby="t-link">
+      <h2 id="t-link">Link para qualquer pessoa</h2>
+      <p class="estado" id="estado" role="status" aria-live="polite">Procurando o link…</p>
+      <div class="qr" id="qr" hidden></div>
+      <p class="link-grande" id="link"></p>
+      <div class="acoes-link">
+        <button type="button" class="botao" id="copiar" hidden>Copiar o link</button>
+        <a class="botao botao--secundario" id="abrir" target="_blank" rel="noopener" hidden>Abrir o link</a>
+      </div>
+      <p class="dica" id="rede"></p>
+    </section>
+
+    <section class="cartao contas" id="contas" aria-labelledby="t-contas" hidden>
+      <h2 id="t-contas">Contas de demonstração</h2>
+      <p class="dica">Todas fictícias. Esta parte só aparece neste computador: quem abre pelo link não vê as senhas.</p>
+      <div id="contas-corpo"></div>
+    </section>
+  </main>
+
+  <script src="js/icones.js"></script>
+  <script src="vendor/qrcode.js"></script>
+  <script>
+  (function () {
+    var ultimo = "";
+    function el(tag, texto) { var n = document.createElement(tag); if (texto != null) n.textContent = texto; return n; }
+
+    function qr(texto) {
+      var q = qrcode(0, "M");
+      q.addData(texto);
+      q.make();
+      var caixa = document.getElementById("qr");
+      caixa.innerHTML = q.createImgTag(8, 0);
+      caixa.querySelector("img").alt = "Código QR do link " + texto;
+      caixa.hidden = false;
+    }
+
+    function mostrar(d) {
+      var alvo = d.link || null;
+      var estado = {
+        pronto: "Link pronto e testado.",
+        criando: "Criando o link público… (até 1 minuto)",
+        bloqueado: "Esta rede bloqueou o link público. Use o celular como roteador, ou o endereço do Wi-Fi abaixo.",
+        caiu: "O link caiu e está sendo criado de novo. O endereço vai mudar.",
+        "sem túnel": "O link público ainda não foi criado. Abra o publicar.bat."
+      }[d.estado] || d.estado;
+      document.getElementById("estado").textContent = estado;
+      var link = alvo || (d.estado !== "pronto" && d.rede) || "";
+      if (link && link !== ultimo) {
+        ultimo = link;
+        qr(link);
+        document.getElementById("link").textContent = link;
+        var abrir = document.getElementById("abrir");
+        abrir.href = link; abrir.hidden = false;
+        document.getElementById("copiar").hidden = false;
+      }
+      document.getElementById("rede").textContent = d.rede
+        ? (alvo ? "No mesmo Wi-Fi também abre em: " + d.rede : "Este código é do endereço no Wi-Fi: só abre em aparelhos na mesma rede.")
+        : "";
+      if (d.demo && !d.demo.erro) contas(d.demo);
+    }
+
+    function contas(demo) {
+      var corpo = document.getElementById("contas-corpo");
+      corpo.textContent = "";
+      var t = el("table");
+      var cab = el("tr");
+      ["Quem", "Como entrar"].forEach(function (x) { cab.appendChild(el("th", x)); });
+      t.appendChild(cab);
+      function linha(quem, como) { var tr = el("tr"); tr.appendChild(el("td", quem)); var td = el("td"); td.appendChild(como); tr.appendChild(td); t.appendChild(tr); }
+      function codigo(texto) { return el("code", texto); }
+      var p = el("span"); p.append("Entrar › Professor(a). E-mail ", codigo(demo.professora.email), ", senha ", codigo(demo.professora.senha));
+      linha("Professora", p);
+      var e = el("span"); e.append("Entrar › Escola. E-mail ", codigo(demo.escola.email), ", senha ", codigo(demo.escola.senha));
+      linha("Escola", e);
+      (demo.turmas || []).forEach(function (turma) {
+        turma.alunos.forEach(function (a) {
+          var s = el("span"); s.append("Entrar › Aluno(a). Turma ", codigo(turma.codigo), ", figurinhas " + a.figuras.join(", ") + ".");
+          linha(a.apelido, s);
+          var f = el("span"); f.append("Entrar › Família. Código ", codigo(a.codigo_familia));
+          linha("Família de " + a.apelido.split(" ")[0], f);
+        });
+      });
+      corpo.appendChild(t);
+      document.getElementById("contas").hidden = false;
+    }
+
+    document.getElementById("copiar").addEventListener("click", function () {
+      var b = this;
+      navigator.clipboard.writeText(ultimo).then(function () { b.textContent = "Copiado!"; setTimeout(function () { b.textContent = "Copiar o link"; }, 2000); });
+    });
+
+    function atualizar() {
+      fetch("/api/compartilhar", { credentials: "same-origin" }).then(function (r) { return r.json(); })
+        .then(mostrar)
+        .catch(function () { document.getElementById("estado").textContent = "O servidor do PRISMA não respondeu. Abra o publicar.bat."; })
+        .then(function () { setTimeout(atualizar, 5000); });
+    }
+    atualizar();
+  })();
+  </script>
+</body>
+</html>

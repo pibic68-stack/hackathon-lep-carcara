@@ -5,7 +5,6 @@ Uso:  python3 web/prisma-instrucoes/build.py
 Lê:   docs/manual/padroes.json  e  docs/manual/manual-prisma-v1.pdf
       web/prisma-instrucoes/src/pagina.html  (estrutura e código)  +  src/estilo.css (visual)
 Gera: web/prisma-instrucoes/index.html          (página para o site: usa ../css, ../js e ../assets do próprio site)
-      web/prisma-instrucoes/padroes.json        (cópia, para o backend ler)
       web/prisma-instrucoes/manual-prisma-v1.pdf (cópia, para o botão de download)
       web/prisma-instrucoes/_previa/            (só para ver a aba fora do site, na prévia do Claude; não vai para o Git)
 
@@ -56,7 +55,6 @@ for marca in ('<!doctype html>', '<html lang="pt-BR">', '<head>', '</head>', '<b
     fragmento = fragmento.replace(marca + "\n", "").replace(marca, "")
 (previa / "index.html").write_text(fragmento, encoding="utf-8")
 
-shutil.copy(MANUAL / "padroes.json", AQUI / "padroes.json")
 pdf = MANUAL / "manual-prisma-v1.pdf"
 if pdf.exists():
     shutil.copy(pdf, AQUI / "manual-prisma-v1.pdf")
