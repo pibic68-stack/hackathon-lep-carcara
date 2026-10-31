@@ -7,10 +7,31 @@ Time **Carcará 3301** · Hackathon LEP (Educação)
 > Time de alunos do IME no hackathon da Liga de Empreendedorismo da Praia Vermelha.
 > **Trilhas:** 1 (Inclusão e acessibilidade) + 4 (Aprendizagem individualizada).
 
-## PRISMA
+## Como rodar (tudo junto: site, manual, login e IA)
 
-**Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis.**
-Protótipo do site em [`web/`](web/README.md): abra `web/index.html` com duplo clique.
+```bash
+cd backend
+python -m pip install -r requirements.txt
+python -m adaptador.api          # abra http://127.0.0.1:8000
+```
+
+Um servidor só entrega o site (`web/`), a aba Instruções (mini curso e manual), o login e a API.
+Configuração em `backend/.env` (modelo em `backend/.env.exemplo`, que nunca leva segredos):
+
+- `GEMINI_API_KEY`: chave da IA. Sem ela tudo funciona, só a Leitura Fácil e a descrição automática ficam pendentes.
+- `PRISMA_CODIGO_ESCOLA`: código que o professor digita para criar conta. Sem ele, o cadastro fica fechado.
+
+**Link público para a banca:** rode `publicar.bat` (Windows). Ele liga o servidor e cria um endereço
+`https://...trycloudflare.com` que qualquer pessoa abre. O endereço muda a cada vez e só funciona
+enquanto este computador estiver ligado. Detalhes em [`backend/README.md`](backend/README.md).
+
+### Quem entra e como
+
+| Perfil | Como entra | O que faz |
+|---|---|---|
+| Professor | e-mail e senha (cria a conta com o código da escola) | cria turmas e alunos fictícios, envia o material, revisa e aprova |
+| Aluno | código da turma + senha de 3 figurinhas | abre os materiais publicados, com as versões do seu jeito primeiro |
+| Família | código da família | vê como o aluno aprende melhor e os materiais da turma |
 
 ## A ideia em uma frase
 
@@ -29,12 +50,23 @@ do aluno        slide)                                                          
 ```
 
 O **Manual de Acessibilidade** (`docs/manual/`) não é um entregável separado: ele é a **base de regras**
-que a ferramenta aplica. Cada regra do manual vira uma automação no código.
+que a ferramenta aplica. A maioria das regras vira automação no código; as outras pedem IA com revisão
+do professor ou uma pessoa (dos 51 critérios: 31 automáticos, 18 de IA com revisão, 2 manuais).
+
+### O mesmo fluxo com outros nomes (item C3 do relatório)
+
+| Site (5 etapas, na tela) | Manual (6 etapas, no pitch) | Backend (código) |
+|---|---|---|
+| Perfil | (antes de tudo) | turmas e alunos com necessidades (`contas.py`) |
+| Material | Enviar | `POST /api/adaptar` |
+| Adaptação | Analisar + Transformar | `leitores.py` + `transformacoes.py` + `ia.py` |
+| Guia | Revisar + Publicar | fila de revisão, `aprovar`, biblioteca da turma |
+| Mini-check | Acompanhar | ainda não construído |
 
 ## Princípios (não negociáveis)
 
 - **Identificar barreiras, não diagnosticar.** A ferramenta não diz se a criança "tem autismo".
-  Ela registra necessidades funcionais (ex.: "precisa de instruções em etapas") e, quando for o caso,
+  Ela registra necessidades funcionais (por exemplo, "precisa de instruções em etapas") e, quando for o caso,
   orienta a família a procurar um profissional.
 - **O professor revisa e aprova** tudo o que a IA gera antes de chegar ao aluno.
 - **Mesmo conteúdo para todos**: muda a forma, não o objetivo de aprendizagem.

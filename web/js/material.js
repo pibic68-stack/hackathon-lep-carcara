@@ -91,10 +91,10 @@
     }).join("") + "</ul>";
   }
 
-  var TEXTO_ORIGINAL = "A água é uma grande viajante! Ela vive dando a volta ao mundo: sobe para o céu, passeia nas nuvens e depois despenca de volta para a terra. Esse vaivém sem fim é o <strong>ciclo da água</strong>, e acontece o tempo todo, mesmo quando a gente nem percebe.";
+  var TEXTO_ORIGINAL = "A água é uma grande viajante! Ela vive dando a volta ao mundo. Sobe para o céu, passeia nas nuvens e depois despenca de volta para a terra. Esse vaivém sem fim é o <strong>ciclo da água</strong>, e acontece o tempo todo, mesmo quando a gente nem percebe.";
 
   function cabecalho(extra) {
-    return '<header class="ficha-cab"><span>CIÊNCIAS · 5º ANO</span><span>' + (extra || "Ficha 7") + "</span></header>" +
+    return '<header class="ficha-cab"><span>Ciências · 5º ano</span><span>' + (extra || "Ficha 7") + "</span></header>" +
       '<h4 class="ficha-titulo">O caminho da água</h4>';
   }
 

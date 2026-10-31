@@ -51,7 +51,31 @@ Em ordem de importância.
 - PDF do manual: logo pixel na capa, fontes e cores do site, números na fonte do texto, sem depender de fontes fora do repositório.
 - Problemas que achei na aba e já corrigi: rolagem horizontal no manual em celular, letras pequenas, linhas longas, cantos arredondados nos gráficos.
 
-## 4. Para decidir em grupo (sugestão de ordem)
+## 4. O que já foi corrigido (31/10, à noite)
+
+Decisões do grupo: identidade do site em tudo, fundo creme no material gerado e **o site também segue P2 e P3**.
+
+| Item | O que mudou |
+|---|---|
+| C1 | `renderizador.py` usa as fontes e cores do site. Contraste conferido nos testes. |
+| C2 | O site mostra os critérios do manual (P1.1, P6.2...). Os 15 códigos antigos foram trocados. `regras.json` saiu dos comentários. |
+| C3 | Tabela "equivale a" no `README.md`. |
+| C4 | A frase virou "A maioria das regras do Manual vira automação. O professor revisa o resto." |
+| C5 | Todas as fichas com letra de pelo menos 14 pt. A ficha "antes" continua com título serifado, de propósito. |
+| C6 | Material gerado com fundo creme `#FBF7EE`. |
+| C7 | O site segue P2 e P3: piso de 14 pt em todo `font-size` (`--letra-min`), nada em maiúsculas, linha de até 60 caracteres, sem itálico, frases de até 20 palavras e sem abreviações. Verificado em todas as páginas; só ficam de fora os exemplos de "antes" da aba Instruções. No manual, 24 frases foram divididas, sem mudar fatos nem números, e "&" virou "e" nas citações. |
+| C8 | Os painéis têm o mesmo menu e rodapé da página inicial. |
+| A1 | A fonte pixel só desenha letras; os números caem na Atkinson (`unicode-range`). |
+| A2 | 0 px de rolagem lateral em 320 px nas páginas medidas. |
+| A3 | Nenhum texto abaixo de 14 pt (fora os exemplos de "antes"). |
+| A4 | Acromatopsia: `--laranja-escuro` passou a `#5A5A5A` (ΔE de 2,4 para 20,7). |
+| A5 | Protanopia e deuteranopia: o verde virou amarelo `#E8D44D` (ΔE contra o azul céu acima de 100). |
+| A6 | Céu e lilás só aparecem juntos nas figurinhas, que já têm ícone e nome. |
+| A7 | Menu fixo com fundo sólido. O pontilhado atrás dos diagramas saiu (P2.7). |
+
+Os ΔE foram medidos com as mesmas matrizes de Machado (2009) do relatório; o script reproduz os valores da tabela acima.
+
+## 5. Para decidir em grupo (sugestão de ordem)
 
 1. C1: aprovar a identidade do site para tudo, inclusive o material gerado.
 2. C7: decidir o escopo dos critérios P2 e P3 (material gerado × interface).

@@ -10,8 +10,8 @@
 .entrar-arte img:not(.entrar-carcara) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 100%; image-rendering: pixelated; }
 .entrar-carcara { position: absolute; left: 8%; bottom: 6%; width: clamp(90px, 10vw, 160px); height: auto; image-rendering: pixelated; }
 
-.entrar-painel { padding: clamp(28px, 5vw, 64px) clamp(20px, 4vw, 56px) 48px; background: var(--cor-fundo); }
-.entrar-painel h1 { font-size: clamp(2rem, 4vw, 2.75rem); }
+.entrar-painel { padding: clamp(28px, 5vw, 64px) clamp(16px, 4vw, 56px) 48px; background: var(--cor-fundo); min-width: 0; }
+.entrar-painel h1 { font-size: max(var(--letra-min), clamp(2rem, 4vw, 2.75rem)); }
 .entrar-painel h1:focus { outline: none; }
 
 @media (max-width: 860px) {
@@ -34,8 +34,8 @@
 .perfil:active { top: 6px; left: 6px; box-shadow: 0 -3px 0 0 var(--cor-borda), 0 3px 0 0 var(--cor-borda), -3px 0 0 0 var(--cor-borda), 3px 0 0 0 var(--cor-borda); }
 .perfil img { width: 72px; height: 72px; flex: none; box-shadow: 0 0 0 3px var(--cor-borda); }
 .perfil-texto { display: grid; gap: 2px; flex: 1; }
-.perfil-texto strong { font-family: var(--fonte-titulo); font-weight: 400; font-size: 1.5rem; }
-.perfil-texto span { color: var(--cor-texto-suave); font-size: 1rem; }
+.perfil-texto strong { font-family: var(--fonte-titulo); font-weight: 400; font-size: max(var(--letra-min), 1.5rem); }
+.perfil-texto span { color: var(--cor-texto-suave); font-size: max(var(--letra-min), 1rem); }
 .perfil > [data-icone] .icone { width: 28px; height: 28px; }
 
 /* ---------- passo 2: formulário ---------- */
@@ -48,9 +48,9 @@
 .form { display: grid; gap: 18px; margin-bottom: 20px; }
 .campo { display: grid; gap: 6px; border: 0; padding: 0; margin: 0; min-width: 0; }
 .campo label, .campo legend { font-weight: 700; padding: 0; }
-.dica { margin: 0; font-size: .95rem; color: var(--cor-texto-suave); }
+.dica { margin: 0; font-size: max(var(--letra-min), .95rem); color: var(--cor-texto-suave); }
 .campo input[type="email"], .campo input[type="text"], .campo input[type="password"] {
-  width: 100%; min-height: 52px; padding: .6rem .8rem; font: inherit; font-size: 1.125rem;
+  width: 100%; min-height: 52px; padding: .6rem .8rem; font: inherit; font-size: max(var(--letra-min), 1.125rem);
   color: var(--cor-texto); background: var(--cor-superficie); border: 0; border-radius: 0;
   box-shadow: 0 0 0 3px var(--cor-borda), inset 3px 3px 0 rgba(30, 34, 53, .08);
 }
@@ -76,7 +76,7 @@
 .senha-slots { list-style: none; padding: 0; margin: 4px 0 8px; display: flex; gap: 12px; }
 .senha-slots li {
   width: 64px; height: 64px; display: grid; place-items: center;
-  font-family: var(--fonte-mono); font-size: 1.4rem; color: var(--cor-texto-suave);
+  font-family: var(--fonte-mono); font-size: max(var(--letra-min), 1.4rem); color: var(--cor-texto-suave);
   background: var(--cor-fundo-2); box-shadow: 0 0 0 3px var(--cor-borda); outline: 2px dashed var(--cor-linha); outline-offset: -10px;
 }
 .senha-slots li.cheio { background: var(--cor); outline: 0; color: #1E2235; }
@@ -84,7 +84,7 @@
 .grade-figurinhas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 16px; padding: 3px 9px 9px 3px; }
 .figurinha {
   display: grid; justify-items: center; gap: 4px; padding: 12px 6px 8px;
-  font: inherit; font-size: .9rem; font-weight: 700; color: #1E2235; background: var(--cor); border: 0; cursor: pointer;
+  font: inherit; font-size: max(var(--letra-min), .9rem); font-weight: 700; color: #1E2235; background: var(--cor); border: 0; cursor: pointer;
   position: relative; top: 0;
   box-shadow: 0 -3px 0 0 var(--cor-borda), 0 3px 0 0 var(--cor-borda), -3px 0 0 0 var(--cor-borda), 3px 0 0 0 var(--cor-borda), 0 7px 0 0 var(--cor-sombra);
 }
@@ -101,6 +101,11 @@
 .painel-cab .botao { margin-left: auto; }
 .painel-grade { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
 .painel-grade .cartao { display: grid; gap: 8px; align-content: start; min-height: 170px; }
-.painel-grade h2 { font-size: 1.35rem; margin: 0; display: flex; gap: 10px; align-items: center; }
-.painel-grade p { margin: 0; color: var(--cor-texto-suave); font-size: 1rem; }
+.painel-grade h2 { font-size: max(var(--letra-min), 1.35rem); margin: 0; display: flex; gap: 10px; align-items: center; }
+.painel-grade p { margin: 0; color: var(--cor-texto-suave); font-size: max(var(--letra-min), 1rem); }
 .em-breve { justify-self: start; }
+
+/* botão com cara de link (ações que não mudam de página) */
+.link { background: none; border: 0; padding: 0; font: inherit; color: var(--cor-link); text-decoration: underline; cursor: pointer; min-height: 44px; }
+.link:focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 3px; }
+.form-titulo { font-size: max(var(--letra-min), 1.6rem); margin: 0; }

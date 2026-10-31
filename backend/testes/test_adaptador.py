@@ -70,6 +70,12 @@ class TestEtapas(unittest.TestCase):
         self.assertEqual(r.blocos[0].itens, ["A", "B"])
 
 
+class TestFigurado(unittest.TestCase):
+    def test_expressao_dentro_de_passos_e_sinalizada(self):
+        d = Documento("x", [Bloco("etapas", itens=["Leia o texto", "Não vale chover no molhado"])])
+        self.assertTrue(any(p.startswith("P6.3") for p in t.sinalizar_linguagem_figurada(d).pendencias))
+
+
 class TestImagem(unittest.TestCase):
     def test_imagem_sem_descricao_vira_pendencia(self):
         d = Documento("x", [Bloco("imagem", arquivo="imagens/a.png")])

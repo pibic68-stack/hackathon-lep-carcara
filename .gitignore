@@ -257,3 +257,4 @@ web/prisma-instrucoes/_previa/
 # ===== Backend: saídas geradas (o cache/ é versionado de propósito, para a demo offline) =====
 backend/saida/
 backend/envios/
+backend/dados/

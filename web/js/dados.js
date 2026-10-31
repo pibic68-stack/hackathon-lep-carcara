@@ -1,5 +1,5 @@
 /* Dados de exemplo do protótipo. Todos os alunos são FICTÍCIOS (LGPD).
-   Quando o backend existir, estes dados virão de lá e de docs/manual/regras.json. */
+   Os códigos (P1.1, P6.2...) são os critérios do Manual: docs/manual/padroes.json. */
 window.Prisma = window.Prisma || {};
 
 /* ---------- necessidades do seletor ---------- */
@@ -11,10 +11,10 @@ Prisma.NECESSIDADES = [
     filtro: "url(#sim-protanopia)",
     adaptacoes: ["Cor + símbolo", "Paleta segura", "Linhas com padrão"],
     regras: [
-      { id: "R-DALT-01", texto: "Toda informação em cor vem com símbolo ou palavra.", fonte: "WCAG 2.2 · 1.4.1" },
-      { id: "R-DALT-02", texto: "Trocar vermelho e verde por azul e laranja (paleta Okabe-Ito).", fonte: "Okabe & Ito, 2008" },
-      { id: "R-DALT-03", texto: "Diferenciar setas por padrão: contínua, tracejada, pontilhada.", fonte: "WCAG 2.2 · 1.4.1" },
-      { id: "R-DALT-04", texto: "A pergunta não pede para reconhecer uma cor.", fonte: "DUA / CAST" }
+      { id: "P1.1", texto: "Toda informação em cor vem com símbolo ou palavra.", fonte: "WCAG 2.2 · 1.4.1" },
+      { id: "P1.3", texto: "Trocar vermelho e verde por azul e laranja (paleta Okabe-Ito).", fonte: "Okabe e Ito, 2008" },
+      { id: "P1.2", texto: "Diferenciar setas por padrão: contínua, tracejada, pontilhada.", fonte: "WCAG 2.2 · 1.4.1" },
+      { id: "P1.5", texto: "A pergunta não pede para reconhecer uma cor.", fonte: "DUA / CAST" }
     ]
   },
   {
@@ -24,10 +24,10 @@ Prisma.NECESSIDADES = [
     filtro: "url(#sim-deuteranopia)",
     adaptacoes: ["Cor + símbolo", "Paleta segura", "Linhas com padrão"],
     regras: [
-      { id: "R-DALT-01", texto: "Toda informação em cor vem com símbolo ou palavra.", fonte: "WCAG 2.2 · 1.4.1" },
-      { id: "R-DALT-02", texto: "Trocar vermelho e verde por azul e laranja (paleta Okabe-Ito).", fonte: "Okabe & Ito, 2008" },
-      { id: "R-DALT-03", texto: "Diferenciar setas por padrão: contínua, tracejada, pontilhada.", fonte: "WCAG 2.2 · 1.4.1" },
-      { id: "R-DALT-04", texto: "A pergunta não pede para reconhecer uma cor.", fonte: "DUA / CAST" }
+      { id: "P1.1", texto: "Toda informação em cor vem com símbolo ou palavra.", fonte: "WCAG 2.2 · 1.4.1" },
+      { id: "P1.3", texto: "Trocar vermelho e verde por azul e laranja (paleta Okabe-Ito).", fonte: "Okabe e Ito, 2008" },
+      { id: "P1.2", texto: "Diferenciar setas por padrão: contínua, tracejada, pontilhada.", fonte: "WCAG 2.2 · 1.4.1" },
+      { id: "P1.5", texto: "A pergunta não pede para reconhecer uma cor.", fonte: "DUA / CAST" }
     ]
   },
   {
@@ -37,10 +37,10 @@ Prisma.NECESSIDADES = [
     filtro: "url(#sim-tritanopia)",
     adaptacoes: ["Cor + símbolo", "Sem azul × amarelo", "Linhas com padrão"],
     regras: [
-      { id: "R-DALT-01", texto: "Toda informação em cor vem com símbolo ou palavra.", fonte: "WCAG 2.2 · 1.4.1" },
-      { id: "R-DALT-06", texto: "Evitar pares azul × verde e amarelo × rosa. Usar vermelho, preto e cinza.", fonte: "Okabe & Ito, 2008" },
-      { id: "R-DALT-03", texto: "Diferenciar setas por padrão: contínua, tracejada, pontilhada.", fonte: "WCAG 2.2 · 1.4.1" },
-      { id: "R-DALT-04", texto: "A pergunta não pede para reconhecer uma cor.", fonte: "DUA / CAST" }
+      { id: "P1.1", texto: "Toda informação em cor vem com símbolo ou palavra.", fonte: "WCAG 2.2 · 1.4.1" },
+      { id: "P1.3", texto: "Evitar pares azul × verde e amarelo × rosa. Usar vermelho, preto e cinza.", fonte: "Okabe e Ito, 2008" },
+      { id: "P1.2", texto: "Diferenciar setas por padrão: contínua, tracejada, pontilhada.", fonte: "WCAG 2.2 · 1.4.1" },
+      { id: "P1.5", texto: "A pergunta não pede para reconhecer uma cor.", fonte: "DUA / CAST" }
     ]
   },
   {
@@ -50,10 +50,10 @@ Prisma.NECESSIDADES = [
     filtro: "url(#sim-acromatopsia)",
     adaptacoes: ["Só formas e padrões", "Contraste de claro e escuro", "Rótulos em tudo"],
     regras: [
-      { id: "R-DALT-01", texto: "Toda informação em cor vem com símbolo ou palavra.", fonte: "WCAG 2.2 · 1.4.1" },
-      { id: "R-DALT-05", texto: "Elementos da figura com contraste de pelo menos 3:1 entre si.", fonte: "WCAG 2.2 · 1.4.11" },
-      { id: "R-DALT-03", texto: "Diferenciar setas por padrão e espessura.", fonte: "WCAG 2.2 · 1.4.1" },
-      { id: "R-DALT-07", texto: "Fundo sem brilho forte (creme no lugar de branco).", fonte: "a validar pela pesquisa" }
+      { id: "P1.1", texto: "Toda informação em cor vem com símbolo ou palavra.", fonte: "WCAG 2.2 · 1.4.1" },
+      { id: "P1.3", texto: "Elementos da figura com contraste de pelo menos 3:1 entre si.", fonte: "WCAG 2.2 · 1.4.11" },
+      { id: "P1.2", texto: "Diferenciar setas por padrão e espessura.", fonte: "WCAG 2.2 · 1.4.1" },
+      { id: "P2", texto: "Fundo sem brilho forte (creme no lugar de branco).", fonte: "decisão do time; a pesquisa confirma a fonte" }
     ]
   },
   {
@@ -63,10 +63,10 @@ Prisma.NECESSIDADES = [
     filtro: "url(#sim-baixa-visao)",
     adaptacoes: ["Fonte ≥ 24 px", "Alto contraste", "1 pergunta por página"],
     regras: [
-      { id: "R-BV-01", texto: "Fonte sem serifa com pelo menos 24 px (18 pt).", fonte: "a validar pela pesquisa" },
-      { id: "R-BV-02", texto: "Contraste de pelo menos 7:1 entre texto e fundo.", fonte: "WCAG 2.2 · 1.4.6" },
-      { id: "R-BV-03", texto: "Menos elementos por página: uma pergunta de cada vez.", fonte: "a validar pela pesquisa" },
-      { id: "R-BV-04", texto: "Figura ampliada, com setas grossas e rótulos grandes.", fonte: "WCAG 2.2 · 1.4.11" }
+      { id: "P2.2", texto: "Fonte sem serifa com pelo menos 24 px (18 pt).", fonte: "a validar pela pesquisa" },
+      { id: "P2.1", texto: "Contraste de pelo menos 7:1 entre texto e fundo.", fonte: "WCAG 2.2 · 1.4.6" },
+      { id: "P2", texto: "Menos elementos por página: uma pergunta de cada vez.", fonte: "a validar pela pesquisa" },
+      { id: "P2.2", texto: "Figura ampliada, com setas grossas e rótulos grandes.", fonte: "WCAG 2.2 · 1.4.11" }
     ]
   },
   {
@@ -76,10 +76,10 @@ Prisma.NECESSIDADES = [
     filtro: null,
     adaptacoes: ["Instruções em etapas", "Linguagem literal", "Rotina visual"],
     regras: [
-      { id: "R-TEA-01", texto: "Instruções em etapas numeradas, uma ação por frase.", fonte: "DUA / CAST" },
-      { id: "R-TEA-02", texto: "Linguagem literal, sem metáforas nem expressões.", fonte: "a validar pela pesquisa" },
-      { id: "R-TEA-03", texto: "Rotina visual: o que fazer agora, depois e quanto tempo leva.", fonte: "a validar pela pesquisa" },
-      { id: "R-TEA-04", texto: "Página limpa, uma tarefa por vez.", fonte: "DUA / CAST" }
+      { id: "P6.2", texto: "Instruções em etapas numeradas, uma ação por frase.", fonte: "DUA / CAST" },
+      { id: "P6.3", texto: "Linguagem literal, sem metáforas nem expressões.", fonte: "a validar pela pesquisa" },
+      { id: "P6.1", texto: "Rotina visual: o que fazer agora, depois e quanto tempo leva.", fonte: "a validar pela pesquisa" },
+      { id: "P2", texto: "Página limpa, uma tarefa por vez.", fonte: "DUA / CAST" }
     ]
   }
 ];
@@ -146,7 +146,7 @@ Prisma.ETAPAS = [
     id: "adaptacao", num: "3", nome: "Adaptação", icone: "zap",
     externos: null, /* vem da necessidade escolhida */
     titulo: "Aplica as regras do Manual de Acessibilidade",
-    texto: function (n) { return "Cada regra do Manual vira uma automação. Para " + n.nome.toLowerCase() + ", o PRISMA aplicou " + n.regras.length + " regras:"; },
+    texto: function (n) { return "A maioria das regras do Manual vira automação. O professor revisa o resto. Para " + n.nome.toLowerCase() + ", o PRISMA aplicou " + n.regras.length + " regras:"; },
     detalhe: function (n) {
       return '<ul class="lista-regras">' + n.regras.map(function (r) {
         return '<li><span class="etiqueta">' + r.id + "</span> " + r.texto + "</li>";

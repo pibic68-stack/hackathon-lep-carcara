@@ -231,14 +231,14 @@ def documento(css_fontes):
   <p class="eyebrow">PRISMA · Manual de padrões · versão {ESC(D["versao"])}</p>
   <h1>Manual PRISMA</h1>
   <p class="sigla">{ESC(D["sigla"])}</p>
-  <p class="sub">{ESC(D["lema"])} Este manual explica as regras que a plataforma usa para transformar cada material, mostra em que pesquisas cada regra se apoia e lista os {ncrit} critérios que o código verifica.</p>
+  <p class="sub">{ESC(D["lema"])} Este manual explica as regras que a plataforma usa para transformar cada material. Mostra em que pesquisas cada regra se apoia e lista os {ncrit} critérios que o código verifica.</p>
   <ul class="capa-leitores">
     <li><b>Professores e escolas</b><span>Partes 1 a 5: por que, princípios, como funciona, quem são os estudantes e os 10 padrões.</span></li>
     <li><b>Time de desenvolvimento</b><span>Parte 6: como o código usa este manual. As tabelas de critérios estão na Parte 5.</span></li>
     <li><b>Famílias</b><span>Parte 9, em linguagem simples.</span></li>
     <li><b>Estudantes</b><span>Parte 10, em Leitura Fácil.</span></li>
   </ul>
-  <p class="nota-capa">Este manual segue as próprias regras: texto em Atkinson Hyperlegible Next (criada para leitores com baixa visão), títulos em Pixelify Sans (a fonte pixel do site, só em frases curtas), números sempre na fonte do texto, texto alinhado à esquerda e nenhuma informação passada só por cor. Time Carcará 3301, Hackathon LEP 2026.</p>
+  <p class="nota-capa">Este manual segue as próprias regras. O texto usa a Atkinson Hyperlegible Next, criada para leitores com baixa visão. Os títulos usam a Pixelify Sans, a fonte pixel do site, só em frases curtas. Os números ficam sempre na fonte do texto. O texto é alinhado à esquerda, e nenhuma informação passa só por cor. Time Carcará 3301, Hackathon LEP 2026.</p>
 </section>
 
 <section class="parte">
@@ -278,7 +278,7 @@ def documento(css_fontes):
 
 <section class="parte">
   <p class="eyebrow">Parte 4</p><h2>Quem são os estudantes</h2>
-  <p>A PRISMA não pergunta diagnósticos. Esta parte existe para quem usa a plataforma entender as necessidades mais comuns em sala, as barreiras que cada uma encontra no material e os padrões que mais ajudam. As descrições são simples de propósito; cada pessoa é única.</p>
+  <p>A PRISMA não pergunta diagnósticos. Esta parte existe para quem usa a plataforma entender as necessidades mais comuns em sala. Mostra também as barreiras que cada uma encontra no material e os padrões que mais ajudam. As descrições são simples de propósito; cada pessoa é única.</p>
   {necessidades()}
   <div class="bloco-mapa"><h3 class="h3s">Mapa: necessidades × padrões</h3>
   {mapa()}</div>
@@ -286,7 +286,7 @@ def documento(css_fontes):
 
 <section class="parte">
   <p class="eyebrow">Parte 5</p><h2>Os 10 padrões de transformação</h2>
-  <p>Cada padrão tem uma regra, uma explicação simples, o que a plataforma faz, como conferir, os critérios que o código verifica e as evidências em que se apoia.</p>
+  <p>Cada padrão tem uma regra, uma explicação simples, o que a plataforma faz e como conferir. Traz também os critérios que o código verifica e as evidências em que se apoia.</p>
   <ul class="chave">
     <li><span class="tag tag-dados">● Dados</span> estudo com dados coletados</li>
     <li><span class="tag tag-pratica">◆ Prática</span> relato, revisão ou estudo qualitativo</li>
@@ -299,14 +299,14 @@ def documento(css_fontes):
 
 <section class="parte">
   <p class="eyebrow">Parte 6 · Para o time de desenvolvimento</p><h2>Como o código usa este manual</h2>
-  <p>Tudo o que está nas tabelas de critérios vive num único arquivo: <span class="mono">docs/manual/padroes.json</span>. O mesmo arquivo gera este PDF e a aba de instruções do site. Se uma regra mudar, mude no arquivo e rode o gerador; o PDF, o site e o código passam a concordar.</p>
+  <p>Tudo o que está nas tabelas de critérios vive num único arquivo: <span class="mono">docs/manual/padroes.json</span>. O mesmo arquivo gera este PDF e a aba de instruções do site. Se uma regra mudar, mude no arquivo e rode o gerador. Assim o PDF, o site e o código passam a concordar.</p>
   <h3 class="h3s">Ordem de verificação sugerida</h3>
   <ol class="passos">
     <li><b>Ler o material</b> e separar texto, imagens, tabelas e cores.</li>
     <li><b>Rodar os critérios automáticos</b> (P1.1, P1.3, P2.x, P3.1, P3.2, P3.5, P4.1, P4.3). São regras com limite numérico ou busca de padrões, sem IA.</li>
-    <li><b>Chamar a IA</b> para os critérios marcados como "IA + revisão", passando a regra e o limite de cada um no prompt.</li>
-    <li><b>Conferir o resultado da IA</b> com os critérios automáticos de novo: frase com mais de 20 palavras volta para reescrita (P3.1); conceito-chave que sumiu bloqueia (P3.7).</li>
-    <li><b>Montar o relatório de barreiras</b> com o código de cada critério e enviar para a fila de revisão do professor (P10.1).</li>
+    <li><b>Chamar a IA</b> para os critérios marcados como "IA + revisão". O pedido leva a regra e o limite de cada um.</li>
+    <li><b>Conferir o resultado da IA</b> com os critérios automáticos de novo. Frase com mais de 20 palavras volta para reescrita (P3.1). Conceito-chave que sumiu bloqueia (P3.7).</li>
+    <li><b>Montar o relatório de barreiras</b> com o código de cada critério. Depois, enviar para a fila de revisão do professor (P10.1).</li>
   </ol>
   {automacao()}
   <h3 class="h3s">Como um critério aparece no arquivo</h3>
@@ -317,19 +317,19 @@ def documento(css_fontes):
   "limite": "≤ 20 em todos os níveis; ≤ 15 no nível II e ≤ 10 no nível I (projeto)",
   "automacao": "automatico"
 }}</pre>
-  <p>O campo <span class="mono">automacao</span> diz quem verifica: <b>automatico</b> (o código, sozinho), <b>ia_revisao</b> (a IA propõe e o professor confere) ou <b>manual</b> (uma pessoa).</p>
+  <p>O campo <span class="mono">automacao</span> diz quem verifica. Pode ser <b>automatico</b> (o código, sozinho), <b>ia_revisao</b> (a IA propõe e o professor confere) ou <b>manual</b> (uma pessoa).</p>
 </section>
 
 <section class="parte">
   <p class="eyebrow">Parte 7</p><h2>Exemplo completo: o ciclo da água</h2>
-  <p>O mesmo conteúdo em quatro níveis de leitura, com a atividade concreta e as conexões que a PRISMA sugere ao professor.</p>
+  <p>O mesmo conteúdo em quatro níveis de leitura. Vêm junto a atividade concreta e as conexões que a PRISMA sugere ao professor.</p>
   {exemplo()}
 </section>
 
 <section class="parte">
   <p class="eyebrow">Parte 8</p><h2>Limites e transparência</h2>
   <ul class="limites">
-    <li><b>A PRISMA não faz diagnóstico.</b> Se a família ou a escola notar dificuldades persistentes, o caminho é procurar a equipe da escola e um profissional de saúde.</li>
+    <li><b>A PRISMA não faz diagnóstico.</b> Se a família ou a escola notar dificuldades persistentes, o caminho é procurar a equipe da escola. Também vale procurar um profissional de saúde.</li>
     <li><b>A IA pode errar.</b> Uma simplificação pode mudar o sentido de um conceito, e modelos de linguagem podem inventar informação. Por isso nenhuma versão é publicada sem revisão (P10) e os conceitos-chave são conferidos (P3.7).</li>
     <li><b>Simplificar não garante compreensão.</b> As pesquisas com leitores reais têm resultados variados. Por isso existe o mini-check (P9).</li>
     <li><b>Não substitui pessoas.</b> AEE, intérprete de Libras, guia-intérprete, professor de apoio e transcrição profissional em braile continuam necessários. A PRISMA não gera Libras.</li>
@@ -358,7 +358,7 @@ def documento(css_fontes):
     <li>Há Atendimento Educacional Especializado (AEE) na escola?</li>
     <li>Como vocês vão avaliar o que ele ou ela aprendeu?</li>
   </ul>
-  <p class="aviso">A PRISMA nunca diz se uma criança tem uma deficiência. Se você tem dúvidas sobre o desenvolvimento do seu filho ou filha, converse com a escola e procure um profissional de saúde. Para receber apoio na escola, como o profissional de apoio, a lei não exige laudo.</p>
+  <p class="aviso">A PRISMA nunca diz se uma criança tem uma deficiência. Se você tem dúvidas sobre o desenvolvimento do seu filho ou filha, converse com a escola. Procure também um profissional de saúde. Para receber apoio na escola, como o profissional de apoio, a lei não exige laudo.</p>
 </section>
 
 <section class="parte estudante">

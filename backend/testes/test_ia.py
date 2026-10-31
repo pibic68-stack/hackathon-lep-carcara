@@ -244,8 +244,24 @@ class TestTransformacaoLeituraFacil(unittest.TestCase):
         self.assertTrue(any(p.startswith("P3.7") for p in r.pendencias))     # professor confere o conteúdo
         self.assertFalse(any(p.startswith("P3.1") for p in r.pendencias))
 
+    def test_frase_longa_volta_para_a_ia_e_e_corrigida(self):
+        pedidos = []
+
+        def reescrever(textos, refazer=False):
+            pedidos.append(refazer)
+            if not refazer:
+                return (["Esta frase tem bem mais palavras do que o limite combinado para o nível pedido aqui e agora.",
+                         "Leia o texto.", "Desenhe."], [])
+            return (["Esta frase era longa. Agora ficou curta."], [{"termo": "nível", "significado": "grau"}])
+
+        r = t.leitura_facil(self._doc(), "lf1", reescrever, 10)
+        self.assertEqual(pedidos, [False, True])             # só o trecho longo voltou
+        self.assertFalse(any(p.startswith("P3.1") for p in r.pendencias))
+        self.assertTrue(any(a.startswith("P3.1") for a in r.aplicados))
+        self.assertIn("Agora ficou curta.", [b.texto for b in r.blocos])
+
     def test_frase_longa_e_abreviacao_viram_pendencia(self):
-        def reescrever(textos):
+        def reescrever(textos, refazer=False):
             return (["Esta frase tem bem mais palavras do que o limite combinado para o nível pedido aqui.",
                      "Use frutas, ex. maçã.", "Faça isso & aquilo."], [])
 

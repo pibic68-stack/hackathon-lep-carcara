@@ -260,16 +260,16 @@
         {
           "tipo": "dados",
           "texto": "Cerca de 8% dos homens e 0,5% das mulheres têm alguma deficiência na visão de cores.",
-          "fonte": "American Optometric Association, citada por Alves & Alves (UniFOA, 2025)"
+          "fonte": "American Optometric Association, citada por Alves e Alves (UniFOA, 2025)"
         },
         {
           "tipo": "dados",
-          "texto": "Em 90 respostas de uma comunidade universitária, 22,1% relataram dificuldade com cores em gráficos, mapas ou tabelas; 25,6% tiveram obstáculos em provas; 30,2% precisaram pedir ajuda para interpretar cores.",
-          "fonte": "Alves & Alves (UniFOA, 2025)"
+          "texto": "Em 90 respostas de uma comunidade universitária, 22,1% relataram dificuldade com cores em gráficos, mapas ou tabelas. Além disso, 25,6% tiveram obstáculos em provas e 30,2% precisaram pedir ajuda para interpretar cores.",
+          "fonte": "Alves e Alves (UniFOA, 2025)"
         },
         {
           "tipo": "dados",
-          "texto": "Recolorir não serve para todos: pessoas com tritanomalia preferiram as ilustrações originais (66,7%); com deuteranomalia e protanomalia, versões com mais contraste.",
+          "texto": "Recolorir não serve para todos. Pessoas com tritanomalia preferiram as ilustrações originais (66,7%). Já as com deuteranomalia e protanomalia preferiram versões com mais contraste.",
           "fonte": "Bacelar (UFMA, 2024)"
         },
         {
@@ -361,31 +361,31 @@
         {
           "tipo": "pratica",
           "texto": "A legibilidade depende de contraste, tamanho, estilo e cor da fonte e das margens da página.",
-          "fonte": "Pires & Machado (2021)"
+          "fonte": "Pires e Machado (2021)"
         },
         {
           "tipo": "pratica",
           "texto": "Página limpa, margens largas e no máximo 60 caracteres por linha.",
-          "fonte": "Muñoz (2012), em Pires & Machado (2021)"
+          "fonte": "Muñoz (2012), em Pires e Machado (2021)"
         },
         {
           "tipo": "pratica",
-          "texto": "Letra de no mínimo Arial 14, sem serifa, sem itálico, sem palavras inteiras em maiúsculas; texto alinhado à esquerda, nunca justificado, sem colunas.",
+          "texto": "Letra de no mínimo Arial 14, sem serifa, sem itálico e sem palavras inteiras em maiúsculas. Texto alinhado à esquerda, nunca justificado e sem colunas.",
           "fonte": "Inclusion Europe, Information for all, regras 5 a 7 e 27 a 28"
         },
         {
           "tipo": "pratica",
-          "texto": "Material ampliado é a tecnologia assistiva mais comum na escola para quem tem baixa visão, mas os livros recebidos muitas vezes não vêm ampliados.",
-          "fonte": "Mendes et al. (UNIFIPMoc); Vilaronga & Caiado (RBEE, 2013)"
+          "texto": "Material ampliado é a tecnologia assistiva mais comum na escola para quem tem baixa visão. Mas os livros recebidos muitas vezes não vêm ampliados.",
+          "fonte": "Mendes et al. (UNIFIPMoc); Vilaronga e Caiado (RBEE, 2013)"
         },
         {
           "tipo": "norma",
-          "texto": "Contraste mínimo de 4,5:1 (nível AA) e 7:1 (nível AAA); espaçamento entre linhas de pelo menos 1,5.",
+          "texto": "Contraste mínimo de 4,5:1 (nível AA) e 7:1 (nível AAA). Espaçamento entre linhas de pelo menos 1,5.",
           "fonte": "WCAG 2.2, critérios 1.4.3, 1.4.6 e 1.4.12"
         },
         {
           "tipo": "projeto",
-          "texto": "O limite de 18 pt para a versão Ampliada é escolha inicial do time e precisa ser testado com estudantes com baixa visão.",
+          "texto": "O limite de 18 pt para a versão Ampliada é escolha inicial do time. Ele precisa ser testado com estudantes com baixa visão.",
           "fonte": "PRISMA"
         }
       ]
@@ -393,7 +393,7 @@
     {
       "id": "P3",
       "nome": "Linguagem Simples em níveis",
-      "regra": "Cada texto pode sair em três níveis de Leitura Fácil, seguindo as técnicas da Lei de Linguagem Simples, sem perder o conteúdo.",
+      "regra": "Cada texto pode sair em três níveis de Leitura Fácil, sem perder o conteúdo. Os níveis seguem as técnicas da Lei de Linguagem Simples.",
       "em_palavras_simples": "Um texto difícil pode esconder um conteúdo simples. A Linguagem Simples usa frases curtas, ordem direta e palavras do dia a dia. A Leitura Fácil vai além e organiza o texto em níveis, com imagens de apoio. O aluno aprende a mesma coisa que a turma, só que lendo de um jeito mais claro.",
       "niveis": {
         "III": "Próximo do original. Mantém o texto e explica palavras difíceis num glossário.",
@@ -441,7 +441,7 @@
         },
         {
           "id": "P3.5",
-          "criterio": "Sem notas de rodapé, abreviações (\"ex.\", \"etc.\") e caracteres especiais (\\ & < § #).",
+          "criterio": "Sem notas de rodapé, abreviações (\"ex.\", \"etc.\") e caracteres especiais (\\ e < § #).",
           "como_medir": "Busca por padrões no texto.",
           "limite": "0 ocorrências",
           "automacao": "automatico"
@@ -473,22 +473,22 @@
       "evidencias": [
         {
           "tipo": "norma",
-          "texto": "A Lei de Linguagem Simples lista 18 técnicas, entre elas: ordem direta, frases curtas, uma ideia por parágrafo, palavras comuns, explicar termos técnicos, nome completo antes da sigla, informação mais importante primeiro, voz ativa, evitar intercalações, linguagem acessível à pessoa com deficiência e testar com o público.",
+          "texto": "A Lei de Linguagem Simples lista 18 técnicas. Entre elas estão: ordem direta, frases curtas, uma ideia por parágrafo, palavras comuns e explicar termos técnicos. Outras: nome completo antes da sigla, informação mais importante primeiro, voz ativa e evitar intercalações. A lei também pede linguagem acessível à pessoa com deficiência e teste com o público.",
           "fonte": "Lei nº 15.263/2025, art. 5º"
         },
         {
           "tipo": "pratica",
-          "texto": "Leitura Fácil em três níveis: I com muitas ilustrações e pouco texto; II com vocabulário cotidiano e ações fáceis de seguir; III mais longo, com algumas palavras incomuns.",
-          "fonte": "Muñoz (2012), em Souza, Campos & Carrizalez"
+          "texto": "Leitura Fácil em três níveis. O nível I tem muitas ilustrações e pouco texto. O II tem vocabulário cotidiano e ações fáceis de seguir. O III é mais longo, com algumas palavras incomuns.",
+          "fonte": "Muñoz (2012), em Souza, Campos e Carrizalez"
         },
         {
           "tipo": "pratica",
           "texto": "No máximo 20 palavras por oração, uma oração por linha. Texto acessível não é texto oral nem simplista.",
-          "fonte": "Muñoz (2012), em Pires & Machado (2021)"
+          "fonte": "Muñoz (2012), em Pires e Machado (2021)"
         },
         {
           "tipo": "pratica",
-          "texto": "Comece cada frase numa nova linha; uma ideia por frase; sem notas de rodapé, abreviações ou caracteres especiais; explique as palavras difíceis.",
+          "texto": "Comece cada frase numa nova linha, com uma ideia por frase. Não use notas de rodapé, abreviações ou caracteres especiais. Explique as palavras difíceis.",
           "fonte": "Inclusion Europe, Information for all, regras 11 a 19"
         },
         {
@@ -561,17 +561,17 @@
         {
           "tipo": "pratica",
           "texto": "A imagem deve ser útil, não bonita. Mesmo desenho para a mesma ideia; nunca o mesmo desenho para duas ideias.",
-          "fonte": "Muñoz (2012), em Pires & Machado (2021); Inclusion Europe, regras 34 a 38"
+          "fonte": "Muñoz (2012), em Pires e Machado (2021); Inclusion Europe, regras 34 a 38"
         },
         {
           "tipo": "pratica",
-          "texto": "A audiodescrição deu a um estudante cego mais autonomia e melhorou seu rendimento em física, onde outras tecnologias assistivas não bastaram.",
-          "fonte": "Santos & Brandão (Ciência & Educação, 2020)"
+          "texto": "A audiodescrição deu a um estudante cego mais autonomia e melhorou seu rendimento em física. Outras tecnologias assistivas não tinham bastado.",
+          "fonte": "Santos e Brandão (Ciência & Educação, 2020)"
         },
         {
           "tipo": "pratica",
           "texto": "Professores precisam de formação para produzir imagens didáticas acessíveis com audiodescrição.",
-          "fonte": "Farias Júnior & Araújo (2023)"
+          "fonte": "Farias Júnior e Araújo (2023)"
         },
         {
           "tipo": "norma",
@@ -636,24 +636,24 @@
         {
           "tipo": "dados",
           "texto": "Aulas planejadas com DUA e Comunicação Aumentativa e Alternativa deixaram a turma de 1º ano motivada e engajada. O que é essencial para um aluno com deficiência foi benéfico para todos.",
-          "fonte": "Domaredzki, Hummel & Costa (2026)"
+          "fonte": "Domaredzki, Hummel e Costa (2026)"
         },
         {
           "tipo": "pratica",
-          "texto": "IA pode diversificar a apresentação do conteúdo e simplificar a linguagem, mas não produz inclusão automaticamente: depende da mediação do professor.",
+          "texto": "IA pode diversificar a apresentação do conteúdo e simplificar a linguagem. Mas não produz inclusão sozinha: depende da mediação do professor.",
           "fonte": "Além das barreiras da aprendizagem (Derecho y Cambio Social, 2026)"
         },
         {
           "tipo": "pratica",
           "texto": "DUA com tecnologias digitais, tecnologia assistiva e IA generativa ampliou acesso, comunicação e autonomia de estudantes com TEA.",
-          "fonte": "Alonso & Souza (2026)"
+          "fonte": "Alonso e Souza (2026)"
         }
       ]
     },
     {
       "id": "P6",
       "nome": "Estrutura previsível",
-      "regra": "O material abre dizendo o que vai acontecer, divide a tarefa em passos numerados com uma ação cada e usa linguagem literal.",
+      "regra": "O material abre dizendo o que vai acontecer. A tarefa vem em passos numerados, com uma ação cada, e a linguagem é literal.",
       "em_palavras_simples": "Saber o que vem pela frente acalma e ajuda a se organizar. Uma tarefa grande dividida em passos pequenos fica possível. E frases sem duplo sentido evitam confusão, principalmente para estudantes autistas.",
       "exemplos": [
         "Quadro \"Hoje vamos: 1. ler · 2. ver o desenho · 3. responder\"",
@@ -701,18 +701,18 @@
       "evidencias": [
         {
           "tipo": "dados",
-          "texto": "Em 43 atendimentos videogravados com 8 alunos com TEA, foram identificadas práticas baseadas em evidências como apoio visual, análise de tarefa (dividir a tarefa em passos) e comunicação alternativa.",
-          "fonte": "Finatto & Schmidt (Práxis Educacional, 2025)"
+          "texto": "Em 43 atendimentos gravados em vídeo com 8 alunos com TEA, foram identificadas práticas baseadas em evidências. Entre elas: apoio visual, análise de tarefa (dividir a tarefa em passos) e comunicação alternativa.",
+          "fonte": "Finatto e Schmidt (Práxis Educacional, 2025)"
         },
         {
           "tipo": "dados",
           "texto": "Mapeamento de 273 estudos (13 selecionados): suportes visuais digitais, como cronogramas visuais, aumentam a autonomia de estudantes com TEA.",
-          "fonte": "Nascimento & Venceslau, mapeamento sistemático"
+          "fonte": "Nascimento e Venceslau, mapeamento sistemático"
         },
         {
           "tipo": "dados",
           "texto": "Apoio visual e Comunicação Aumentativa e Alternativa amenizaram barreiras de comunicação de um aluno com TEA.",
-          "fonte": "Domaredzki, Hummel & Costa (2026)"
+          "fonte": "Domaredzki, Hummel e Costa (2026)"
         },
         {
           "tipo": "projeto",
@@ -771,7 +771,7 @@
       "evidencias": [
         {
           "tipo": "pratica",
-          "texto": "Com 4 alunos com deficiência intelectual, objetos manipuláveis (material dourado, cilindros graduados, planificações) ajudaram a entender conceitos complexos e aumentaram autonomia e confiança.",
+          "texto": "Com 4 alunos com deficiência intelectual, objetos manipuláveis ajudaram a entender conceitos complexos. Foram usados material dourado, cilindros graduados e planificações. Os objetos também aumentaram a autonomia e a confiança.",
           "fonte": "Oliveira (PROFMAT/UEPB, 2026)"
         },
         {
@@ -782,11 +782,11 @@
         {
           "tipo": "pratica",
           "texto": "Observação de prática: adaptações de acesso ao currículo e materiais didáticos dão ao aluno chance equitativa de acompanhar a aula.",
-          "fonte": "Evangelista & Borges (2020)"
+          "fonte": "Evangelista e Borges (2020)"
         },
         {
           "tipo": "pratica",
-          "texto": "Experiência de professora do grupo: para um aluno com TDAH cujo maior desafio é a concentração, letras móveis, quebra-cabeça, material dourado e régua Cuisenaire tornam o conteúdo concreto.",
+          "texto": "Experiência de professora do grupo: um aluno com TDAH tem como maior desafio a concentração. Para ele, letras móveis, quebra-cabeça, material dourado e régua Cuisenaire tornam o conteúdo concreto.",
           "fonte": "Relato de integrante do time PRISMA"
         }
       ]
@@ -840,13 +840,13 @@
       "evidencias": [
         {
           "tipo": "norma",
-          "texto": "A BNCC define 15 Temas Contemporâneos Transversais como referência obrigatória, a serem trabalhados de forma transversal e integradora, de preferência sem blocos rígidos.",
+          "texto": "A BNCC define 15 Temas Contemporâneos Transversais como referência obrigatória. Eles devem ser trabalhados de forma transversal e integradora, de preferência sem blocos rígidos.",
           "fonte": "MEC, Temas Contemporâneos Transversais na BNCC (2019)"
         },
         {
           "tipo": "pratica",
-          "texto": "Práticas colaborativas e interdisciplinares entre professores, AEE, equipe e família beneficiam estudantes com TEA e TDAH e qualificam a cultura escolar como um todo.",
-          "fonte": "Almeida, Sousa & Rocha (Revista Tópicos, 2026)"
+          "texto": "Práticas colaborativas e interdisciplinares entre professores, AEE, equipe e família beneficiam estudantes com TEA e TDAH. Elas também qualificam a cultura escolar como um todo.",
+          "fonte": "Almeida, Sousa e Rocha (Revista Tópicos, 2026)"
         },
         {
           "tipo": "pratica",
@@ -855,7 +855,7 @@
         },
         {
           "tipo": "pratica",
-          "texto": "Experiência de professora do grupo: as apostilas da rede pública são usadas sem conexão entre disciplinas, porque o planejamento conjunto exige tempo de organização que o professor não tem.",
+          "texto": "Experiência de professora do grupo: as apostilas da rede pública são usadas sem conexão entre disciplinas. O motivo é que o planejamento conjunto exige um tempo de organização que o professor não tem.",
           "fonte": "Relato de integrante do time PRISMA"
         }
       ]
@@ -863,7 +863,7 @@
     {
       "id": "P9",
       "nome": "Material vivo",
-      "regra": "O material se ajusta durante o ensino: cada versão tem um mini-check, o professor acompanha o resultado e a plataforma sugere ajustes.",
+      "regra": "O material se ajusta durante o ensino. Cada versão tem um mini-check, o professor acompanha o resultado e a plataforma sugere ajustes.",
       "em_palavras_simples": "Um material adaptado não nasce pronto. Ele vai sendo construído durante as aulas, conforme o professor vê o que funciona para cada aluno. A plataforma guarda esse histórico e ajuda a melhorar o material a cada uso.",
       "exemplos": [
         "Três perguntas no fim de cada versão",
@@ -926,7 +926,7 @@
         },
         {
           "tipo": "pratica",
-          "texto": "Experiência de professora do grupo: o material se constrói no decorrer do processo de ensino-aprendizagem, com materiais diversos para cada aluno.",
+          "texto": "Experiência de professora do grupo: o material se constrói no decorrer do processo de ensino-aprendizagem. Há materiais diversos para cada aluno.",
           "fonte": "Relato de integrante do time PRISMA"
         }
       ]
@@ -996,7 +996,7 @@
       "evidencias": [
         {
           "tipo": "norma",
-          "texto": "É obrigatório um documento individualizado de natureza pedagógica, como o PEI ou o plano de AEE, que integra o projeto político-pedagógico da escola.",
+          "texto": "É obrigatório um documento individualizado de natureza pedagógica, como o PEI ou o plano de AEE. Esse documento integra o projeto político-pedagógico da escola.",
           "fonte": "Decreto nº 12.686/2025, art. 12, com redação do Decreto nº 12.773/2025"
         },
         {
@@ -1006,8 +1006,8 @@
         },
         {
           "tipo": "pratica",
-          "texto": "Dos 16 artigos nacionais sobre o PEI analisados, nenhum explica com clareza como elaborá-lo e só 1 mostrou ganhos com dados.",
-          "fonte": "Silva & Camargo (2021)"
+          "texto": "Foram analisados 16 artigos nacionais sobre o PEI. Nenhum explica com clareza como elaborá-lo, e só 1 mostrou ganhos com dados.",
+          "fonte": "Silva e Camargo (2021)"
         },
         {
           "tipo": "pratica",
@@ -1017,7 +1017,7 @@
         {
           "tipo": "pratica",
           "texto": "A falta de tempo para planejar adaptações é a principal queixa dos professores.",
-          "fonte": "Marques & Duarte (2013)"
+          "fonte": "Marques e Duarte (2013)"
         },
         {
           "tipo": "pratica",
@@ -1027,7 +1027,7 @@
         {
           "tipo": "pratica",
           "texto": "A inclusão de um adolescente autista só avançou com esforço coordenado entre escola e família.",
-          "fonte": "Ferreira & Grossi (2024)"
+          "fonte": "Ferreira e Grossi (2024)"
         },
         {
           "tipo": "norma",
@@ -1129,7 +1129,7 @@
         "P5"
       ],
       "registros_2024": 6857,
-      "limite_da_plataforma": "A PRISMA prepara o texto e as descrições, mas a transcrição em braile, principalmente de matemática, é feita pelo Centro de Apoio Pedagógico (CAP) ou pelo AEE."
+      "limite_da_plataforma": "A PRISMA prepara o texto e as descrições. A transcrição em braile, principalmente de matemática, é feita pelo Centro de Apoio Pedagógico (CAP) ou pelo AEE."
     },
     {
       "id": "surdez",
@@ -1309,7 +1309,7 @@
       ]
     },
     "daltonismo_unifoa": {
-      "fonte": "Alves & Alves (UniFOA, 2025), 90 respostas",
+      "fonte": "Alves e Alves (UniFOA, 2025), 90 respostas",
       "itens": [
         {
           "nome": "Precisaram pedir ajuda",
@@ -1436,7 +1436,7 @@
     "MENDES, C. L. et al. A ampliação de materiais para pessoas com deficiência visual e seu avanço no contexto educacional. UNIFIPMoc.",
     "MINHOLI, F. S.; ROCHA, L. R. M. Materiais didáticos no contexto da educação bilíngue de surdos no ensino de matemática: revisão sistemática. Educação e Pesquisa, v. 52, 2026.",
     "MOSCARDINI, S. F. Escolarização de alunos com deficiência intelectual em classes comuns e em salas de recursos multifuncionais. Dissertação (Mestrado), UNESP, 2011.",
-    "MUÑOZ, Ó. G. Lectura fácil: métodos de redacción y evaluación. Madri, 2012 (citado por Pires & Machado e por Souza, Campos & Carrizalez).",
+    "MUÑOZ, Ó. G. Lectura fácil: métodos de redacción y evaluación. Madri, 2012 (citado por Pires e Machado e por Souza, Campos e Carrizalez).",
     "NASCIMENTO, J. P. S.; VENCESLAU, A. D. P. Suporte visual digital para estudantes com Transtorno do Espectro Autista: um mapeamento sistemático da literatura.",
     "OLIVEIRA, P. S. Práticas inclusivas no ensino de matemática: do concreto ao abstrato. Produto educacional (PROFMAT), UEPB, 2026.",
     "ONOHARA, J. V. Formação de professores: adaptação curricular da leitura e escrita para estudantes com deficiência intelectual. Dissertação (PROFEI), UNESP, 2024.",

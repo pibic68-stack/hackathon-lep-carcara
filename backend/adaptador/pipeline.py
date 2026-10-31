@@ -106,7 +106,7 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
             maximo = int(limites_p31[1] if v == "lf2" else limites_p31[2])
             try:
                 versao_doc = t.leitura_facil(
-                    doc, v, lambda textos, v=v, m=maximo: ia_mod.leitura_facil(ia, textos, v, m), maximo)
+                    doc, v, lambda textos, refazer=False, v=v, m=maximo: ia_mod.leitura_facil(ia, textos, v, m, refazer), maximo)
             except ia_mod.ErroIA as erro:
                 versoes[v] = {"status": "falhou", "motivo": str(erro)}
                 continue
@@ -128,6 +128,7 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
     bloqueios = [p for p in pendencias if p.startswith("P4.1")]
     revisao = {
         "material": doc.origem,
+        "titulo": doc.titulo,
         "aluno": (perfil or {}).get("aluno"),
         "status": "aguardando_aprovacao_do_professor",   # P10.1: nada chega ao aluno sem aprovar
         "pode_publicar": not bloqueios,

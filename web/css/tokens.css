@@ -3,8 +3,9 @@
    Mude aqui e o site inteiro acompanha.
    ========================================================= */
 
-@font-face { font-family: "Pixelify Sans"; src: url("../assets/fontes/pixelify-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Pixelify Sans"; src: url("../assets/fontes/pixelify-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+/* Pixelify só para letras: os algarismos caem na Atkinson (na fonte pixel o 5 parece S e o 0 parece 8). */
+@font-face { font-family: "Pixelify Sans"; src: url("../assets/fontes/pixelify-400.woff2") format("woff2"); font-weight: 400; font-display: swap; unicode-range: U+0000-002F, U+003A-10FFFF; }
+@font-face { font-family: "Pixelify Sans"; src: url("../assets/fontes/pixelify-700.woff2") format("woff2"); font-weight: 700; font-display: swap; unicode-range: U+0000-002F, U+003A-10FFFF; }
 @font-face { font-family: "Atkinson Hyperlegible Next"; src: url("../assets/fontes/atkinson-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Atkinson Hyperlegible Next"; src: url("../assets/fontes/atkinson-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
 @font-face { font-family: "Departure Mono"; src: url("../assets/fontes/departure-mono.woff2") format("woff2"); font-display: swap; }
@@ -56,6 +57,8 @@
 
   /* escala de letra (a barra de acessibilidade muda) */
   --escala: 1;
+  /* P2.2 do Manual: nenhum texto abaixo de 14 pt (18,7 px). Todo font-size do site usa max(var(--letra-min), ...). */
+  --letra-min: 1.1875rem;
 
   /* pixel */
   --b: 3px;          /* espessura da borda pixel */
@@ -101,9 +104,9 @@
 /* protanopia e deuteranopia: confundem vermelho e verde → verde vira azul, vermelho vira âmbar escuro */
 :root[data-daltonismo="protanopia"],
 :root[data-daltonismo="deuteranopia"] {
-  --grama: #8DB4F0;
-  --grama-claro: #DCE6FA;
-  --grama-escuro: #1F5FBF;
+  --grama: #E8D44D;
+  --grama-claro: #FAF3C2;
+  --grama-escuro: #6B5A00;
   --laranja: #F2B266;
   --laranja-escuro: #8A4B00;
   --cor-erro: #8A4B00;
@@ -129,7 +132,7 @@
   --sol: #CFCFCF;
   --sol-claro: #F2F2F2;
   --laranja: #B3B3B3;
-  --laranja-escuro: #262626;
+  --laranja-escuro: #5A5A5A;
   --grama: #7A7A7A;
   --grama-claro: #D0D0D0;
   --grama-escuro: #1A1A1A;

@@ -18,7 +18,7 @@
   display: inline-flex; align-items: center; justify-content: center; gap: .55em;
   min-height: 48px; padding: .6rem 1.4rem;
   margin: var(--b) var(--b) calc(var(--b) + var(--sombra));
-  font-family: var(--fonte-titulo); font-size: 1.125rem; line-height: 1.1;
+  font-family: var(--fonte-titulo); font-size: max(var(--letra-min), 1.125rem); line-height: 1.1;
   color: var(--texto); background: var(--fundo);
   border: 0; border-radius: 0; cursor: pointer; text-decoration: none;
   position: relative; top: 0;
@@ -43,7 +43,7 @@
 .botao--secundario { --fundo: var(--cor-superficie); --texto: var(--cor-texto); }
 .botao--escuro { --fundo: var(--tinta); --texto: var(--papel); }
 :root[data-contraste="alto"] .botao--escuro { --fundo: #FFE600; --texto: #000; }
-.botao--pequeno { min-height: 40px; padding: .35rem .9rem; font-size: 1rem; --sombra: 3px; }
+.botao--pequeno { min-height: 40px; padding: .35rem .9rem; font-size: max(var(--letra-min), 1rem); --sombra: 3px; }
 .botao--fantasma {
   background: none; box-shadow: none; margin: 0; padding-inline: .4rem;
   color: var(--cor-texto); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px;
@@ -66,7 +66,7 @@
 
 /* ---------- rótulo mono "1.0 — PERFIL" ---------- */
 .rotulo {
-  font-family: var(--fonte-mono); font-size: .875rem; letter-spacing: .08em; text-transform: uppercase;
+  font-family: var(--fonte-mono); font-size: max(var(--letra-min), .875rem); letter-spacing: .08em; text-transform: none;
   color: var(--cor-texto-suave); margin: 0 0 1rem; display: flex; align-items: center; gap: .6em;
 }
 .rotulo::before { content: ""; width: 10px; height: 10px; background: var(--cor-destaque); box-shadow: 0 0 0 2px var(--cor-borda); }
@@ -74,7 +74,7 @@
 /* ---------- etiquetas ---------- */
 .etiqueta {
   display: inline-flex; align-items: center; gap: .35em;
-  font-family: var(--fonte-mono); font-size: .8rem; letter-spacing: .04em;
+  font-family: var(--fonte-mono); font-size: max(var(--letra-min), .8rem); letter-spacing: .04em;
   padding: .15rem .5rem; background: var(--ceu-claro); color: var(--cor-texto);
   box-shadow: 0 0 0 2px var(--cor-borda);
 }
@@ -86,7 +86,7 @@
 .chip {
   display: inline-flex; align-items: center; gap: .45em;
   min-height: 44px; padding: .35rem .9rem;
-  font-family: var(--fonte-texto); font-size: 1rem; font-weight: 700;
+  font-family: var(--fonte-texto); font-size: max(var(--letra-min), 1rem); font-weight: 700;
   color: var(--cor-texto); background: var(--cor-superficie);
   border: 0; cursor: pointer; position: relative; top: 0;
   box-shadow: 0 -2px 0 0 var(--cor-borda), 0 2px 0 0 var(--cor-borda), -2px 0 0 0 var(--cor-borda), 2px 0 0 0 var(--cor-borda), 0 5px 0 0 var(--cor-sombra);
@@ -106,8 +106,8 @@
   padding: .9rem 1.1rem; font-weight: 700; min-height: 52px;
 }
 .sanfona summary::-webkit-details-marker { display: none; }
-.sanfona summary .num { font-family: var(--fonte-mono); font-weight: 400; color: var(--cor-texto-suave); font-size: .9rem; }
-.sanfona summary .mais { margin-left: auto; font-family: var(--fonte-mono); font-size: 1.4rem; line-height: 1; }
+.sanfona summary .num { font-family: var(--fonte-mono); font-weight: 400; color: var(--cor-texto-suave); font-size: max(var(--letra-min), .9rem); }
+.sanfona summary .mais { margin-left: auto; font-family: var(--fonte-mono); font-size: max(var(--letra-min), 1.4rem); line-height: 1; }
 .sanfona details[open] summary .mais { transform: rotate(45deg); }
 .sanfona details[open] summary { background: var(--sol-claro); }
 .sanfona .corpo { padding: .25rem 1.1rem 1.1rem 3.6rem; color: var(--cor-texto-suave); }
@@ -116,15 +116,14 @@
 /* ---------- grade pontilhada (fundo dos diagramas) ---------- */
 .grade-pontos {
   background-color: var(--cor-fundo-2);
-  background-image: radial-gradient(var(--cor-pontos) 1.2px, transparent 1.4px);
-  background-size: 16px 16px;
+  /* sem pontilhado: o P2.7 do Manual pede nada de padrão atrás do texto */
 }
 
 /* ---------- barra de acessibilidade ---------- */
-.barra-acess { background: var(--tinta); color: var(--papel); font-size: .95rem; }
+.barra-acess { background: var(--tinta); color: var(--papel); font-size: max(var(--letra-min), .95rem); }
 :root[data-contraste="alto"] .barra-acess { background: #000; color: #fff; border-bottom: 2px solid #fff; }
 .barra-acess .conteiner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-block: 6px; }
-.barra-acess .titulo-barra { font-family: var(--fonte-mono); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; opacity: .85; margin-right: auto; display: flex; align-items: center; gap: .5em; }
+.barra-acess .titulo-barra { font-family: var(--fonte-mono); font-size: max(var(--letra-min), .8rem); letter-spacing: .08em; text-transform: none; opacity: .85; margin-right: auto; display: flex; align-items: center; gap: .5em; }
 .barra-acess .grupo { display: flex; flex-wrap: wrap; gap: 6px; }
 .barra-acess button {
   display: inline-flex; align-items: center; gap: .4em; min-height: 36px; padding: .2rem .7rem;
@@ -147,7 +146,7 @@
 @media (max-width: 640px) {
   .barra-acess .titulo-barra { display: none; }
   .barra-acess .conteiner { gap: 6px; }
-  .barra-acess button, .barra-acess .cores { padding: .2rem .45rem; font-size: .85rem; }
+  .barra-acess button, .barra-acess .cores { padding: .2rem .45rem; font-size: max(var(--letra-min), .85rem); }
   .barra-acess .cores { padding: 0; }
   .barra-acess .longo { display: none; }
   .barra-acess .curto { display: inline; }
@@ -156,15 +155,15 @@
 /* ---------- topo / menu ---------- */
 .topo {
   position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--cor-fundo) 92%, transparent);
-  backdrop-filter: blur(6px);
+  background: var(--cor-fundo);
   border-bottom: 3px solid var(--cor-borda);
 }
 .topo .conteiner { display: flex; align-items: center; gap: 1rem; min-height: 72px; }
-.marca { display: flex; align-items: center; gap: .6rem; text-decoration: none; color: var(--cor-texto); font-family: var(--fonte-titulo); font-size: 1.6rem; }
+.marca { display: flex; align-items: center; gap: .6rem; text-decoration: none; color: var(--cor-texto); font-family: var(--fonte-titulo); font-size: max(var(--letra-min), 1.6rem); }
 .marca img { width: 40px; height: auto; }
 .menu { margin-left: auto; display: flex; align-items: center; gap: .25rem; }
 .menu ul { display: flex; gap: .25rem; list-style: none; margin: 0; padding: 0; }
+.menu a { white-space: nowrap; }
 .menu a:not(.botao) {
   display: inline-block; padding: .5rem .75rem; color: var(--cor-texto); text-decoration: none; font-weight: 700;
 }
@@ -172,7 +171,7 @@
 .menu .botao { margin-left: .5rem; }
 .menu-botao { display: none; }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) { /* com letra de 14 pt o menu completo só cabe acima disso */
   .menu-botao { display: inline-flex; margin-left: auto; }
   .menu { position: absolute; left: 0; right: 0; top: 100%; display: none; flex-direction: column; align-items: stretch; padding: 12px var(--gutter) 20px; background: var(--cor-fundo); border-bottom: 3px solid var(--cor-borda); }
   .menu.aberto { display: flex; }
@@ -194,16 +193,16 @@
 :root[data-contraste="alto"] .rodape::before { display: none; }
 .rodape a { color: #FFE38A; }
 .rodape .conteiner { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 32px; padding-block: 56px 32px; }
-.rodape h3 { font-size: 1.1rem; font-family: var(--fonte-mono); text-transform: uppercase; letter-spacing: .08em; color: #FFE38A; }
+.rodape h3 { font-size: max(var(--letra-min), 1.1rem); font-family: var(--fonte-mono); text-transform: none; letter-spacing: .08em; color: #FFE38A; }
 .rodape ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .4rem; }
 .rodape .marca { color: #FBF7EE; }
-.rodape .fim { grid-column: 1 / -1; border-top: 2px dashed rgba(251,247,238,.35); padding-top: 20px; font-family: var(--fonte-mono); font-size: .85rem; opacity: .9; }
+.rodape .fim { grid-column: 1 / -1; border-top: 2px dashed rgba(251,247,238,.35); padding-top: 20px; font-family: var(--fonte-mono); font-size: max(var(--letra-min), .85rem); opacity: .9; }
 @media (max-width: 760px) { .rodape .conteiner { grid-template-columns: 1fr; } }
 
 /* ---------- aviso de protótipo ---------- */
 .aviso {
   display: flex; gap: .75rem; align-items: flex-start;
-  background: var(--sol-claro); padding: .9rem 1.1rem; font-size: 1rem;
+  background: var(--sol-claro); padding: .9rem 1.1rem; font-size: max(var(--letra-min), 1rem);
   box-shadow: 0 0 0 2px var(--cor-borda);
 }
 .aviso .icone { margin-top: .15em; }

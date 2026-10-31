@@ -16,7 +16,7 @@ EXT_PDF = {".pdf"}
 EXT_PPT = {".pptx"}
 EXT_MIDIA = {".mp4", ".mkv", ".mov", ".webm", ".mp3", ".wav", ".m4a", ".ogg"}
 
-MARCA_LISTA = re.compile(r"^\s*(?:[-•–*▪●○◦])\s+(.*)$")
+MARCA_LISTA = re.compile(r"^\s*(?:[-•–*▪●○◦‣⁃■□➢✓])\s+(.*)$")
 MARCA_NUMERO = re.compile(r"^\s*(?:\d{1,2}|[a-z])[.)]\s+(.*)$", re.I)
 NOME_DE_ARQUIVO = re.compile(r".*\.(png|jpe?g|gif|bmp|tiff?|svg|emf|wmf|webp)$", re.I)
 
@@ -44,10 +44,13 @@ def ler(caminho: Path, pasta_trabalho: Path, modelo_audio: str = "small") -> Doc
 # ---------- utilidades ----------
 
 def _tirar_titulo(blocos: list[Bloco], padrao: str) -> tuple[str, list[Bloco]]:
-    """Se o primeiro bloco é um título, ele vira o título do documento."""
-    if blocos and blocos[0].tipo == "titulo":
-        return blocos[0].texto, blocos[1:]
-    return padrao, blocos
+    """O título principal (nível mais alto entre os 3 primeiros blocos) vira o título do documento.
+    Cobre apostilas com cabeçalho pequeno antes do título ("Ciências - 5º ano")."""
+    candidatos = [(b.nivel, i) for i, b in enumerate(blocos[:3]) if b.tipo == "titulo"]
+    if not candidatos:
+        return padrao, blocos
+    _, i = min(candidatos)
+    return blocos[i].texto, blocos[:i] + blocos[i + 1:]
 
 
 def _bloco_de_linhas(linhas: list[str]) -> Bloco | None:
@@ -127,28 +130,35 @@ def _ler_pdf(caminho: Path, pasta_trabalho: Path) -> Documento:
                 (pasta_img / nome).write_bytes(b["image"])
                 blocos.append(Bloco("imagem", arquivo=f"imagens/{nome}"))
                 continue
-            linhas, tamanhos, negritos = [], [], []
+            # o PDF às vezes junta num bloco linhas de tamanhos diferentes (ex.: cabeçalho pequeno + título grande);
+            # separa em grupos de linhas com o mesmo tamanho e o mesmo peso
+            grupos: list[list[tuple[str, float, bool]]] = []
             for linha in b.get("lines", []):
                 t = "".join(s["text"] for s in linha["spans"]).strip()
-                if t:
-                    linhas.append(t)
-                    tamanhos.append(max(s["size"] for s in linha["spans"]))
-                    negritos.append(all(s["flags"] & 16 or "bold" in s["font"].lower()
-                                        for s in linha["spans"] if s["text"].strip()))
-            if not linhas or re.fullmatch(r"\d{1,3}", " ".join(linhas)):
-                continue  # vazio ou número de página
-            texto = " ".join(linhas)
-            tam = max(tamanhos)
-            if len(texto) <= 120 and tam >= corpo * 1.2:
-                blocos.append(Bloco("titulo", texto, nivel=1 if tam >= corpo * 1.6 else 2))
-            elif len(texto) <= 80 and all(negritos) and not texto.endswith("."):
-                blocos.append(Bloco("titulo", texto, nivel=3))
-            else:
-                bloco = _bloco_de_linhas(linhas)
-                if bloco:
-                    if bloco.tipo == "paragrafo":
-                        bloco.texto = re.sub(r"(\w)- (?=[a-zà-ú])", r"\1", bloco.texto)
-                    blocos.append(bloco)
+                if not t:
+                    continue
+                tam = max(s["size"] for s in linha["spans"])
+                negrito = all(s["flags"] & 16 or "bold" in s["font"].lower() for s in linha["spans"] if s["text"].strip())
+                if grupos and abs(grupos[-1][-1][1] - tam) <= 0.15 * tam and grupos[-1][-1][2] == negrito:
+                    grupos[-1].append((t, tam, negrito))
+                else:
+                    grupos.append([(t, tam, negrito)])
+            for grupo in grupos:
+                linhas = [g[0] for g in grupo]
+                if re.fullmatch(r"\d{1,3}", " ".join(linhas)):
+                    continue  # número de página
+                texto = " ".join(linhas)
+                tam = max(g[1] for g in grupo)
+                if len(texto) <= 120 and tam >= corpo * 1.2:
+                    blocos.append(Bloco("titulo", texto, nivel=1 if tam >= corpo * 1.6 else 2))
+                elif len(texto) <= 80 and all(g[2] for g in grupo) and not texto.endswith("."):
+                    blocos.append(Bloco("titulo", texto, nivel=3))
+                else:
+                    bloco = _bloco_de_linhas(linhas)
+                    if bloco:
+                        if bloco.tipo == "paragrafo":
+                            bloco.texto = re.sub(r"(\w)- (?=[a-zà-ú])", r"\1", bloco.texto)
+                        blocos.append(bloco)
 
     titulo, blocos = _tirar_titulo(blocos, caminho.stem)
     doc = Documento(titulo, blocos)

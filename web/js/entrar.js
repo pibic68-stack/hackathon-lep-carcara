@@ -13,7 +13,7 @@
   ];
   var PERFIS = {
     professor: { rotulo: "Professor(a)", ola: "Olá, professor(a)!", avatar: "professor.png", form: "form-email" },
-    familia: { rotulo: "Família", ola: "Olá, família!", avatar: "familia.png", form: "form-email" },
+    familia: { rotulo: "Família", ola: "Olá, família!", avatar: "familia.png", form: "form-codigo" },
     aluno: { rotulo: "Aluno(a)", ola: "Oi! Vamos estudar?", avatar: "aluno.png", form: "form-aluno" }
   };
   var perfil = null, figuras = [];
@@ -36,8 +36,7 @@
     $("form-avatar").src = "assets/img/" + cfg.avatar;
     $("form-rotulo").textContent = cfg.rotulo;
     $("titulo-form").textContent = cfg.ola;
-    ["form-email", "form-codigo", "form-aluno"].forEach(function (f) { $(f).hidden = f !== cfg.form; });
-    $("abas-familia").hidden = p !== "familia";
+    ["form-email", "form-codigo", "form-aluno", "form-cadastro"].forEach(function (f) { $(f).hidden = f !== cfg.form; });
     $("criar-conta").hidden = p !== "professor";
     limparErros();
     $("status").textContent = "";
@@ -45,12 +44,13 @@
     if (focar !== false) $("titulo-form").focus();
   }
 
-  function trocarAba(aba) {
-    $("form-email").hidden = aba !== "email";
-    $("form-codigo").hidden = aba !== "codigo";
-    document.querySelectorAll("[data-aba]").forEach(function (t) { t.setAttribute("aria-selected", t.dataset.aba === aba); });
-    var alvo = document.querySelector((aba === "email" ? "#form-email" : "#form-codigo") + ' [data-aba="' + aba + '"]');
-    if (alvo) alvo.focus();
+  function mostrarCadastro(sim) {
+    limparErros();
+    $("status").textContent = "";
+    $("form-email").hidden = sim;
+    $("form-cadastro").hidden = !sim;
+    $("titulo-form").textContent = sim ? "Bem-vindo(a) ao PRISMA!" : PERFIS.professor.ola;
+    $(sim ? "nome" : "email").focus();
   }
 
   /* ---------- erros acessíveis ---------- */
@@ -94,8 +94,10 @@
       b.addEventListener("click", function () { escolher(b.dataset.perfil); });
     });
     $("trocar-perfil").addEventListener("click", mostrarPerfis);
-    document.querySelectorAll("[data-aba]").forEach(function (t) {
-      t.addEventListener("click", function () { trocarAba(t.dataset.aba); });
+    $("abrir-cadastro").addEventListener("click", function () { mostrarCadastro(true); });
+    $("voltar-entrar").addEventListener("click", function () { mostrarCadastro(false); });
+    $("esqueci").addEventListener("click", function () {
+      $("status").textContent = "Ainda não dá para trocar a senha sozinho. Peça ajuda à coordenação da escola.";
     });
 
     $("mostrar-senha").addEventListener("click", function () {
@@ -117,21 +119,14 @@
       document.querySelector(".figurinha").focus();
     });
 
-    document.querySelectorAll("[data-em-breve]").forEach(function (a) {
-      a.addEventListener("click", function (e) {
-        e.preventDefault();
-        $("status").textContent = "“" + a.textContent + "” ainda não existe neste protótipo.";
-      });
-    });
-
-    function enviar(form, dados) {
+    function enviar(form, dados, acao) {
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         limparErros();
         var botao = form.querySelector("[type=submit]");
         botao.disabled = true;
         $("status").textContent = "Entrando…";
-        Prisma.auth.entrar(perfil, dados()).then(function (r) {
+        (acao || Prisma.auth.entrar)(perfil, dados()).then(function (r) {
           botao.disabled = false;
           if (!r.ok) { $("status").textContent = ""; mostrarErro(r.erro); return; }
           $("status").textContent = "Pronto, " + r.nome + "! Abrindo o seu painel…";
@@ -139,12 +134,29 @@
         });
       });
     }
-    enviar($("form-email"), function () { return { email: $("email").value.trim(), senha: $("senha").value }; });
+    enviar($("form-email"), function () { return { email: $("email").value.trim(), senha: $("senha").value, lembrar: $("lembrar").checked }; });
+    enviar($("form-cadastro"), function () {
+      return { nome: $("nome").value.trim(), email_novo: $("email_novo").value.trim(), senha_nova: $("senha_nova").value,
+               codigo_escola: $("codigo_escola").value.trim(), lembrar: $("lembrar_novo").checked };
+    }, function (_, d) { return Prisma.auth.cadastrar(d); });
     enviar($("form-codigo"), function () { return { codigo: $("codigo").value }; });
     enviar($("form-aluno"), function () { return { turma: $("turma").value, figuras: figuras.slice() }; });
 
     // index.html pode mandar direto para um perfil: entrar.html#aluno
     var inicial = location.hash.slice(1);
     if (PERFIS[inicial]) escolher(inicial, false);
+
+    // quem já entrou pode ir direto para o painel
+    Prisma.auth.sessao().then(function (u) {
+      if (!u) return;
+      var aviso = $("ja-entrou");
+      aviso.textContent = "";
+      aviso.appendChild(document.createTextNode("Você já entrou como " + u.nome + ". "));
+      var link = document.createElement("a");
+      link.href = "painel/" + u.perfil + ".html";
+      link.textContent = "Ir para o meu painel";
+      aviso.appendChild(link);
+      aviso.hidden = false;
+    });
   });
 })();

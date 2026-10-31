@@ -226,17 +226,23 @@ def _alinhar(novos, quantos: int) -> list[str]:
     return [x.strip() for x in novos]
 
 
-def leitura_facil(provedor: Provedor, textos: list[str], nivel: str, max_palavras: int) -> tuple[list[str], list[dict]]:
-    """Reescreve `textos` no nível pedido. Devolve (textos reescritos, glossário)."""
+REFORCO = """
+ATENÇÃO: estes textos já passaram por você e ainda têm frases com mais de {n} palavras.
+Divida TODA frase longa em frases menores, de até {n} palavras, sem perder nenhuma informação."""
+
+
+def leitura_facil(provedor: Provedor, textos: list[str], nivel: str, max_palavras: int,
+                  refazer: bool = False) -> tuple[list[str], list[dict]]:
+    """Reescreve `textos` no nível pedido. Devolve (textos reescritos, glossário).
+    `refazer=True` é a segunda tentativa para trechos que ainda vieram com frase longa (P3.1)."""
     saida: list[str] = []
     glossario: dict[str, str] = {}
+    sistema = _sistema_lf(nivel, max_palavras) + (REFORCO.format(n=max_palavras) if refazer else "")
+    tarefa = f"leitura_facil_v2_{nivel}_{max_palavras}" + ("_refazer" if refazer else "")
     for i in range(0, len(textos), TEXTOS_POR_PEDIDO):
         lote = textos[i:i + TEXTOS_POR_PEDIDO]
         entrada = json.dumps({"textos": lote}, ensure_ascii=False)
-        resposta = com_cache(
-            f"leitura_facil_v2_{nivel}_{max_palavras}", entrada,
-            lambda: provedor.gerar(_sistema_lf(nivel, max_palavras), entrada),
-        )
+        resposta = com_cache(tarefa, entrada, lambda: provedor.gerar(sistema, entrada))
         dados = _extrair_json(resposta)
         saida.extend(_alinhar(dados.get("textos"), len(lote)))
         for g in dados.get("glossario") or []:

@@ -21,15 +21,49 @@
         <img class="pixel" src="../assets/img/prisma-logo.svg" alt="" width="45" height="27">
         <span>PRISMA</span>
       </a>
+      <button class="botao botao--secundario botao--pequeno menu-botao" type="button" aria-expanded="false" aria-controls="menu">
+        <span data-icone="menu"></span> Menu
+      </button>
+      <nav class="menu" id="menu" aria-label="Principal">
+        <ul>
+          <li><a href="../index.html">Início</a></li>
+          <li><a href="../prisma-instrucoes/index.html">Instruções</a></li>
+          <li><a href="professor.html" aria-current="page">Meu painel</a></li>
+        </ul>
+      </nav>
     </div>
   </header>
   <main id="conteudo" class="conteiner painel">
     <div id="painel"></div>
   </main>
+  <footer class="rodape">
+    <div class="conteiner">
+      <div>
+        <a class="marca" href="../index.html"><img class="pixel" src="../assets/img/prisma-logo.svg" alt="" width="45" height="27"><span>PRISMA</span></a>
+        <p>Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis.</p>
+      </div>
+      <div>
+        <h3>Navegar</h3>
+        <ul>
+          <li><a href="../index.html">Página inicial</a></li>
+          <li><a href="../prisma-instrucoes/index.html">Instruções: mini curso e manual</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>O time</h3>
+        <ul>
+          <li>Carcará 3301, do IME</li>
+          <li>Hackathon LEP de Educação</li>
+          <li><a href="https://github.com/pibic68-stack/hackathon-lep-carcara">Código no GitHub</a></li>
+        </ul>
+      </div>
+      <p class="fim">Demonstração. Todos os alunos e dados são fictícios.</p>
+    </div>
+  </footer>
   <script src="../js/icones.js"></script>
   <script src="../js/auth.js"></script>
-  <script src="../js/painel.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/painel.js"></script>
   <script src="../js/professor.js"></script>
 </body>
 </html>

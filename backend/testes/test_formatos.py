@@ -71,6 +71,23 @@ class TestPDF(unittest.TestCase):
         self.assertIn("azul (■)", html)
         self.assertTrue((Path(r["pasta"]) / "imagens").exists())
 
+    def test_cabecalho_pequeno_nao_gruda_no_titulo(self):
+        pdf = pymupdf.open()
+        pg = pdf.new_page()
+        pg.insert_text((72, 70), "Ciências - 5º ano", fontsize=9)
+        pg.insert_text((72, 100), "O ciclo da água", fontsize=22)     # o PDF junta as duas linhas num bloco
+        pg.insert_textbox(pymupdf.Rect(72, 120, 520, 220), "A água muda de estado o tempo todo. " * 3, fontsize=11)
+        f = self.dir / "cab.pdf"
+        pdf.save(f)
+        doc = leitores.ler(f, self.dir / "t3")
+        self.assertEqual(doc.titulo, "O ciclo da água")
+        self.assertEqual((doc.blocos[0].tipo, doc.blocos[0].texto), ("paragrafo", "Ciências - 5º ano"))
+
+    def test_marcador_do_word_vira_lista(self):
+        marca = chr(0xF0B7)
+        b = leitores._bloco_de_linhas([marca + " Evaporação", marca + " Condensação"])
+        self.assertEqual((b.tipo, b.itens), ("lista", ["Evaporação", "Condensação"]))
+
     def test_pdf_escaneado_avisa(self):
         pdf = pymupdf.open()
         pg = pdf.new_page()

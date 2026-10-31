@@ -69,8 +69,8 @@ def cor_com_simbolo(doc: Documento) -> Documento:
             f"P1.1 Cor nunca sozinha: {len(usadas)} cor(es) ganharam símbolo e uma legenda no topo."
         )
         novo.pendencias.append(
-            "P1.1: confira se as palavras de cor marcadas realmente se referem a cores "
-            "(ex.: \"rosa\" pode ser a flor)."
+            "P1.1: confira se as palavras de cor marcadas são mesmo cores. "
+            "Por exemplo, \"rosa\" pode ser a flor."
         )
     return novo
 
@@ -147,7 +147,9 @@ def sinalizar_linguagem_figurada(doc: Documento) -> Documento:
     novo = copy.deepcopy(doc)
     expressoes = ["chover no molhado", "pagar o pato", "de cabeça", "pisar na bola",
                   "um mar de", "quebrar a cabeça", "ficar de olho", "dar uma mão"]
-    achadas = sorted({e for b in novo.blocos if b.texto for e in expressoes if e in b.texto.lower()})
+    # olha também dentro de listas e passos (a instrução costuma virar passos antes desta regra)
+    textos = [b.texto for b in novo.blocos if b.texto] + [i for b in novo.blocos for i in b.itens]
+    achadas = sorted({e for x in textos for e in expressoes if e in x.lower()})
     if achadas:
         novo.pendencias.append(
             "P6.3: expressões de sentido figurado encontradas (" + ", ".join(achadas)
@@ -215,6 +217,19 @@ def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> 
         return novo
 
     textos, glossario = reescrever([a[2] for a in alvos])
+
+    # P3.1: trecho com frase longa volta para a IA uma vez, com a instrução reforçada
+    refazer = [k for k, t in enumerate(textos) if any(_palavras(f) > max_palavras for f in _frases(t))]
+    if refazer:
+        novos, glos2 = reescrever([textos[k] for k in refazer], refazer=True)
+        for k, t in zip(refazer, novos):
+            antes = sum(_palavras(f) > max_palavras for f in _frases(textos[k]))
+            if sum(_palavras(f) > max_palavras for f in _frases(t)) < antes:
+                textos[k] = t
+        nomes = {g["termo"] for g in glossario}
+        glossario = glossario + [g for g in glos2 if g["termo"] not in nomes]
+        novo.aplicados.append(f"P3.1: {len(refazer)} trecho(s) com frase longa voltaram para a IA reescrever.")
+
     for (b, i, _), texto in zip(alvos, textos):
         if i is None:
             b.texto = texto
@@ -245,7 +260,8 @@ def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> 
         f"P3.7 ({rotulo}): a IA reescreveu o texto. Confira se todos os conceitos da aula foram conservados."
     )
     if longas:
-        novo.pendencias.append(f"P3.1 ({rotulo}): {len(longas)} frase(s) passam de {max_palavras} palavras. Ex.: \"{longas[0][:80]}\"")
+        novo.pendencias.append(f"P3.1 ({rotulo}): {len(longas)} frase(s) ainda passam de {max_palavras} palavras. "
+                               f"Por exemplo: \"{longas[0][:80]}\"")
     if sujas:
         novo.pendencias.append(f"P3.5 ({rotulo}): {len(sujas)} frase(s) com abreviação ou caractere especial.")
     return novo

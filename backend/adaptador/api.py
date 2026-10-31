@@ -1,31 +1,37 @@
-"""API HTTP do PRISMA: o site envia o material e recebe as versões adaptadas.
+"""API HTTP do PRISMA: o mesmo servidor entrega o site (web/), a aba de instruções e a API.
 
 Rodar (de dentro de backend/):   python -m adaptador.api      -> http://127.0.0.1:8000
 Documentação interativa:         http://127.0.0.1:8000/docs
 
-Ciclo de vida de um material (critério P10.1 do Manual: nada chega ao aluno sem aprovação):
-    POST /api/adaptar  ->  estado "rascunho"  ->  POST .../aprovar  ->  estado "publicado"
-Só materiais publicados aparecem na biblioteca dos alunos.
-Imagem sem descrição bloqueia a aprovação (P4.1) até o professor escrever o texto.
+Quem pode o quê:
+  - professor: cria turmas e alunos fictícios, envia materiais, revisa, descreve imagens e aprova;
+  - aluno e família: veem só os materiais PUBLICADOS da própria turma.
+Ciclo de vida (critério P10.1: nada chega ao aluno sem aprovação):
+    POST /api/adaptar -> "rascunho" -> POST .../aprovar -> "publicado"
+Imagem sem descrição bloqueia a aprovação (P4.1).
 
-AINDA NÃO HÁ LOGIN: qualquer um que alcance o servidor pode aprovar. Use só em rede local na demo.
+Segurança: sessão em cookie HttpOnly (SameSite=Lax); todo pedido que muda dados precisa do
+cabeçalho "X-Prisma: 1" (impede que outro site faça pedidos em nome de quem está logado);
+limite de tentativas de login e de envios por hora.
 """
 from __future__ import annotations
 
 import json
 import re
 import shutil
+import time
 import uuid
+from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import FastAPI, Form, HTTPException, UploadFile
+from fastapi import FastAPI, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import ia, pipeline, regras
+from . import contas, ia, pipeline, regras
 from .leitores import EXT_MIDIA, EXT_PDF, EXT_PPT, EXT_TEXTO
 
 RAIZ = Path(__file__).resolve().parents[1]
@@ -36,13 +42,67 @@ SITE = RAIZ.parent / "web"
 LIMITE_BYTES = 300 * 1024 * 1024   # 300 MB (vídeos grandes devem ser comprimidos antes)
 EXTENSOES = EXT_TEXTO | EXT_PDF | EXT_PPT | EXT_MIDIA
 ID_VALIDO = re.compile(r"^[0-9a-f]{12}$")
+COOKIE = "prisma_sessao"
+ENVIOS_POR_HORA = 20               # por professor: protege a cota gratuita da IA
 
-app = FastAPI(title="PRISMA – adaptador de material", version="0.1")
-# O site abre por duplo clique (origem "null"), então precisa de CORS aberto. Sem cookies/credenciais.
+app = FastAPI(title="PRISMA – adaptador de material", version="0.2")
+# CORS sem credenciais: outra origem até chama a API, mas nunca com o cookie de quem está logado.
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
-# ---------- utilidades ----------
+@app.middleware("http")
+async def protecoes(request: Request, chamar):
+    if request.url.path.startswith("/api/") and request.method in ("POST", "PUT", "PATCH", "DELETE") \
+            and request.headers.get("x-prisma") != "1":
+        return JSONResponse({"detail": "Pedido recusado."}, status_code=403)
+    resposta = await chamar(request)
+    # o navegador sempre confere se o arquivo mudou (senão, depois de uma atualização, mostra CSS velho)
+    resposta.headers.setdefault("Cache-Control", "no-cache")
+    resposta.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resposta.headers.setdefault("Referrer-Policy", "same-origin")
+    resposta.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+    return resposta
+
+
+@app.exception_handler(contas.ErroConta)
+async def erro_conta(_: Request, erro: contas.ErroConta):
+    return JSONResponse({"detail": {"erro": erro.texto, "campo": erro.campo}}, status_code=erro.status)
+
+
+# ---------- quem está pedindo ----------
+
+def _ip(request: Request) -> str:
+    # atrás do túnel da Cloudflare todo pedido chega de 127.0.0.1; o IP real vem neste cabeçalho
+    host = request.client.host if request.client else ""
+    if host in ("127.0.0.1", "::1"):
+        return request.headers.get("cf-connecting-ip", host)
+    return host
+
+
+def _https(request: Request) -> bool:
+    return request.url.scheme == "https" or request.headers.get("x-forwarded-proto", "").lower() == "https"
+
+
+def usuario(request: Request) -> dict | None:
+    return contas.sessao(request.cookies.get(COOKIE))
+
+
+def exigir(request: Request, *perfis: str) -> dict:
+    u = usuario(request)
+    if not u:
+        raise HTTPException(401, "Entre na sua conta para continuar.")
+    if perfis and u["perfil"] not in perfis:
+        raise HTTPException(403, "Esta área não é para o seu perfil.")
+    return u
+
+
+def _abrir_sessao(request: Request, resposta: Response, token: str, duracao: int, lembrar: bool, info: dict) -> dict:
+    resposta.set_cookie(COOKIE, token, max_age=duracao if lembrar else None, httponly=True,
+                        samesite="lax", secure=_https(request), path="/")
+    return {"ok": True, **info, "destino": f"painel/{info['perfil']}.html"}
+
+
+# ---------- utilidades de material ----------
 
 def _pasta(id_: str) -> Path:
     if not ID_VALIDO.match(id_):
@@ -61,14 +121,24 @@ def _gravar(pasta: Path, nome: str, dados: dict) -> None:
     (pasta / nome).write_text(json.dumps(dados, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _do_professor(id_: str, prof: dict) -> Path:
+    pasta = _pasta(id_)
+    if _ler(pasta, "estado.json").get("professor_id") != prof["id"]:
+        raise HTTPException(404, "Material não encontrado.")      # não revela que existe
+    return pasta
+
+
 def _resumo(id_: str, pasta: Path) -> dict:
     estado, revisao = _ler(pasta, "estado.json"), _ler(pasta, "revisao.json")
     nomes = regras.versoes(regras.carregar_manual())
     return {
         "id": id_,
         "material": revisao["material"],
+        "titulo": revisao.get("titulo") or revisao["material"],
         "estado": estado["estado"],
         "criado": estado["criado"],
+        "turma_id": estado.get("turma_id"),
+        "turma": estado.get("turma_nome"),
         "pode_publicar": revisao["pode_publicar"],
         "versoes": {
             nome: {**v, "nome": nomes.get(nome, {}).get("nome", nome),
@@ -83,7 +153,6 @@ def _detalhe(id_: str, pasta: Path) -> dict:
     revisao = _ler(pasta, "revisao.json")
     return {
         **_resumo(id_, pasta),
-        "aluno": revisao.get("aluno"),
         "transformacoes_aplicadas": revisao["transformacoes_aplicadas"],
         "pendencias_para_o_professor": revisao["pendencias_para_o_professor"],
         "bloqueios": revisao["bloqueios"],
@@ -114,26 +183,154 @@ def _servir(pasta: Path, caminho: str) -> FileResponse:
     return FileResponse(alvo)
 
 
-# ---------- rotas ----------
+def _todos_materiais() -> list[tuple[str, Path]]:
+    if not SAIDA.exists():
+        return []
+    return [(p.name, p) for p in SAIDA.glob("*") if ID_VALIDO.match(p.name) and (p / "estado.json").exists()]
+
+
+_envios_recentes: dict[int, deque] = defaultdict(deque)
+
+
+def _limitar_envios(professor_id: int) -> None:
+    agora, fila = time.time(), _envios_recentes[professor_id]
+    while fila and fila[0] < agora - 3600:
+        fila.popleft()
+    if len(fila) >= ENVIOS_POR_HORA:
+        raise HTTPException(429, f"Limite de {ENVIOS_POR_HORA} materiais por hora atingido. Tente mais tarde.")
+    fila.append(agora)
+
+
+# ---------- rotas públicas ----------
 
 @app.get("/api/saude")
 def saude() -> dict:
-    return {"ok": True, "ia_ligada": ia.configurada(), "formatos": sorted(EXTENSOES)}
+    return {"ok": True, "ia_ligada": ia.configurada(), "cadastro_aberto": bool(contas.codigo_escola()),
+            "formatos": sorted(EXTENSOES)}
 
+
+@app.get("/api/opcoes")
+def opcoes() -> dict:
+    """Necessidades (lista fechada, P10.2) e figurinhas, para montar os formulários."""
+    return {"necessidades": contas.NECESSIDADES, "preferencias": contas.PREFERENCIAS, "figuras": contas.FIGURAS}
+
+
+# ---------- contas e sessão ----------
+
+class NovoProfessor(BaseModel):
+    nome: str
+    email: str
+    senha: str
+    codigo_escola: str
+    lembrar: bool = False
+
+
+class Entrada(BaseModel):
+    perfil: str
+    email: str = ""
+    senha: str = ""
+    codigo: str = ""
+    turma: str = ""
+    figuras: list[str] = []
+    lembrar: bool = False
+
+
+@app.post("/api/contas/professor", status_code=201)
+def cadastrar_professor(corpo: NovoProfessor, request: Request, resposta: Response) -> dict:
+    token, duracao, info = contas.criar_professor(corpo.nome, corpo.email, corpo.senha, corpo.codigo_escola,
+                                                  _ip(request), corpo.lembrar)
+    return _abrir_sessao(request, resposta, token, duracao, corpo.lembrar, info)
+
+
+@app.post("/api/entrar")
+def entrar(corpo: Entrada, request: Request, resposta: Response) -> dict:
+    ip = _ip(request)
+    if corpo.perfil == "professor":
+        token, duracao, info = contas.entrar_professor(corpo.email, corpo.senha, ip, corpo.lembrar)
+    elif corpo.perfil == "aluno":
+        token, duracao, info = contas.entrar_aluno(corpo.turma, corpo.figuras, ip, corpo.lembrar)
+    elif corpo.perfil == "familia":
+        token, duracao, info = contas.entrar_familia(corpo.codigo, ip, corpo.lembrar)
+    else:
+        raise HTTPException(400, "Perfil desconhecido.")
+    return _abrir_sessao(request, resposta, token, duracao, corpo.lembrar, info)
+
+
+@app.post("/api/sair")
+def sair(request: Request, resposta: Response) -> dict:
+    contas.sair(request.cookies.get(COOKIE))
+    resposta.delete_cookie(COOKIE, path="/")
+    return {"ok": True}
+
+
+@app.get("/api/eu")
+def eu(request: Request) -> dict:
+    return exigir(request)
+
+
+# ---------- turmas e alunos (professor) ----------
+
+class NovaTurma(BaseModel):
+    nome: str
+
+
+class DadosAluno(BaseModel):
+    apelido: str = ""
+    necessidades: list[str] = []
+    preferencias: list[str] = []
+
+
+@app.get("/api/turmas")
+def listar_turmas(request: Request) -> list[dict]:
+    return contas.turmas_do_professor(exigir(request, "professor")["id"])
+
+
+@app.post("/api/turmas", status_code=201)
+def nova_turma(corpo: NovaTurma, request: Request) -> dict:
+    return contas.criar_turma(exigir(request, "professor")["id"], corpo.nome)
+
+
+@app.post("/api/turmas/{turma_id}/alunos", status_code=201)
+def novo_aluno(turma_id: int, corpo: DadosAluno, request: Request) -> dict:
+    prof = exigir(request, "professor")
+    return contas.criar_aluno(prof["id"], turma_id, corpo.apelido, corpo.necessidades, corpo.preferencias)
+
+
+@app.patch("/api/alunos/{aluno_id}")
+def mudar_aluno(aluno_id: int, corpo: DadosAluno, request: Request) -> dict:
+    prof = exigir(request, "professor")
+    return contas.atualizar_aluno(prof["id"], aluno_id, corpo.necessidades, corpo.preferencias)
+
+
+@app.delete("/api/alunos/{aluno_id}")
+def apagar_aluno(aluno_id: int, request: Request) -> dict:
+    contas.remover_aluno(exigir(request, "professor")["id"], aluno_id)
+    return {"ok": True}
+
+
+# ---------- materiais (professor) ----------
 
 @app.post("/api/adaptar", status_code=201)
-def adaptar(arquivo: UploadFile, perfil: str | None = Form(None)) -> dict:
-    """Recebe o material (.pdf, .pptx, .txt, .mp4, .mp3...) e o perfil (JSON, opcional). Cria um rascunho."""
+def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), perfil: str | None = Form(None)) -> dict:
+    """Recebe o material e a turma. As versões saem conforme as necessidades dos alunos da turma
+    (mais as marcadas em `perfil`, se houver). Cria um rascunho."""
+    prof = exigir(request, "professor")
+    perfil_turma = contas.perfil_da_turma(prof["id"], turma_id)
     nome = Path(arquivo.filename or "material").name
     ext = Path(nome).suffix.lower()
     if ext not in EXTENSOES:
         raise HTTPException(415, f"Formato {ext or 'desconhecido'} não suportado. Use: {', '.join(sorted(EXTENSOES))}.")
     try:
-        perfil_dict = json.loads(perfil) if perfil else None
-        if perfil_dict is not None and not isinstance(perfil_dict, dict):
+        extra = json.loads(perfil) if perfil else {}
+        if not isinstance(extra, dict):
             raise ValueError
     except ValueError:
-        raise HTTPException(422, "O perfil precisa ser um JSON de objeto, ex.: {\"necessidades\": [\"baixa_visao\"]}.")
+        raise HTTPException(422, "O perfil precisa ser um JSON de objeto.")
+    perfil_final = {
+        "necessidades": sorted(set(perfil_turma["necessidades"]) | set(extra.get("necessidades") or [])),
+        "preferencias": sorted(set(perfil_turma["preferencias"]) | set(extra.get("preferencias") or [])),
+    }
+    _limitar_envios(prof["id"])
 
     id_ = uuid.uuid4().hex[:12]
     pasta_envio = ENVIOS / id_
@@ -146,33 +343,45 @@ def adaptar(arquivo: UploadFile, perfil: str | None = Form(None)) -> dict:
         while bloco := arquivo.file.read(1024 * 1024):
             total += len(bloco)
             if total > LIMITE_BYTES:
+                saida.close()
                 shutil.rmtree(pasta_envio, ignore_errors=True)
                 raise HTTPException(413, f"Arquivo maior que {LIMITE_BYTES // (1024 * 1024)} MB.")
             saida.write(bloco)
 
     try:
-        _processar(id_, caminho, perfil_dict, None)
+        _processar(id_, caminho, perfil_final, None)
     except HTTPException:
         shutil.rmtree(pasta_envio, ignore_errors=True)
+        shutil.rmtree(SAIDA / id_, ignore_errors=True)
         raise
     pasta = SAIDA / id_
     _gravar(pasta, "estado.json", {
         "estado": "rascunho", "criado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "envio": f"{id_}/{caminho.name}", "perfil": perfil_dict,
+        "envio": f"{id_}/{caminho.name}", "perfil": perfil_final,
+        "professor_id": prof["id"], "turma_id": turma_id, "turma_nome": perfil_turma["turma"],
     })
     return _detalhe(id_, pasta)
 
 
 @app.get("/api/materiais")
-def listar_materiais() -> list[dict]:
-    """Visão do professor: todos os materiais, mais recentes primeiro."""
-    itens = [_resumo(p.name, p) for p in SAIDA.glob("*") if ID_VALIDO.match(p.name) and (p / "estado.json").exists()] if SAIDA.exists() else []
+def listar_materiais(request: Request) -> list[dict]:
+    """Visão do professor: os próprios materiais, mais recentes primeiro."""
+    prof = exigir(request, "professor")
+    itens = [_resumo(i, p) for i, p in _todos_materiais() if _ler(p, "estado.json").get("professor_id") == prof["id"]]
     return sorted(itens, key=lambda i: i["criado"], reverse=True)
 
 
 @app.get("/api/materiais/{id_}")
-def ver_material(id_: str) -> dict:
-    return _detalhe(id_, _pasta(id_))
+def ver_material(id_: str, request: Request) -> dict:
+    return _detalhe(id_, _do_professor(id_, exigir(request, "professor")))
+
+
+@app.delete("/api/materiais/{id_}")
+def apagar_material(id_: str, request: Request) -> dict:
+    pasta = _do_professor(id_, exigir(request, "professor"))
+    shutil.rmtree(pasta, ignore_errors=True)
+    shutil.rmtree(ENVIOS / id_, ignore_errors=True)
+    return {"ok": True}
 
 
 class Descricoes(BaseModel):
@@ -180,23 +389,23 @@ class Descricoes(BaseModel):
 
 
 @app.post("/api/materiais/{id_}/descricoes")
-def escrever_descricoes(id_: str, corpo: Descricoes) -> dict:
+def escrever_descricoes(id_: str, corpo: Descricoes, request: Request) -> dict:
     """O professor escreve (ou corrige) as descrições das imagens; as versões são geradas de novo."""
-    pasta = _pasta(id_)
+    pasta = _do_professor(id_, exigir(request, "professor"))
     estado = _ler(pasta, "estado.json")
     if estado["estado"] == "publicado":
-        raise HTTPException(409, "Material já publicado. Crie um novo rascunho para alterar.")
+        raise HTTPException(409, "Material já publicado. Envie de novo para alterar.")
     anteriores = _ler(pasta, "descricoes.json") if (pasta / "descricoes.json").exists() else {}
-    todas = {**anteriores, **{k: v for k, v in corpo.imagens.items() if v.strip()}}
+    todas = {**anteriores, **{k: v.strip()[:1000] for k, v in corpo.imagens.items() if v.strip()}}
     _gravar(pasta, "descricoes.json", todas)
     _processar(id_, ENVIOS / estado["envio"], estado.get("perfil"), todas)
     return _detalhe(id_, pasta)
 
 
 @app.post("/api/materiais/{id_}/aprovar")
-def aprovar(id_: str) -> dict:
-    """Aprovação do professor: publica o material na biblioteca dos alunos."""
-    pasta = _pasta(id_)
+def aprovar(id_: str, request: Request) -> dict:
+    """Aprovação do professor: publica o material para a turma."""
+    pasta = _do_professor(id_, exigir(request, "professor"))
     revisao = _ler(pasta, "revisao.json")
     if not revisao["pode_publicar"]:
         raise HTTPException(409, {"erro": "Há pendências que bloqueiam a publicação.", "bloqueios": revisao["bloqueios"]})
@@ -207,39 +416,55 @@ def aprovar(id_: str) -> dict:
 
 
 @app.get("/api/previa/{id_}/{caminho:path}")
-def previa(id_: str, caminho: str) -> FileResponse:
-    """Para o professor revisar qualquer versão, publicada ou não."""
-    return _servir(_pasta(id_), caminho)
+def previa(id_: str, caminho: str, request: Request) -> FileResponse:
+    """Para o professor dono revisar qualquer versão, publicada ou não."""
+    return _servir(_do_professor(id_, exigir(request, "professor")), caminho)
+
+
+# ---------- biblioteca (aluno e família) ----------
+
+def _recomendadas(u: dict) -> set[str]:
+    return set(pipeline.versoes_do_perfil({"necessidades": u.get("necessidades", []),
+                                           "preferencias": u.get("preferencias", [])})) - {"universal"}
 
 
 @app.get("/api/biblioteca")
-def biblioteca() -> list[dict]:
-    """Visão do aluno e da família: só o que foi publicado."""
+def biblioteca(request: Request) -> list[dict]:
+    """Só o que foi publicado para a turma de quem está logado."""
+    u = exigir(request, "aluno", "familia")
+    recomendadas = _recomendadas(u)
     saida = []
-    for item in listar_materiais():
-        if item["estado"] != "publicado":
+    for id_, pasta in _todos_materiais():
+        estado = _ler(pasta, "estado.json")
+        if estado["estado"] != "publicado" or estado.get("turma_id") != u["turma_id"]:
             continue
+        item = _resumo(id_, pasta)
         saida.append({
-            "id": item["id"], "material": item["material"],
-            "versoes": {n: {"url": f"/api/biblioteca/{item['id']}/{v['arquivo']}", "rotulo": v["rotulo"]}
+            "id": id_, "material": item["material"], "titulo": item["titulo"], "publicado": estado.get("publicado"),
+            "versoes": {n: {"url": f"/api/biblioteca/{id_}/{v['arquivo']}", "rotulo": v["rotulo"],
+                            "recomendada": n in recomendadas}
                         for n, v in item["versoes"].items() if v["status"] == "gerada"},
         })
-    return saida
+    return sorted(saida, key=lambda i: i.get("publicado") or "", reverse=True)
 
 
 @app.get("/api/biblioteca/{id_}/{caminho:path}")
-def arquivo_publicado(id_: str, caminho: str) -> FileResponse:
+def arquivo_publicado(id_: str, caminho: str, request: Request) -> FileResponse:
+    u = exigir(request)
     pasta = _pasta(id_)
-    if _ler(pasta, "estado.json")["estado"] != "publicado":
-        raise HTTPException(404, "Material não encontrado.")   # rascunho não vaza para o aluno
+    estado = _ler(pasta, "estado.json")
+    dono = u["perfil"] == "professor" and estado.get("professor_id") == u["id"]
+    da_turma = u["perfil"] in ("aluno", "familia") and estado.get("turma_id") == u.get("turma_id")
+    if estado["estado"] != "publicado" or not (dono or da_turma):
+        raise HTTPException(404, "Material não encontrado.")   # rascunho e outra turma não vazam
     return _servir(pasta, caminho)
 
 
-# O mesmo servidor entrega o site: assim a demo é um comando só e não há problema de CORS.
+# O mesmo servidor entrega o site: um endereço só, sem problema de CORS nem de cookie.
 if SITE.exists():
     app.mount("/", StaticFiles(directory=SITE, html=True), name="site")
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000, proxy_headers=True, forwarded_allow_ips="127.0.0.1")

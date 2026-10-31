@@ -1,6 +1,8 @@
 """Transforma um `Documento` em uma página HTML acessível (padrão P2: página limpa e legível).
 
-O HTML não depende de internet: as fontes têm alternativas do sistema.
+Identidade visual do site (web/css/tokens.css): Atkinson Hyperlegible Next, tinta #1E2235,
+fundo creme #FBF7EE (decisão do time em 31/10), bordas retas de pixel. A fonte vem do próprio
+servidor (/assets/fontes); fora dele, cai para fontes do sistema sem serifa.
 """
 from __future__ import annotations
 
@@ -12,14 +14,18 @@ from pathlib import Path
 from .modelo import Documento
 from .regras import parametros_p2
 
-FONTE = "'Atkinson Hyperlegible', 'Lexend', Verdana, Arial, sans-serif"
+FONTE = "'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Verdana, Arial, sans-serif"
+FONTES_SITE = """
+@font-face { font-family: "Atkinson Hyperlegible Next"; src: url("/assets/fontes/atkinson-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Atkinson Hyperlegible Next"; src: url("/assets/fontes/atkinson-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+"""
 
-# Cores da identidade (CLAUDE.md). Os testes conferem o contraste contra o manual.
+# Cores do site (tokens.css). Os testes conferem o contraste contra o manual (P2.1).
 ESTILOS = {
-    "padrao": {"texto": "#1A1A1A", "fundo": "#FFFFFF", "destaque": "#1F5FBF",
-               "quadro_fundo": "#EEF3FB", "borda": "#C26A00"},
-    "ampliada": {"texto": "#000000", "fundo": "#FFFFFF", "destaque": "#0B3A8F",
-                 "quadro_fundo": "#FFF4D6", "borda": "#000000"},
+    "padrao": {"texto": "#1E2235", "fundo": "#FBF7EE", "destaque": "#1F6FB2",
+               "quadro_fundo": "#F3EDDF", "borda": "#1E2235"},
+    "ampliada": {"texto": "#000000", "fundo": "#FBF7EE", "destaque": "#0E4A82",
+                 "quadro_fundo": "#FFFFFF", "borda": "#000000"},
 }
 
 
@@ -37,7 +43,7 @@ def contraste(a: str, b: str) -> float:
 def _css(estilo: str, params: dict) -> str:
     cor = ESTILOS[estilo]
     pt = params["pt_ampliada"] if estilo == "ampliada" else params["pt_padrao"]
-    return f"""
+    return FONTES_SITE + f"""
 :root {{ --texto:{cor['texto']}; --fundo:{cor['fundo']}; --destaque:{cor['destaque']};
          --quadro:{cor['quadro_fundo']}; --borda:{cor['borda']}; }}
 * {{ box-sizing: border-box; }}
@@ -51,7 +57,7 @@ p, li {{ margin:.6em 0; }}
 ol.etapas {{ padding-left:1.6em; }}
 ol.etapas li {{ margin:.9em 0; padding-left:.3em; }}
 ol.etapas li::marker {{ font-weight:700; color:var(--destaque); }}
-aside.quadro {{ background:var(--quadro); border:3px solid var(--borda); border-radius:6px;
+aside.quadro {{ background:var(--quadro); border:3px solid var(--borda); border-radius:0;
                 padding:.6rem 1.2rem; margin:1.2rem 0; }}
 aside.quadro h2 {{ margin:.4rem 0; font-size:1.1em; }}
 figure {{ margin:1.2rem 0; }} img {{ max-width:100%; height:auto; }}

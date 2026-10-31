@@ -7,7 +7,7 @@
 .lista-materiais .painel-cab h3 { flex: 1 1 14rem; }
 .form-envio { display: grid; gap: 20px; max-width: 46rem; margin-bottom: 16px; }
 .form-envio input[type="file"], .descricoes textarea {
-  width: 100%; padding: .6rem .8rem; font: inherit; font-size: 1.125rem;
+  width: 100%; padding: .6rem .8rem; font: inherit; font-size: max(var(--letra-min), 1.125rem);
   color: var(--cor-texto); background: var(--cor-superficie); border: 0; border-radius: 0;
   box-shadow: 0 0 0 3px var(--cor-borda), inset 3px 3px 0 rgba(30, 34, 53, .08);
 }
@@ -20,3 +20,26 @@
 details > summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
 details ul { margin-top: 0; }
 [role="status"] { margin-block: 12px; }
+
+/* Turmas, alunos e cartões de acesso */
+.area-painel { margin-bottom: 48px; }
+.lista-turmas, .lista-alunos { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 24px; }
+.lista-alunos { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+.lista-turmas .turma { display: grid; gap: 12px; }
+.cartao-aluno { display: grid; gap: 8px; align-content: start; }
+.cartao-aluno h4 { margin: 0; font-size: max(var(--letra-min), 1.3rem); }
+.cartao-aluno p { margin: 0; }
+/* códigos e números sempre na fonte de texto: na fonte pixel o 5 parece S e o 0 parece 8 */
+.codigo { font-family: var(--fonte-texto); font-weight: 700; font-size: max(var(--letra-min), 1.25rem); letter-spacing: .06em; background: var(--cor-fundo-2); padding: 0 .4em; box-shadow: 0 0 0 2px var(--cor-borda); }
+.figuras-cartao { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.figuras-cartao li { display: inline-flex; align-items: center; gap: 6px; padding: .3rem .6rem; background: var(--cor-superficie); box-shadow: 0 0 0 2px var(--cor-borda); font-weight: 700; }
+.form-nova-turma, .form-novo-aluno, .form-aluno-editar { display: grid; gap: 16px; max-width: 46rem; }
+.form-nova-turma input[type="text"], .form-novo-aluno input[type="text"], .form-envio select {
+  width: 100%; min-height: 52px; padding: .6rem .8rem; font: inherit; font-size: max(var(--letra-min), 1.1875rem);
+  color: var(--cor-texto); background: var(--cor-superficie); border: 0; border-radius: 0;
+  box-shadow: 0 0 0 3px var(--cor-borda), inset 3px 3px 0 rgba(30, 34, 53, .08);
+}
+.form-nova-turma input:focus-visible, .form-novo-aluno input:focus-visible, .form-envio select:focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 5px; }
+.acoes-material { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.aviso-fixo:empty { display: none; }
+.aviso-fixo { position: sticky; top: 8px; z-index: 5; background: var(--cor-superficie); box-shadow: 0 0 0 3px var(--cor-borda); padding: 0 1rem; }

@@ -7,8 +7,9 @@ body {
   background: var(--cor-fundo);
   color: var(--cor-texto);
   font-family: var(--fonte-texto);
-  font-size: 1.125rem; /* 18px */
+  font-size: var(--letra-min); /* 19 px: P2.2 pede pelo menos 14 pt (18,7 px) */
   line-height: 1.6;
+  text-align: left; hyphens: none; -webkit-hyphens: none;  /* P2.5 */
   overflow-x: hidden;
 }
 :root[data-fonte="dislexia"] body { line-height: 1.85; letter-spacing: .02em; word-spacing: .08em; }
@@ -17,11 +18,17 @@ body {
 img, svg, canvas { display: block; max-width: 100%; }
 .pixel, .pixel img { image-rendering: pixelated; image-rendering: crisp-edges; }
 
+/* em telas estreitas, palavra longa quebra em vez de vazar (sem hífen: P2.5) */
+h1, h2, h3, h4, p, li, label, legend, button, a { overflow-wrap: break-word; }
 h1, h2, h3, h4 { font-family: var(--fonte-titulo); font-weight: 400; line-height: 1.12; margin: 0 0 .5em; letter-spacing: .005em; }
-h1 { font-size: clamp(2.2rem, 5.5vw, 3.75rem); }
-h2 { font-size: clamp(1.9rem, 4vw, 2.75rem); }
-h3 { font-size: 1.5rem; }
+h1 { font-size: max(var(--letra-min), clamp(2.2rem, 5.5vw, 3.75rem)); }
+h2 { font-size: max(var(--letra-min), clamp(1.9rem, 4vw, 2.75rem)); }
+h3 { font-size: max(var(--letra-min), 1.5rem); }
 p { margin: 0 0 1em; }
+/* P2.4: no máximo 60 caracteres por linha nos textos corridos */
+main p, main li, main dd, main figcaption { max-width: 60ch; }
+/* P2.3: sem itálico; ênfase vira negrito */
+em, i, cite { font-style: normal; font-weight: 700; }
 a { color: var(--cor-link); text-underline-offset: 3px; text-decoration-thickness: 2px; }
 .suave { color: var(--cor-texto-suave); }
 
