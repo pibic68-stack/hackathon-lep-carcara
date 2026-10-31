@@ -36,7 +36,9 @@ ARQUIVO_ENV = RAIZ / ".env"
 # Testado com chave real em 30/10/2026: responde em ~7 s. O gemini-2.5-flash foi desativado para contas novas
 # e o gemini-3.8-flash não respondeu em 60 s.
 MODELO_PADRAO = "gemini-3.1-flash-lite"
-URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/interactions"
+URL_BASE = "https://generativelanguage.googleapis.com/v1beta"
+URL_GEMINI = URL_BASE + "/interactions"
+URL_UPLOAD = "https://generativelanguage.googleapis.com/upload/v1beta/files"
 LIMITE_IMAGEM = 15 * 1024 * 1024     # imagem inline: o pedido todo pode ter no máximo 20 MB
 # Gemini Flash Lite (plano gratuito) guarda pouco contexto: lotes pequenos erram muito menos.
 TEXTOS_POR_PEDIDO = 6
@@ -102,10 +104,13 @@ class Gemini:
         entrada = usuario
         if imagem:
             dados, mime = imagem
-            if len(dados) > LIMITE_IMAGEM:
-                raise ErroIA("A imagem é grande demais para a IA (máximo 15 MB).")
-            entrada = [{"type": "text", "text": usuario},
-                       {"type": "image", "data": base64.b64encode(dados).decode("ascii"), "mime_type": mime}]
+            if isinstance(dados, str):                      # arquivo já enviado à IA (Files API): dados = uri
+                parte = {"type": _tipo_midia(mime), "uri": dados, "mime_type": mime}
+            else:
+                if len(dados) > LIMITE_IMAGEM:
+                    raise ErroIA("O arquivo é grande demais para mandar de uma vez à IA (máximo 15 MB).")
+                parte = {"type": _tipo_midia(mime), "data": base64.b64encode(dados).decode("ascii"), "mime_type": mime}
+            entrada = [{"type": "text", "text": usuario}, parte]
         corpo = json.dumps({"model": self.modelo, "system_instruction": sistema, "input": entrada}).encode("utf-8")
         cabecalhos = {"x-goog-api-key": self.chave, "Content-Type": "application/json"}
 
@@ -127,6 +132,45 @@ class Gemini:
             except urllib.error.URLError:
                 raise ErroIA("Não consegui falar com a IA. Confira a internet.") from None
         raise ErroIA("A IA não respondeu.")
+
+
+    def enviar_arquivo(self, caminho: Path, mime: str) -> str:
+        """Files API (upload resumível): para áudio/vídeo acima de 15 MB. Devolve a uri. O Google apaga em 48 h."""
+        tamanho = Path(caminho).stat().st_size
+        inicio = urllib.request.Request(
+            URL_UPLOAD, method="POST", data=json.dumps({"file": {"display_name": Path(caminho).name}}).encode(),
+            headers={"x-goog-api-key": self.chave, "X-Goog-Upload-Protocol": "resumable",
+                     "X-Goog-Upload-Command": "start", "X-Goog-Upload-Header-Content-Length": str(tamanho),
+                     "X-Goog-Upload-Header-Content-Type": mime, "Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(inicio, timeout=TEMPO_LIMITE) as r:
+                destino = r.headers.get("x-goog-upload-url")
+            with open(caminho, "rb") as f:
+                envio = urllib.request.Request(destino, method="POST", data=f.read(), headers={
+                    "Content-Length": str(tamanho), "X-Goog-Upload-Offset": "0",
+                    "X-Goog-Upload-Command": "upload, finalize"})
+            with urllib.request.urlopen(envio, timeout=600) as r:
+                arquivo = json.load(r).get("file", {})
+            # vídeo passa por processamento antes de ficar ACTIVE
+            for _ in range(60):
+                if arquivo.get("state", "ACTIVE") == "ACTIVE":
+                    return arquivo["uri"]
+                if arquivo.get("state") == "FAILED":
+                    raise ErroIA("A IA não conseguiu processar este vídeo.")
+                time.sleep(5)
+                consulta = urllib.request.Request(f"{URL_BASE}/{arquivo['name']}", headers={"x-goog-api-key": self.chave})
+                with urllib.request.urlopen(consulta, timeout=TEMPO_LIMITE) as r:
+                    arquivo = json.load(r)
+            raise ErroIA("O vídeo demorou demais para ser processado pela IA. Tente um vídeo mais curto.")
+        except urllib.error.HTTPError as erro:
+            raise ErroIA(_mensagem_http(erro, self.modelo)) from None
+        except urllib.error.URLError:
+            raise ErroIA("Não consegui falar com a IA. Confira a internet.") from None
+
+
+def _tipo_midia(mime: str) -> str:
+    principal = mime.split("/")[0]
+    return principal if principal in ("image", "audio", "video") else "document"
 
 
 def _mensagem_http(erro: urllib.error.HTTPError, modelo: str = "") -> str:
@@ -189,6 +233,41 @@ def descrever_imagem(provedor: Provedor, caminho: Path, colorida: bool = False) 
         "descrever_imagem_v3" + ("_cor" if colorida else ""), cache.impressao_digital(dados),
         lambda: provedor.gerar(sistema, "Descreva esta imagem.", (dados, mime)).strip(),
     )
+
+
+SISTEMA_TRANSCRICAO = """Você transcreve aulas gravadas (áudio ou vídeo) para estudantes surdos ou que preferem ler, em português do Brasil.
+Responda só com JSON neste formato:
+{"paragrafos": ["...", "..."], "na_tela": ["...", "..."]}
+Regras:
+- "paragrafos": a fala, fiel ao que foi dito, na ordem. Um parágrafo por assunto ou pausa longa, com até 5 frases. Tire só hesitações ("é...", "né", "tipo") e repetições sem sentido. Não resuma e não invente.
+- Se a fala não for em português, transcreva no idioma falado.
+- Escreva fórmulas como no quadro: CO2, H2O, x^2.
+- "na_tela" (só para vídeo): textos e imagens importantes que aparecem na tela e não são ditos (título de slide, fórmula no quadro, gráfico). Uma frase curta cada. Lista vazia se for só áudio ou se nada importante aparecer.
+- Se não houver fala, devolva "paragrafos": []."""
+
+MIME_MIDIA = {".mp3": "audio/mp3", ".wav": "audio/wav", ".m4a": "audio/aac", ".ogg": "audio/ogg",
+              ".mp4": "video/mp4", ".mov": "video/mov", ".webm": "video/webm", ".mkv": "video/x-matroska"}
+
+
+def transcrever_midia(provedor: Provedor, caminho: Path) -> dict:
+    """Plano B da transcrição quando o faster-whisper não está instalado: a IA ouve o arquivo."""
+    caminho = Path(caminho)
+    mime = MIME_MIDIA.get(caminho.suffix.lower()) or mimetypes.guess_type(str(caminho))[0] or "audio/mp3"
+
+    def produzir() -> str:
+        if caminho.stat().st_size <= LIMITE_IMAGEM:
+            midia = (caminho.read_bytes(), mime)
+        elif hasattr(provedor, "enviar_arquivo"):
+            midia = (provedor.enviar_arquivo(caminho, mime), mime)
+        else:
+            raise ErroIA("O arquivo é grande demais para a IA.")
+        return provedor.gerar(SISTEMA_TRANSCRICAO, "Transcreva esta aula.", midia)
+
+    impressao = cache.impressao_digital(caminho.read_bytes())
+    dados = _extrair_json(com_cache("transcrever_v1", impressao, produzir))
+    paragrafos = [str(p).strip() for p in dados.get("paragrafos") or [] if str(p).strip()]
+    na_tela = [str(p).strip() for p in dados.get("na_tela") or [] if str(p).strip()]
+    return {"paragrafos": paragrafos, "na_tela": na_tela}
 
 
 NIVEIS = {

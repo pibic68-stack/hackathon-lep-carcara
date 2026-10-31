@@ -423,6 +423,18 @@ def escrever_descricoes(id_: str, corpo: Descricoes, request: Request) -> dict:
     return _detalhe(id_, pasta)
 
 
+@app.post("/api/materiais/{id_}/refazer")
+def refazer(id_: str, request: Request) -> dict:
+    """Gera as versões de novo com o mesmo arquivo (ex.: a IA foi ligada depois, ou a Leitura Fácil falhou)."""
+    pasta = _do_professor(id_, exigir(request, "professor"))
+    estado = _ler(pasta, "estado.json")
+    if estado["estado"] == "publicado":
+        raise HTTPException(409, "Material já publicado. Envie de novo para alterar.")
+    descricoes = _ler(pasta, "descricoes.json") if (pasta / "descricoes.json").exists() else None
+    _processar(id_, ENVIOS / estado["envio"], estado.get("perfil"), descricoes)
+    return _detalhe(id_, pasta)
+
+
 @app.post("/api/materiais/{id_}/aprovar")
 def aprovar(id_: str, request: Request) -> dict:
     """Aprovação do professor: publica o material para a turma."""

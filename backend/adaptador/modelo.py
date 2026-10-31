@@ -23,6 +23,8 @@ class Bloco:
     alt: Optional[str] = None            # imagem: descrição; None = ainda não existe
     origem_alt: str = ""                 # imagem: quem escreveu a descrição ("ia", "professor" ou "" = original)
     colorida: bool = False               # imagem: tem cor que pode carregar informação (P1.2)
+    arquivo_cores: str = ""              # imagem: cópia com símbolos sobre cada cor (P1.1); "" = não há
+    cores_imagem: list[str] = field(default_factory=list)  # imagem: cores marcadas na cópia, na ordem da legenda
 
 
 @dataclass

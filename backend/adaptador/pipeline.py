@@ -46,7 +46,7 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
     if guardado:
         doc = Documento.de_dict(guardado)
     else:
-        doc = leitores.ler(caminho, pasta, modelo_audio)
+        doc = leitores.ler(caminho, pasta, modelo_audio, ia)
         cache.gravar(chave, "documento", doc.para_dict())
 
     # descrições escritas pelo professor (chave = caminho da imagem, ex.: "imagens/img-001.png")
@@ -68,6 +68,7 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
             return None
 
     doc = t.cor_com_simbolo(doc)                      # P1
+    _simbolos_nas_imagens(doc, pasta)                 # P1.1 dentro das imagens coloridas
     doc = t.instrucoes_em_etapas(doc)                 # P6
     doc = t.sinalizar_linguagem_figurada(doc)         # P6 (só avisa)
     doc = t.imagens_com_descricao(doc, descrever)     # P4
@@ -75,6 +76,26 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
     for erro in erros_ia:
         doc.pendencias.append(f"IA indisponível para descrever imagens: {erro}")
     return doc, pasta
+
+
+def _simbolos_nas_imagens(doc, pasta: Path) -> None:
+    """Imagem colorida ganha uma cópia com símbolos sobre cada cor e a legenda (P1.1)."""
+    from .simbolos_imagem import marcar_cores
+    marcadas = 0
+    for b in doc.blocos:
+        if b.tipo != "imagem" or not b.colorida or not (pasta / b.arquivo).exists():
+            continue
+        destino = Path(b.arquivo).with_name(Path(b.arquivo).stem + "-cores.png").as_posix()
+        try:
+            cores = marcar_cores(pasta / b.arquivo, pasta / destino)
+        except Exception:                       # imagem estranha: fica sem símbolos, o professor já foi avisado (P1.2)
+            cores = []
+        if cores:
+            b.arquivo_cores, b.cores_imagem = destino, cores
+            marcadas += 1
+    if marcadas:
+        doc.aplicados.append(
+            f"P1.1 Cor nunca sozinha: {marcadas} imagem(ns) colorida(s) ganharam símbolos sobre cada cor e uma legenda.")
 
 
 def _origem_imagem(b) -> str:
@@ -102,7 +123,7 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
         if v in PRECISA_IA:
             if not ia:
                 versoes[v] = {"status": "pendente_ia",
-                              "motivo": "Esta versão precisa de IA, que ainda não está ligada (veja backend/README.md)."}
+                              "motivo": "Esta versão precisa da IA, e a chave do Gemini não foi colocada neste computador."}
                 continue
             maximo = int(limites_p31[1] if v == "lf2" else limites_p31[2])
             try:

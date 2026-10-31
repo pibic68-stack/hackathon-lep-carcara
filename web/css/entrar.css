@@ -63,7 +63,7 @@
 .erro { margin: 0; display: flex; gap: 6px; align-items: center; color: var(--cor-erro); font-weight: 700; }
 :root[data-contraste="alto"] .erro { color: #FFE600; }
 .lembrar { display: flex; gap: 10px; align-items: center; min-height: 44px; }
-.lembrar input { width: 22px; height: 22px; accent-color: var(--tinta); }
+.lembrar input { width: 26px; height: 26px; accent-color: var(--tinta); }
 .botao--largo { width: calc(100% - 2 * var(--b)); }
 .links { margin: 0; text-align: center; }
 .status { min-height: 1.6em; font-weight: 700; }

@@ -259,3 +259,5 @@ backend/saida/
 backend/envios/
 backend/dados/
 ferramentas/
+.env.tmp
+ferramentas/

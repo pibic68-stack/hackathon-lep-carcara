@@ -37,6 +37,11 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
   - **IA (Gemini Flash Lite gratuito)**: Leitura Fácil em lotes de até 6 trechos, fórmulas protegidas como `[M1]`, conferência de cada resposta (fórmula perdida, frase longa, parecido demais com o original, nível I sem encurtar), nova tentativa um trecho por vez e plano B (só divide frases) com aviso ao professor. A versão nunca sai "pela metade".
   - Home: a caixa do "Como funciona" tem a altura da maior etapa (botões não pulam); rótulos do diagrama se afastam sozinhos ou viram lista no caderno quando não cabem; menu do topo recolhe quando a letra grande não cabe.
 
+- Decisões de 31/10, 3h (testes do time):
+  - **Símbolos dentro das imagens coloridas** (`backend/adaptador/simbolos_imagem.py`): cada região de cor ganha o símbolo da legenda (● verde, ◆ amarelo, ◇ marrom...) em preto com contorno branco; regiões grandes em xadrez, pequenas (sol, tronco, grupo de bolinhas) com um símbolo no centro; bordas finas e degradês de fundo ficam de fora. A versão mostra a imagem com símbolos, a legenda e "Ver a imagem sem os símbolos"; o Ouvir lê a legenda.
+  - **Vídeo/áudio sem faster-whisper**: a IA (Gemini) transcreve e lista "O que aparece na tela"; o professor confere.
+  - **Chave da IA pelo publicar.bat**: na primeira vez ele pede a chave e grava só em `backend/.env`. O `publicar.bat` também instala o Python pelo winget. No painel, versões que faltaram têm o botão "Gerar as versões de novo" (`POST /api/materiais/{id}/refazer`).
+
 ## Regras para o Claude
 - Responder em português.
 - Depois de uma compactação, ou se faltar contexto, reler `prompts/conversas/` e `docs/` antes de responder.

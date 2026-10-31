@@ -87,6 +87,10 @@ ul.itens li {{ padding-left:2.2em; text-indent:-2.2em; }}
   background:var(--fundo); border:3px solid var(--borda); border-radius:0; cursor:pointer; }}
 .ajustes .grupo {{ display:inline-flex; gap:.4rem; align-items:center; }}
 figure img {{ border:3px solid var(--borda); background:#fff; }}
+.legenda-cores {{ display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin:.5rem 0; padding:.5rem .8rem;
+  border:3px solid var(--borda); background:var(--quadro); }}
+.legenda-cores .simbolo {{ font-size:1.25em; }}
+details.sem-simbolos {{ margin:.5rem 0; }} details.sem-simbolos summary {{ cursor:pointer; min-height:44px; font-weight:700; }}
 .cor-aviso {{ font-size:.9em; }}
 
 main {{ max-width:{params['caracteres_por_linha']}ch; margin:0 auto; padding:1.5rem 1rem 4rem; }}
@@ -262,17 +266,31 @@ def para_html(doc: Documento, estilo: str = "padrao", manual: dict | None = None
                 + "<ul>" + "".join(f"<li>{_html(x)}</li>" for x in b.itens) + "</ul></aside>"
             )
         elif b.tipo == "imagem":
+            com_cores = bool(b.arquivo_cores and b.cores_imagem)
+            fonte = b.arquivo_cores if com_cores else b.arquivo
+            legenda, legenda_falada = "", ""
+            if com_cores:
+                from .transformacoes import SIMBOLOS
+                legenda = ('<p class="legenda-cores"><strong>Na imagem, cada cor ganhou um símbolo preto:</strong> '
+                           + " ".join(f'<span><span class="simbolo" aria-hidden="true">{SIMBOLOS.get(c, "▬")}</span> {c}</span>'
+                                        for c in b.cores_imagem) + "</p>")
+                legenda_falada = (" Na imagem, cada cor tem um símbolo preto por cima: "
+                                  + "; ".join(f"{FALA_SIMBOLOS.get(SIMBOLOS.get(c, ''), 'barra')} sobre o {c}"
+                                              for c in b.cores_imagem) + ".")
+            original = ('<details class="sem-simbolos"><summary>Ver a imagem sem os símbolos</summary>'
+                        f'<img src="{_esc(b.arquivo)}" alt=""></details>') if com_cores else ""
             if b.alt:
-                partes.append(f'<figure{marca("Imagem: " + b.alt)}><img src="{_esc(b.arquivo)}" alt="{_esc(b.alt)}">'
-                              f"<figcaption>{_esc(b.alt)}</figcaption></figure>")
+                partes.append(f'<figure{marca("Imagem: " + b.alt + legenda_falada)}><img src="{_esc(fonte)}" alt="{_esc(b.alt)}">'
+                              f"{legenda}<figcaption>{_esc(b.alt)}</figcaption>{original}</figure>")
             else:
-                partes.append(f'<figure{marca("Imagem sem descrição.")}><img src="{_esc(b.arquivo)}" alt="">'
-                              '<p class="pendente">Descrição da imagem pendente: aguarda o professor.</p></figure>')
+                partes.append(f'<figure{marca("Imagem sem descrição." + legenda_falada)}><img src="{_esc(fonte)}" alt="">'
+                              f'{legenda}<p class="pendente">Descrição da imagem pendente: aguarda o professor.</p>{original}</figure>')
             if pasta_imagens and pasta_saida:
-                destino = pasta_saida / b.arquivo
-                destino.parent.mkdir(parents=True, exist_ok=True)
-                if (pasta_imagens / b.arquivo).exists():
-                    shutil.copyfile(pasta_imagens / b.arquivo, destino)
+                for arq in ([b.arquivo, b.arquivo_cores] if com_cores else [b.arquivo]):
+                    destino = pasta_saida / arq
+                    destino.parent.mkdir(parents=True, exist_ok=True)
+                    if (pasta_imagens / arq).exists():
+                        shutil.copyfile(pasta_imagens / arq, destino)
     if abertura:
         partes.append("</section>")
 

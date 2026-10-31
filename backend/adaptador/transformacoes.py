@@ -59,7 +59,7 @@ def cor_com_simbolo(doc: Documento) -> Documento:
     desenhos = [f for f in novo.figuras_coloridas if not f.startswith("imagens/")]
     if imagens:
         novo.pendencias.append(
-            f"P1.2: {len(imagens)} imagem(ns) colorida(s). Na descrição de cada uma, diga o que cada cor representa "
+            f"P1.2: {len(imagens)} imagem(ns) colorida(s). O PRISMA já pôs um símbolo sobre cada cor. Na descrição, diga o que cada cor representa "
             "(por exemplo: \"barras vermelhas: meninas\"). É assim que o aluno daltônico e a versão Ouvir entendem o desenho."
         )
         for b in novo.blocos:

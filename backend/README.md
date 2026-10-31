@@ -81,7 +81,8 @@ arquivo ──► leitores.py ──► Documento (blocos) ──► transformac
 | Arquivo | Papel |
 |---|---|
 | `modelo.py` | Formato interno (`Documento`, `Bloco`). É o "contrato" entre as peças. |
-| `leitores.py` | Um leitor por formato. Vídeo/áudio usa `faster-whisper` (roda no computador, sem internet). |
+| `leitores.py` | Um leitor por formato. Vídeo/áudio usa `faster-whisper` se instalado; senão, a IA transcreve. |
+| `simbolos_imagem.py` | P1.1 dentro de imagens coloridas: símbolo preto sobre cada região de cor + legenda (Pillow). |
 | `regras.py` | Lê os limites dos critérios do Manual (`docs/manual/padroes.json`: P2.1 contraste, P2.2 e P2.4 tamanho e linha, P6.1 etapas). Não ficam fixos no código. |
 | `transformacoes.py` | Regras determinísticas: **P1.1** cor + símbolo, **P6.1/P6.2** "Hoje vamos" e passos numerados, **P6.3** avisa linguagem figurada, **P4.1** imagem sem descrição bloqueia a publicação. |
 | `renderizador.py` | Gera o HTML acessível (idioma, pular para o conteúdo, foco visível, contraste conferido nos testes). |
@@ -151,6 +152,13 @@ Ela lê o texto na tela e não gera arquivo de áudio.
   e o `.env.exemplo` vai para o GitHub. Se uma chave vazar, apague-a em https://aistudio.google.com/apikey e crie outra.
 
 ## Vídeo e áudio
+
+Dois caminhos, nesta ordem (31/10):
+1. **`faster-whisper` instalado** (`pip install faster-whisper`): transcreve no próprio computador, sem internet depois de baixar o modelo.
+2. **Sem ele, a IA (Gemini) ouve o arquivo** (`ia.transcrever_midia`): até 15 MB vai junto no pedido; acima disso sobe pela
+   Files API do Google (apagado por ele em 48 h). Em vídeo, a IA também lista "O que aparece na tela" (slide, fórmula no quadro).
+   O professor confere antes de aprovar. É o caminho do `publicar.bat`, que não instala o `faster-whisper` (pesado).
+Sem nenhum dos dois, a plataforma explica como ligar a IA.
 
 `pip install -r requirements.txt` já inclui o `faster-whisper`. Na primeira vez ele baixa o modelo de voz
 (`small`, ~460 MB). Testado com um `.mp4` e um `.wav` em português: transcrição correta e, na segunda vez, 1 segundo (cache).

@@ -24,7 +24,7 @@ MARCA_NUMERO = re.compile(r"^\s*(?:\d{1,2}|[a-z])[.)]\s+(.*)$", re.I)
 NOME_DE_ARQUIVO = re.compile(r".*\.(png|jpe?g|gif|bmp|tiff?|svg|emf|wmf|webp)$", re.I)
 
 
-def ler(caminho: Path, pasta_trabalho: Path, modelo_audio: str = "small") -> Documento:
+def ler(caminho: Path, pasta_trabalho: Path, modelo_audio: str = "small", ia=None) -> Documento:
     """Escolhe o leitor pela extensão. Imagens extraídas vão para pasta_trabalho/imagens."""
     caminho = Path(caminho)
     ext = caminho.suffix.lower()
@@ -35,7 +35,7 @@ def ler(caminho: Path, pasta_trabalho: Path, modelo_audio: str = "small") -> Doc
     elif ext in EXT_PPT:
         doc = _ler_pptx(caminho, pasta_trabalho)
     elif ext in EXT_MIDIA:
-        doc = _ler_midia(caminho, modelo_audio)
+        doc = _ler_midia(caminho, modelo_audio, ia)
     else:
         raise ValueError(
             f"Formato não suportado: {ext}. Use .pdf, .pptx, .txt, .mp4 ou .mp3."
@@ -327,14 +327,18 @@ def _texto_pptx_com_cor(paragrafo, cores: list[str]) -> str:
 
 # ---------- vídeo e áudio ----------
 
-def _ler_midia(caminho: Path, modelo: str) -> Documento:
-    """Transcreve o áudio localmente com faster-whisper (sem internet depois de baixar o modelo)."""
+def _ler_midia(caminho: Path, modelo: str, ia=None) -> Documento:
+    """Transcreve o áudio. 1º faster-whisper (local, sem internet depois de baixar o modelo);
+    se não estiver instalado, a IA (Gemini) ouve o arquivo; sem os dois, explica o que fazer."""
     try:
         from faster_whisper import WhisperModel
-    except ImportError as erro:
+    except ImportError:
+        if ia is not None:
+            return _ler_midia_pela_ia(caminho, ia)
         raise RuntimeError(
-            "Para transcrever vídeo/áudio instale: pip install faster-whisper"
-        ) from erro
+            "Para transcrever vídeo ou áudio, ligue a IA: rode o publicar.bat e cole a chave do Gemini "
+            "quando ele pedir (ou instale o transcritor local: pip install faster-whisper)."
+        ) from None
 
     whisper = WhisperModel(modelo, device="cpu", compute_type="int8")
     segmentos, _ = whisper.transcribe(str(caminho), language="pt", vad_filter=True)
@@ -351,8 +355,33 @@ def _ler_midia(caminho: Path, modelo: str) -> Documento:
         paragrafos.append(" ".join(atual))
 
     doc = Documento(caminho.stem, [Bloco("paragrafo", texto=p) for p in paragrafos])
+    _pendencia_transcricao(doc)
+    return doc
+
+
+def _ler_midia_pela_ia(caminho: Path, ia) -> Documento:
+    from . import ia as ia_mod
+    try:
+        dados = ia_mod.transcrever_midia(ia, caminho)
+    except ia_mod.ErroIA as erro:
+        raise RuntimeError(f"Não consegui transcrever o arquivo: {erro}") from None
+    if not dados["paragrafos"]:
+        raise RuntimeError("Não encontrei fala neste arquivo. Confira se o áudio está ligado.")
+    blocos = [Bloco("paragrafo", texto=p) for p in dados["paragrafos"]]
+    if dados["na_tela"]:
+        blocos += [Bloco("titulo", texto="O que aparece na tela", nivel=2), Bloco("lista", itens=dados["na_tela"])]
+    doc = Documento(caminho.stem, blocos)
+    _pendencia_transcricao(doc, pela_ia=True)
+    return doc
+
+
+def _pendencia_transcricao(doc: Documento, pela_ia: bool = False) -> None:
+    if pela_ia:
+        doc.pendencias.append(
+            "O texto veio da transcrição feita pela IA: o professor precisa conferir nomes, números e termos "
+            "técnicos, e a lista \"O que aparece na tela\", antes de aprovar.")
+        return
     doc.pendencias.append(
         "O texto veio da transcrição automática do áudio: o professor precisa conferir nomes, "
         "números e termos técnicos. Imagens e slides mostrados no vídeo não foram lidos."
     )
-    return doc

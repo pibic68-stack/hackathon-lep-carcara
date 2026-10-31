@@ -328,7 +328,8 @@ def imagem_colorida(dados: bytes) -> bool:
         from PIL import Image
         im = Image.open(io.BytesIO(dados)).convert("RGB")
         im.thumbnail((160, 160))
-        px = list(im.getdata())
+        bruto = im.tobytes()
+        px = [tuple(bruto[i:i + 3]) for i in range(0, len(bruto), 3)]
     except Exception:
         return False
     if not px:

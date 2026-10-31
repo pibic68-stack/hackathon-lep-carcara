@@ -13,7 +13,7 @@
 }
 .form-envio input[type="file"] { min-height: 52px; }
 .form-envio input:focus-visible, .descricoes textarea:focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 5px; }
-.form-envio .lembrar input { width: 22px; height: 22px; accent-color: var(--tinta); }
+.form-envio .lembrar input { width: 26px; height: 26px; accent-color: var(--tinta); }
 .descricoes { display: grid; gap: 16px; padding-top: 8px; }
 .descricoes .campo { gap: 8px; }
 .miniatura { max-width: 12rem; height: auto; box-shadow: 0 0 0 3px var(--cor-borda); }

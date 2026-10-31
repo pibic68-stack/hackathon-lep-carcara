@@ -50,6 +50,30 @@ if errorlevel 1 (
   )
 )
 
+rem --- 2b. chave da IA (Gemini). Fica so em backend\.env, que nunca vai para o GitHub ---
+set "TEM_CHAVE="
+if exist "backend\.env" findstr /r /c:"^GEMINI_API_KEY=..*" "backend\.env" >nul 2>nul && set "TEM_CHAVE=1"
+if not defined TEM_CHAVE (
+  echo.
+  echo  ------------------------------------------------------------
+  echo   A IA ^(Leitura Facil, descricao de imagens, transcricao de video^)
+  echo   precisa da chave gratuita do Gemini. So e pedida uma vez.
+  echo   Pegue em https://aistudio.google.com/apikey  ^(botao "Create API key"^)
+  echo   Cole aqui com o botao direito do mouse e aperte Enter.
+  echo   Para seguir sem IA, so aperte Enter.
+  echo  ------------------------------------------------------------
+  set "CHAVE="
+  set /p "CHAVE=  Chave do Gemini: "
+)
+if not defined TEM_CHAVE if defined CHAVE (
+  if not exist "backend\.env" copy /y "backend\.env.exemplo" "backend\.env" >nul
+  findstr /v /r /c:"^GEMINI_API_KEY=" "backend\.env" > "backend\.env.tmp"
+  >>"backend\.env.tmp" echo GEMINI_API_KEY=%CHAVE%
+  move /y "backend\.env.tmp" "backend\.env" >nul
+  echo  Chave salva em backend\.env ^(so neste computador^).
+)
+if not defined TEM_CHAVE if not defined CHAVE echo  Seguindo sem IA. Para ligar depois, abra este arquivo de novo.
+
 rem --- 3. cloudflared (baixa sozinho se faltar) ---
 set "CF="
 where cloudflared >nul 2>nul && set "CF=cloudflared"

@@ -196,7 +196,8 @@
     var titulo = el("h3", { tabindex: "-1", texto: m.titulo || m.material });
     var versoes = Object.keys(m.versoes).map(function (k) {
       var v = m.versoes[k];
-      if (v.status === "pendente_ia") return el("li", {}, [el("strong", { texto: v.nome + ": " }), "precisa da IA, que está desligada."]);
+      if (v.status === "pendente_ia") return el("li", {}, [el("strong", { texto: v.nome + ": " }),
+        "precisa da IA, e a chave do Gemini não foi colocada neste computador. Feche o PRISMA, abra o publicar.bat, cole a chave quando ele pedir e use \"Gerar as versões de novo\"."]);
       if (v.status === "falhou") return el("li", {}, [el("strong", { texto: v.nome + ": " }), "não saiu. " + (v.motivo || "")]);
       return el("li", {}, [el("a", { href: Prisma.api.url(v.url), target: "_blank", rel: "noopener", texto: "Abrir a versão " + v.nome }), " (abre em outra aba)"]);
     });
@@ -219,6 +220,17 @@
     if (imagens.length && m.estado !== "publicado") partes.push(formularioImagens(m, imagens));
     var acoes = el("div", { classe: "acoes-material" });
     if (m.estado !== "publicado") acoes.appendChild(botaoAprovar(m));
+    var faltou = Object.keys(m.versoes).some(function (k) { return m.versoes[k].status === "pendente_ia" || m.versoes[k].status === "falhou"; });
+    if (faltou && m.estado !== "publicado") {
+      var refazer = el("button", { type: "button", classe: "botao botao--secundario botao--pequeno" }, [icone("reload"), " Gerar as versões de novo"]);
+      refazer.addEventListener("click", function () {
+        refazer.disabled = true;
+        avisar("Gerando as versões de novo. Pode levar um minuto.");
+        Prisma.api.refazer(m.id).then(function () { avisar("Versões geradas de novo."); return recarregar(m.id); })
+          .catch(function (e) { avisar(e.message, "erro"); refazer.disabled = false; });
+      });
+      acoes.appendChild(refazer);
+    }
     var apagar = el("button", { type: "button", classe: "botao botao--fantasma botao--pequeno", texto: "Apagar material" });
     apagar.addEventListener("click", function () {
       if (!confirm("Apagar " + (m.titulo || m.material) + "? A turma deixa de ver este material.")) return;
