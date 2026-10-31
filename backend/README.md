@@ -62,32 +62,68 @@ arquivo ──► leitores.py ──► Documento (blocos) ──► transformac
 | `transformacoes.py` | Regras determinísticas: **P1.1** cor + símbolo, **P6.1/P6.2** "Hoje vamos" e passos numerados, **P6.3** avisa linguagem figurada, **P4.1** imagem sem descrição bloqueia a publicação. |
 | `renderizador.py` | Gera o HTML acessível (idioma, pular para o conteúdo, foco visível, contraste conferido nos testes). |
 | `cache.py` | Guarda o que é lento (transcrição, respostas da IA) em `backend/cache/`. Esta pasta **é versionada** de propósito, para a demo funcionar sem internet. |
-| `ia.py` | Ponto de ligação da IA. **Ainda sem provedor.** |
+| `ia.py` | IA (Gemini): descrever imagens e Leitura Fácil. Pedidos e cache ficam aqui. Veja a seção IA. |
 | `pipeline.py` | Junta tudo e decide as versões pelo perfil (baixa visão ⇒ ampliada etc.). |
 
 ## O que já está feito e o que falta
 
 - [x] Ler `.txt` · [x] critérios P1.1, P6.1 a P6.3 e P4.1 · [x] HTML padrão e ampliado · [x] fila de revisão · [x] cache
 - [x] Ler PDF e PowerPoint (testado com arquivos criados nos testes) · [ ] testar com **PDFs e PowerPoints reais** de aula (layouts complicados, colunas, escaneados)
-- [ ] Testar vídeo (precisa `faster-whisper`)
-- [x] API para o site enviar arquivos (FastAPI, ver seção acima) · [ ] ligar o site (`web/js`) à API · [ ] login de verdade
-- [ ] IA: simplificar texto (Leitura Fácil), descrever imagens, roteiro de áudio
+- [x] Vídeo/áudio com `faster-whisper` (testado com arquivo sintético; falta áudio real de sala de aula)
+- [x] API para o site enviar arquivos (FastAPI, ver seção acima) · [x] site ligado à API (`web/js/api.js`, `professor.js`, `biblioteca.js`) · [ ] login de verdade
+- [x] IA (Gemini): descrever imagens e Leitura Fácil, **falta testar com a chave real** · [x] versão Ouvir (sem IA)
 - [ ] Mover `PEDE_VERSAO` (em `pipeline.py`, qual necessidade pede qual versão) para o `padroes.json`; versão `braille` ainda não tratada
 
 ## Limites conhecidos das regras sem IA
 
 - **P1** reconhece palavras de cor, não cores dentro de imagens. "Rosa" (flor) pode ser marcado sem querer: o professor é avisado.
 - **P6** reconhece instruções que começam com verbo de ordem (leia, desenhe, responda...). Lista de verbos em `transformacoes.py`.
-- Imagens e gráficos não são adaptados; só ganham descrição quando a IA estiver ligada (ou o professor escrever).
+- Imagens e gráficos não são alterados; só ganham descrição (IA ou professor).
 - PDF escaneado (só imagem) não tem texto: precisa de OCR, e o sistema avisa.
 
-## IA: do zero
+## IA (Gemini)
 
-1. **O que é**: um modelo de linguagem (LLM) é um serviço na internet. O código envia um texto (o *prompt*,
-   com as instruções e o material) e recebe outro texto de volta. Não é preciso "treinar" nada.
-2. **Como se liga**: o backend faz uma chamada HTTP autenticada por uma **chave de API**. A chave fica só no
-   servidor (arquivo `.env`, já no `.gitignore`), nunca no HTML nem no GitHub.
-3. **Onde entra aqui**: as três tarefas do manual que regra fixa não resolve: reescrever em Leitura Fácil (P3),
-   descrever imagens (P4) e roteiro de áudio (P5). Tudo passa por `ia.py` e por `cache.com_cache()`,
-   então cada pedido é pago/esperado uma vez só e a demo roda offline.
-4. **Segurança**: o professor aprova tudo (P10); a IA nunca recebe nome real de aluno (LGPD).
+**Escolha do time:** Gemini (Google), pela chave **gratuita** do Google AI Studio (sem cartão), boa em português
+e com leitura de imagens. O código não depende dele: todos os pedidos (prompts) ficam em `ia.py`, e trocar de
+serviço (ex.: Claude) é escrever **uma** função `gerar(sistema, usuario, imagem)` numa nova classe.
+
+### O que é uma IA aqui, do zero
+Um modelo de linguagem é um serviço na internet. O código envia um texto (as instruções + o material) e recebe
+outro texto de volta. Ninguém precisa treinar nada. O acesso é pago por uma **chave de API** (uma senha longa)
+que fica só neste computador, no arquivo `.env`, nunca no site nem no GitHub.
+
+### Ligar em 3 passos
+1. Abra https://aistudio.google.com/apikey, entre com uma conta Google e clique em **Criar chave de API**.
+2. Na pasta `backend/`, copie `.env.exemplo` para `.env`:
+   ```bash
+   cp .env.exemplo .env
+   ```
+3. Abra o `.env` e cole a chave depois de `GEMINI_API_KEY=`. Reinicie a API. Em `/api/saude` aparece `"ia_ligada": true`.
+
+### O que a IA faz (e o que o código confere)
+| Tarefa | Critério | Como funciona |
+|---|---|---|
+| Descrever imagens | P4.2, P4.5 | A IA escreve; o professor **confere e corrige** no painel antes de aprovar. Se achar que é só enfeite, avisa. |
+| Leitura Fácil I e II | P3.1 a P3.5 | A IA reescreve com os limites do manual (palavras por frase vêm de `padroes.json`). Depois o **código confere** frases longas e abreviações e avisa o professor. Uma frase por linha e glossário de palavras difíceis. |
+
+A versão **Ouvir** (P5) **não usa IA**: usa a voz do navegador (Chrome e Edge têm voz em português), sem internet.
+Ela lê o texto na tela e não gera arquivo de áudio.
+
+### Cuidados
+- **Privacidade:** no plano gratuito o Google pode usar o conteúdo enviado para melhorar os produtos dele.
+  Use só material de domínio público ou criado pelo time, **nunca dados reais de alunos**. Para uso real, o plano pago
+  não usa o conteúdo desse jeito.
+- **Limites gratuitos:** ao passar do limite, o sistema espera e tenta de novo; se não der, avisa o professor.
+  Tudo que a IA responde fica em `backend/cache/`, então **rode a demo antes**: depois disso ela funciona sem internet.
+- **Sem IA, nada quebra:** as versões Padrão, Ampliada e Ouvir continuam saindo. Leitura Fácil fica "pendente".
+- **Revisão obrigatória:** a IA erra. Nada chega ao aluno sem o professor aprovar (P10.1).
+- **Não testado ao vivo:** o código segue a documentação oficial do Google (API `interactions`, out/2026) e passa
+  em testes simulados, mas **ainda não foi executado com uma chave de verdade**. O primeiro teste real é com você.
+- Modelo: padrão `gemini-3.8-flash`; para trocar, `PRISMA_IA_MODELO=` no `.env`.
+
+## Vídeo e áudio
+
+`pip install -r requirements.txt` já inclui o `faster-whisper`. Na primeira vez ele baixa o modelo de voz
+(`small`, ~460 MB). Testado com um `.mp4` e um `.wav` em português: transcrição correta e, na segunda vez, 1 segundo (cache).
+O modelo `tiny` (`--modelo-audio tiny`, ~75 MB) é rápido, mas erra palavras. Áudio de sala de aula real,
+com ruído e vários falando, será pior que o de teste: o professor precisa conferir a transcrição.

@@ -6,18 +6,20 @@ import re
 from pathlib import Path
 
 from . import cache, leitores, regras, renderizador, transformacoes as t
+from . import ia as ia_mod
 from .modelo import Documento
 
 SAIDA_PADRAO = Path(__file__).resolve().parents[1] / "saida"
 
 # Qual necessidade/preferência do perfil pede qual versão do manual (ver "versoes_geradas").
-# Quando regras.json existir, isto deve migrar para lá.
+# Quando o time quiser, isto pode migrar para o padroes.json.
 PEDE_VERSAO = {
     "baixa_visao": "ampliada", "fonte_ampliada": "ampliada",
     "leitura_facil": "lf2", "alfabetizacao": "lf2",
     "audio": "audio",
 }
-PRECISA_IA = {"lf1", "lf2", "audio"}
+PRECISA_IA = {"lf1", "lf2"}
+ROTULO_VERSAO = {"lf1": "Leitura Fácil I", "lf2": "Leitura Fácil II"}
 
 
 def versoes_do_perfil(perfil: dict | None) -> list[str]:
@@ -49,14 +51,35 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
     # descrições escritas pelo professor (chave = caminho da imagem, ex.: "imagens/img-001.png")
     for b in doc.blocos:
         if b.tipo == "imagem" and descricoes and descricoes.get(b.arquivo, "").strip():
-            b.alt = descricoes[b.arquivo].strip()
+            b.alt, b.origem_alt = descricoes[b.arquivo].strip(), "professor"
+
+    # P4: se a IA falhar (sem internet, limite...), a imagem fica "sem descrição" e o professor é avisado
+    erros_ia: list[str] = []
+
+    def descrever(arquivo: str) -> str | None:
+        if not ia:
+            return None
+        try:
+            return ia_mod.descrever_imagem(ia, pasta / arquivo)
+        except ia_mod.ErroIA as erro:
+            if str(erro) not in erros_ia:
+                erros_ia.append(str(erro))
+            return None
 
     doc = t.cor_com_simbolo(doc)                      # P1
     doc = t.instrucoes_em_etapas(doc)                 # P6
     doc = t.sinalizar_linguagem_figurada(doc)         # P6 (só avisa)
-    doc = t.imagens_com_descricao(doc, ia.descrever_imagem if ia else None)  # P4
+    doc = t.imagens_com_descricao(doc, descrever)     # P4
     doc = t.quadro_hoje_vamos(doc, regras.maximo_etapas_hoje_vamos(manual))  # P6.1
+    for erro in erros_ia:
+        doc.pendencias.append(f"IA indisponível para descrever imagens: {erro}")
     return doc, pasta
+
+
+def _origem_imagem(b) -> str:
+    if not b.alt:
+        return "pendente"
+    return b.origem_alt or "original"
 
 
 def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRAO,
@@ -70,18 +93,39 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
     pasta.mkdir(parents=True, exist_ok=True)
 
     versoes: dict[str, dict] = {}
+    extra_aplicados: list[str] = []
+    extra_pendencias: list[str] = []
+    limites_p31 = regras.limites(manual, "P3.1")          # [20, 15, 10]: todos, nível II, nível I
+
     for v in versoes_do_perfil(perfil):
         if v in PRECISA_IA:
-            versoes[v] = {"status": "pendente_ia",
-                          "motivo": "Esta versão precisa de IA, que ainda não está ligada."}
-            continue
-        estilo = "ampliada" if v == "ampliada" else "padrao"
-        html = renderizador.para_html(doc, estilo, manual, pasta_trabalho, pasta)
+            if not ia:
+                versoes[v] = {"status": "pendente_ia",
+                              "motivo": "Esta versão precisa de IA, que ainda não está ligada (veja backend/README.md)."}
+                continue
+            maximo = int(limites_p31[1] if v == "lf2" else limites_p31[2])
+            try:
+                versao_doc = t.leitura_facil(
+                    doc, v, lambda textos, v=v, m=maximo: ia_mod.leitura_facil(ia, textos, v, m), maximo)
+            except ia_mod.ErroIA as erro:
+                versoes[v] = {"status": "falhou", "motivo": str(erro)}
+                continue
+            extra_aplicados += versao_doc.aplicados[len(doc.aplicados):]
+            extra_pendencias += versao_doc.pendencias[len(doc.pendencias):]
+            html = renderizador.para_html(versao_doc, "padrao", manual, pasta_trabalho, pasta)
+        elif v == "audio":
+            html = renderizador.para_html(doc, "padrao", manual, pasta_trabalho, pasta, audio=True)
+            extra_aplicados.append("P5: versão para ouvir criada (lê o texto em voz alta pelo navegador).")
+        else:
+            html = renderizador.para_html(doc, "ampliada" if v == "ampliada" else "padrao",
+                                          manual, pasta_trabalho, pasta)
         (pasta / f"{v}.html").write_text(html, encoding="utf-8")
         versoes[v] = {"status": "gerada", "arquivo": f"{v}.html"}
 
+    aplicados = doc.aplicados + extra_aplicados
+    pendencias = doc.pendencias + extra_pendencias
     # P4.1: imagem sem descrição bloqueia a publicação
-    bloqueios = [p for p in doc.pendencias if p.startswith("P4.1")]
+    bloqueios = [p for p in pendencias if p.startswith("P4.1")]
     revisao = {
         "material": doc.origem,
         "aluno": (perfil or {}).get("aluno"),
@@ -89,8 +133,10 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
         "pode_publicar": not bloqueios,
         "bloqueios": bloqueios,
         "versoes": versoes,
-        "transformacoes_aplicadas": doc.aplicados,
-        "pendencias_para_o_professor": doc.pendencias,
+        "imagens": [{"arquivo": b.arquivo, "alt": b.alt or "", "origem": _origem_imagem(b)}
+                    for b in doc.blocos if b.tipo == "imagem"],
+        "transformacoes_aplicadas": aplicados,
+        "pendencias_para_o_professor": pendencias,
     }
     (pasta / "revisao.json").write_text(
         json.dumps(revisao, ensure_ascii=False, indent=2), encoding="utf-8"

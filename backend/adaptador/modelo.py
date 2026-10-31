@@ -21,6 +21,7 @@ class Bloco:
     nivel: int = 2                       # nível do título (1 a 3)
     arquivo: str = ""                    # imagem: caminho relativo ao HTML
     alt: Optional[str] = None            # imagem: descrição; None = ainda não existe
+    origem_alt: str = ""                 # imagem: quem escreveu a descrição ("ia", "professor" ou "" = original)
 
 
 @dataclass

@@ -159,19 +159,93 @@ def sinalizar_linguagem_figurada(doc: Documento) -> Documento:
 # ---------- P4: imagem com descrição ----------
 
 def imagens_com_descricao(doc: Documento, descrever=None) -> Documento:
-    """`descrever(bytes_caminho) -> str|None` é a IA (opcional). Sem ela, vira pendência."""
+    """`descrever(caminho_da_imagem) -> str|None` é a IA (opcional). Sem ela, vira pendência (P4.1)."""
     novo = copy.deepcopy(doc)
-    sem = 0
+    sem = por_ia = decorativas = 0
     for b in novo.blocos:
         if b.tipo == "imagem" and not b.alt:
             texto = descrever(b.arquivo) if descrever else None
             if texto:
-                b.alt = texto
-                novo.aplicados.append(f"P4.2: descrição gerada por IA para {b.arquivo} (precisa de revisão).")
+                if texto.upper().startswith("DECORATIVA:"):      # P4.5: a IA acha que é só enfeite
+                    texto = texto[len("DECORATIVA:"):].strip()
+                    decorativas += 1
+                b.alt, b.origem_alt = texto, "ia"
+                por_ia += 1
             else:
                 sem += 1
+    if por_ia:
+        novo.aplicados.append(f"P4.2: {por_ia} descrição(ões) de imagem escrita(s) por IA.")
+        novo.pendencias.append(
+            f"P4.2: {por_ia} descrição(ões) de imagem foram escritas por IA. Confira e corrija antes de aprovar."
+        )
+    if decorativas:
+        novo.pendencias.append(
+            f"P4.5: {decorativas} imagem(ns) parece(m) só decorativa(s). Decida se ficam no material."
+        )
     if sem:
         novo.pendencias.append(
             f"P4.1: {sem} imagem(ns) sem descrição. O professor precisa escrever o texto alternativo."
         )
+    return novo
+
+
+# ---------- P3: Leitura Fácil (usa IA; o código confere os limites do manual) ----------
+
+ABREVIACAO = re.compile(r"\b(?:ex|etc|obs|p\.ex|cf|aprox)\.|[\\&<§#]", re.I)
+
+
+def _frases(texto: str) -> list[str]:
+    return [f.strip() for f in re.split(r"(?<=[.!?])\s+", texto.strip()) if f.strip()]
+
+
+def _palavras(frase: str) -> int:
+    return len(re.findall(r"\w+", frase))
+
+
+def leitura_facil(doc: Documento, nivel: str, reescrever, max_palavras: int) -> Documento:
+    """`reescrever(textos) -> (textos, glossario)` é a IA. Aplica P3.2, P3.4 e confere P3.1 e P3.5."""
+    novo = copy.deepcopy(doc)
+    alvos = []  # (bloco, índice do item ou None, texto)
+    for b in novo.blocos:
+        if b.tipo == "paragrafo":
+            alvos.append((b, None, b.texto))
+        elif b.tipo in ("lista", "etapas"):
+            alvos.extend((b, i, x) for i, x in enumerate(b.itens))
+    if not alvos:
+        return novo
+
+    textos, glossario = reescrever([a[2] for a in alvos])
+    for (b, i, _), texto in zip(alvos, textos):
+        if i is None:
+            b.texto = texto
+        else:
+            b.itens[i] = texto
+
+    # P3.2: uma frase por linha
+    saida: list[Bloco] = []
+    for b in novo.blocos:
+        if b.tipo == "paragrafo":
+            saida.extend(Bloco("paragrafo", texto=f) for f in (_frases(b.texto) or [b.texto]))
+        else:
+            saida.append(b)
+    novo.blocos = saida
+
+    # P3.4: glossário
+    if glossario:
+        novo.blocos.append(Bloco("quadro", "Palavras difíceis", [f"{g['termo']}: {g['significado']}" for g in glossario]))
+
+    # P3.1 e P3.5: conferência automática do que a IA devolveu
+    todas = [f for b in novo.blocos if b.tipo in ("paragrafo", "lista", "etapas")
+             for f in (_frases(b.texto) if b.tipo == "paragrafo" else b.itens)]
+    longas = [f for f in todas if _palavras(f) > max_palavras]
+    sujas = [f for f in todas if ABREVIACAO.search(f)]
+    rotulo = {"lf2": "Leitura Fácil II", "lf1": "Leitura Fácil I"}.get(nivel, nivel)
+    novo.aplicados.append(f"P3 ({rotulo}): {len(textos)} texto(s) reescrito(s) por IA, uma frase por linha.")
+    novo.pendencias.append(
+        f"P3.7 ({rotulo}): a IA reescreveu o texto. Confira se todos os conceitos da aula foram conservados."
+    )
+    if longas:
+        novo.pendencias.append(f"P3.1 ({rotulo}): {len(longas)} frase(s) passam de {max_palavras} palavras. Ex.: \"{longas[0][:80]}\"")
+    if sujas:
+        novo.pendencias.append(f"P3.5 ({rotulo}): {len(sujas)} frase(s) com abreviação ou caractere especial.")
     return novo

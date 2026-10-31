@@ -25,7 +25,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import ia, pipeline
+from . import ia, pipeline, regras
 from .leitores import EXT_MIDIA, EXT_PDF, EXT_PPT, EXT_TEXTO
 
 RAIZ = Path(__file__).resolve().parents[1]
@@ -63,6 +63,7 @@ def _gravar(pasta: Path, nome: str, dados: dict) -> None:
 
 def _resumo(id_: str, pasta: Path) -> dict:
     estado, revisao = _ler(pasta, "estado.json"), _ler(pasta, "revisao.json")
+    nomes = regras.versoes(regras.carregar_manual())
     return {
         "id": id_,
         "material": revisao["material"],
@@ -70,7 +71,9 @@ def _resumo(id_: str, pasta: Path) -> dict:
         "criado": estado["criado"],
         "pode_publicar": revisao["pode_publicar"],
         "versoes": {
-            nome: {**v, **({"url": f"/api/previa/{id_}/{v['arquivo']}"} if "arquivo" in v else {})}
+            nome: {**v, "nome": nomes.get(nome, {}).get("nome", nome),
+                   "rotulo": nomes.get(nome, {}).get("rotulo_aluno", nome),   # P5.3: jeito de estudar, nunca deficiência
+                   **({"url": f"/api/previa/{id_}/{v['arquivo']}"} if "arquivo" in v else {})}
             for nome, v in revisao["versoes"].items()
         },
     }
@@ -84,22 +87,18 @@ def _detalhe(id_: str, pasta: Path) -> dict:
         "transformacoes_aplicadas": revisao["transformacoes_aplicadas"],
         "pendencias_para_o_professor": revisao["pendencias_para_o_professor"],
         "bloqueios": revisao["bloqueios"],
-        "imagens_sem_descricao": _imagens_pendentes(pasta),
+        # origem: "pendente" (sem descrição), "ia" (escrita pela IA, conferir), "professor" ou "original"
+        "imagens": revisao.get("imagens", []),
+        "imagens_sem_descricao": [i["arquivo"] for i in revisao.get("imagens", []) if not i["alt"]],
     }
-
-
-def _imagens_pendentes(pasta: Path) -> list[str]:
-    """Caminhos das imagens sem descrição, lidos do HTML gerado (cada <img alt=""> é uma pendência)."""
-    achadas: set[str] = set()
-    for html in pasta.glob("*.html"):
-        achadas.update(re.findall(r'<img src="([^"]+)" alt="">', html.read_text(encoding="utf-8")))
-    return sorted(achadas)
 
 
 def _processar(id_: str, arquivo: Path, perfil: dict | None, descricoes: dict | None) -> dict:
     try:
         return pipeline.adaptar(arquivo, perfil, SAIDA, ia.obter_provedor(),
                                 descricoes=descricoes, nome_pasta=id_)
+    except ia.ErroIA as erro:                  # IA fora do ar, chave recusada, limite gratuito...
+        raise HTTPException(502, str(erro))
     except ValueError as erro:                 # formato não suportado
         raise HTTPException(415, str(erro))
     except RuntimeError as erro:               # biblioteca opcional não instalada
@@ -119,7 +118,7 @@ def _servir(pasta: Path, caminho: str) -> FileResponse:
 
 @app.get("/api/saude")
 def saude() -> dict:
-    return {"ok": True, "ia_ligada": ia.obter_provedor() is not None, "formatos": sorted(EXTENSOES)}
+    return {"ok": True, "ia_ligada": ia.configurada(), "formatos": sorted(EXTENSOES)}
 
 
 @app.post("/api/adaptar", status_code=201)
@@ -222,7 +221,7 @@ def biblioteca() -> list[dict]:
             continue
         saida.append({
             "id": item["id"], "material": item["material"],
-            "versoes": {n: {"url": f"/api/biblioteca/{item['id']}/{v['arquivo']}"}
+            "versoes": {n: {"url": f"/api/biblioteca/{item['id']}/{v['arquivo']}", "rotulo": v["rotulo"]}
                         for n, v in item["versoes"].items() if v["status"] == "gerada"},
         })
     return saida

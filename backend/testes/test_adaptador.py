@@ -116,7 +116,7 @@ class TestPipeline(unittest.TestCase):
             pasta = Path(r["pasta"])
             self.assertEqual(r["versoes"]["universal"]["status"], "gerada")
             self.assertEqual(r["versoes"]["ampliada"]["status"], "gerada")
-            self.assertEqual(r["versoes"]["audio"]["status"], "pendente_ia")
+            self.assertEqual(r["versoes"]["audio"]["status"], "gerada")   # áudio não precisa de IA
             self.assertEqual(r["status"], "aguardando_aprovacao_do_professor")
             self.assertTrue(r["pode_publicar"])
             pagina = (pasta / "ampliada.html").read_text(encoding="utf-8")

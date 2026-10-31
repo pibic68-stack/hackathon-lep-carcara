@@ -2,8 +2,9 @@
 pymupdf>=1.24        # ler PDF (texto, títulos, imagens)
 python-pptx>=1.0     # ler PowerPoint
 
-# Só para vídeo/áudio (baixa um modelo de voz na primeira vez; depois funciona offline):
-# faster-whisper>=1.0
+# Vídeo/áudio (baixa o modelo de voz na primeira vez: small = ~460 MB; depois funciona offline):
+faster-whisper>=1.0
+av>=11,<19           # av 19 removeu um parâmetro que o faster-whisper ainda usa
 
 # API para o site enviar arquivos:
 fastapi>=0.110

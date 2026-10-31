@@ -1,0 +1,22 @@
+/* Telas que falam com a API: envio e revisão (professor) e biblioteca (aluno e família). */
+.lista-materiais, .botoes-versoes { list-style: none; padding: 0; margin: 0; display: grid; gap: 24px; }
+.botoes-versoes { display: flex; flex-wrap: wrap; gap: 12px; }
+.lista-materiais .cartao { display: grid; gap: 12px; }
+.lista-materiais h3 { margin: 0; }
+.lista-materiais .painel-cab { margin-bottom: 0; }
+.lista-materiais .painel-cab h3 { flex: 1 1 14rem; }
+.form-envio { display: grid; gap: 20px; max-width: 46rem; margin-bottom: 16px; }
+.form-envio input[type="file"], .descricoes textarea {
+  width: 100%; padding: .6rem .8rem; font: inherit; font-size: 1.125rem;
+  color: var(--cor-texto); background: var(--cor-superficie); border: 0; border-radius: 0;
+  box-shadow: 0 0 0 3px var(--cor-borda), inset 3px 3px 0 rgba(30, 34, 53, .08);
+}
+.form-envio input[type="file"] { min-height: 52px; }
+.form-envio input:focus-visible, .descricoes textarea:focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 5px; }
+.form-envio .lembrar input { width: 22px; height: 22px; accent-color: var(--tinta); }
+.descricoes { display: grid; gap: 16px; padding-top: 8px; }
+.descricoes .campo { gap: 8px; }
+.miniatura { max-width: 12rem; height: auto; box-shadow: 0 0 0 3px var(--cor-borda); }
+details > summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+details ul { margin-top: 0; }
+[role="status"] { margin-block: 12px; }

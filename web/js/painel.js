@@ -6,8 +6,6 @@
       nome: "Prof.ª Coruja", avatar: "professor.png", ola: "Boa aula, Prof.ª Coruja!",
       cartoes: [
         ["users", "Minhas turmas", "5º ano A e 5º ano B. Perfis dos alunos (fictícios)."],
-        ["upload", "Enviar material", "PDF, texto ou slide para adaptar."],
-        ["check-double", "Aprovações", "Versões adaptadas esperando a sua revisão."],
         ["chart-bar", "Mini-checks", "Resultado das últimas aulas, por aluno."]
       ]
     },
@@ -40,6 +38,8 @@
       '<div><p class="rotulo">Painel · em construção</p><h1 tabindex="-1">' + p.ola + "</h1></div>" +
       '<a class="botao botao--secundario botao--pequeno" href="../entrar.html" id="sair">' + window.icone("login") + " Sair</a></div>" +
       '<p class="aviso">' + window.icone("info-box") + " <span><strong>Protótipo:</strong> estas áreas ainda vão ser construídas. O login de verdade entra aqui depois.</span></p><br>" +
+      (document.body.dataset.perfil === "professor" ? '<div id="area-professor"></div>' : '<div id="area-biblioteca"></div>') +
+      '<h2 class="mais-em-breve">Em breve</h2>' +
       '<ul class="painel-grade">' + p.cartoes.map(function (c) {
         return '<li class="cartao"><h2>' + window.icone(c[0]) + c[1] + "</h2><p>" + c[2] + '</p><span class="etiqueta etiqueta--sol em-breve">em breve</span></li>';
       }).join("") + "</ul>";

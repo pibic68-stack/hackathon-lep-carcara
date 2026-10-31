@@ -39,9 +39,17 @@ e abra http://localhost:8765.
 
 ### Ligar ao backend depois
 
-Só `js/auth.js` precisa mudar: troque o conteúdo de `Prisma.auth.entrar(perfil, dados)` por uma
-chamada ao servidor. O formato de `dados` está documentado no topo do arquivo.
-As regras de `js/dados.js` devem passar a vir de `docs/manual/regras.json`.
+O envio e a revisão de materiais **já falam com a API** (`js/api.js`, `js/professor.js`, `js/biblioteca.js`).
+Para ver funcionando, rode o servidor do backend, que também entrega este site:
+
+```bash
+cd backend
+python -m adaptador.api      # abra http://127.0.0.1:8000/painel/professor.html
+```
+
+Abrindo o site por duplo clique ou por outro servidor, ele procura a API em `http://127.0.0.1:8000`
+(para outro endereço, abra a página com `?api=http://endereco:porta`). O login continua falso: só
+`js/auth.js` precisa mudar quando existir login de verdade. As regras de `js/dados.js` ainda são fictícias.
 
 ## Arte e animações (geradas por script)
 
