@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 1
-- **Exportado em:** 30/10/2026 21:17
+- **Mensagens do time:** 2
+- **Exportado em:** 30/10/2026 21:38
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -181,3 +181,141 @@ Eu edito os arquivos aqui, faço commit e envio para o GitHub. Minhas alteraçõ
 - A aba Instruções (`web/prisma-instrucoes/`) já está dentro do site, mas **nenhuma página aponta para ela**. Falta só um link no menu para `prisma-instrucoes/index.html`.
 
 Posso colocar esse link no menu, no estilo pixel do site, e conferir se o mini curso combina com as fontes e cores dele. Antes, vale avisar o RicBunny para ele não editar o menu ao mesmo tempo e gerar conflito. Quer que eu faça?
+
+
+---
+
+## 🧑 Time · 30/10 21:24
+
+preciso que haja uma aba no site para o minicurso e para o manual do jeito que prototipamos. realmente preciso que voce coloque em tudo que tinha a logo, a logo correta, meio pixelada, que ha no site e tentei enviar pra voce aqui. me ajude a modelar tudo como esta o site ate agora. peço que nos indique erros de acessibilidade e visual que nao estejam condizendo entre si (minhas partes com as dos outros) e me diga aqui pra que meu grupo pense em conjunto. nao faça alteraçoes no site alem do acrescimo do curso agora, so preciso ver como fica a aba e ver partes incoerentes entre nos e de acessibilidade num relatorio seu.
+vamos focar 100% agora no backend quando voce me der luz verde
+
+<details><summary>Ações executadas pelo Claude (54)</summary>
+
+- 🔧 `Bash`: Atualizar repo e ver logo e guia do site
+- 🔧 `Bash`: Ver tokens de estilo e cabeçalho do index
+- 🔧 `Bash`: Medir arquivos, ver rodapé e script de acessibilidade
+- 🔧 `Bash`: Ler CSS base e componentes do site
+- 🔧 `Bash`: Ver build.py, uso de logo e estrutura da página
+- 🔧 `Bash`: Ler CSS inicial e cabeçalho da página do curso
+- 🔧 `Bash`: Ler restante do CSS da página do curso
+- 🔧 `TaskCreate`: Reescrever o CSS de pagina.html com os tokens do site, usar prisma-logo.svg, cabeçalho/rodapé e barra de acessibilidade do site; build.py em modo site (links relativos) e modo prévia (tudo embutido)
+- 🔧 `TaskCreate`: Substituir o prisma desenhado por mim pela logo pixel (prisma-logo.svg) na capa do PDF; usar as fontes woff2 do site para o build não depender de /tmp
+- 🔧 `TaskCreate`: web/index.html: item no menu e no rodapé apontando para prisma-instrucoes/index.html; nada além disso
+- 🔧 `TaskCreate`: axe + checagens de contraste em todos os modos + critérios automáticos do próprio manual aplicados ao site; relatório em docs/ e resumo no chat
+- 🔧 `TaskCreate`: Capturas em modo padrão, alto contraste, daltonismo e celular; regenerar PDF; commit com atribuição; publicar prévia
+- 🔧 `SendUserMessage`
+- 🔧 `TaskUpdate`
+- 🔧 `Bash`: Ver logo, ícones e como o PDF carrega fontes e logo
+- 🔧 `Bash`: Ver como os ícones e scripts são carregados no site
+- 🔧 `Bash`: Ver trechos de HTML/JS que usam cores e estilos
+- 🔧 `Bash`: Ver bordas do template e classes usadas no HTML/JS
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/web/prisma-instrucoes/src/estilo.css
+- 🔧 `Bash`: Reescrever o modelo da página com cabeçalho e rodapé do site
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/web/prisma-instrucoes/build.py
+- 🔧 `Bash`: Gerar a aba e a prévia com o novo visual
+- 🔧 `Bash`: Corrigir .gitignore e tirar capturas da aba nova
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/shots/1-topo.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/shots/3-rosca.png
+- 🔧 `Bash`: Trocar fonte dos números por Atkinson e refazer capturas
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/shots/4-manual.png
+- 🔧 `Bash`: Ver constantes de cor e CSS do PDF
+- 🔧 `Bash`: Ver funções de gráfico e carregamento de fontes do PDF
+- 🔧 `Bash`: Aplicar logo, fontes e cores do site no gerador do PDF
+- 🔧 `Bash`: Gerar o PDF novo e renderizar páginas para conferir
+- 🔧 `Bash`: Ver trecho com erro de indentação
+- 🔧 `Bash`: Corrigir indentação, gerar PDF e conferir fontes
+- 🔧 `Bash`: Montar as 4 primeiras páginas do PDF lado a lado
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/shots/pdf-montagem.png
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+- 🔧 `Read`: /home/claude/hackathon-lep-carcara/web/index.html
+- 🔧 `Edit`: /home/claude/hackathon-lep-carcara/web/index.html
+- 🔧 `Edit`: /home/claude/hackathon-lep-carcara/web/index.html
+- 🔧 `Bash`: Ligar o menu do site à aba e documentar no README
+- 🔧 `Bash`: Listar critérios P1 a P6 para aplicar ao site
+- 🔧 `Bash`: Ver CSS do backend e referências antigas no site
+- 🔧 `Bash`: Ver CSS gerado pelo backend e restos da identidade antiga
+- 🔧 `Bash`: Alinhar cores dos ícones do PDF e instalar o axe-core
+- 🔧 `Bash`: Instalar axe via pip (traz axe.min.js)
+- 🔧 `Bash`: Tentar baixar o axe.min.js de CDNs
+- 🔧 `Bash`: Rodar auditoria própria em todas as páginas e modos
+- 🔧 `Bash`: Resumir estrutura e contraste da auditoria
+- 🔧 `Bash`: Achar quais elementos causam rolagem horizontal em 320px
+- 🔧 `Bash`: Repetir a busca de estouro ignorando o body
+- 🔧 `Bash`: Corrigir estouro no manual e validar o verificador de contraste
+- 🔧 `Bash`: Corrigir grid do corpo dos padrões e reverificar 320px
+
+</details>
+
+
+## 🤖 Claude · 30/10 21:32
+
+Corrigido no manual (0 px de estouro em 320). Agora os outros achados da auditoria: alvos de toque, letras pequenas, frases e linhas longas.
+
+<details><summary>Ações executadas pelo Claude (31)</summary>
+
+- 🔧 `Bash`: Resumir alvos pequenos, letras, frases e linhas longas
+- 🔧 `Bash`: Medir colisões de cores do site sob simulação de daltonismo
+- 🔧 `Bash`: Checar etapas, animação, ficha, login e títulos do site
+- 🔧 `Bash`: Ver senha de figurinhas e saltos de título
+- 🔧 `Bash`: Conferir nomes das figurinhas e bolinhas de cor
+- 🔧 `Bash`: Aumentar rótulos pequenos e limitar a largura das linhas
+- 🔧 `SendUserMessage`
+- 🔧 `Bash`: Reconstruir e tirar capturas em alto contraste, acromatopsia, celular e dislexia
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/shots/a-alto.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/shots/b-acro.png
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/shots/c-celular.png
+- 🔧 `Bash`: Tirar cantos arredondados dos gráficos e refazer capturas
+- 🔧 `Bash`: Procurar onde os gráficos arredondam cantos
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/shots/a-alto.png
+- 🔧 `Bash`: Regenerar tudo e reauditar as páginas da aba Instruções
+- 🔧 `Bash`: Estreitar linhas e aumentar rótulos dos eixos; reauditar
+- 🔧 `Bash`: Ler o LEIA-ME da aba e o estado do git
+- 🔧 `Bash`: Atualizar LEIA-ME da aba e memória do projeto
+- 🔧 `TaskUpdate`
+- 🔧 `Bash`: Mover a nota do relatório para a seção de decisões
+- 🔧 `Write`: /home/claude/hackathon-lep-carcara/docs/relatorio-coerencia-acessibilidade.md
+- 🔧 `Bash`: Conferir novidades dos colegas antes de commitar
+- 🔧 `Bash`: Commitar, atualizar com os colegas e enviar ao GitHub
+- 🔧 `Bash`: Ver o conflito no CLAUDE.md
+- 🔧 `Bash`: Resolver o conflito mantendo as duas linhas e enviar
+- 🔧 `Bash`: Gerar a prévia como fragmento para o Claude embrulhar
+- 🔧 `Skill`
+- 🔧 `Artifact`: Instruções da PRISMA: mini curso interativo e manual, no visual do site.
+- 🔧 `Bash`: Enviar o ajuste do gerador ao GitHub
+- 🔧 `TaskUpdate`
+- 🔧 `TaskUpdate`
+
+</details>
+
+
+## 🤖 Claude · 30/10 21:38
+
+A aba **Instruções** (mini curso + manual) já está no site, no visual dele, e foi enviada ao GitHub. O relatório de incoerências também. Eu abri as páginas em um navegador automatizado, nos 4 modos de daltonismo, alto contraste e celular. Não testei com leitor de tela nem com pessoas.
+
+**A aba**
+- O menu da página inicial ganhou o link **Instruções**. Foi a única mudança no site, além de um link igual no rodapé.
+- Ela usa a logo pixel, as fontes, as cores e a barra de acessibilidade do site. Mudar uma cor no `tokens.css` muda a aba junto. Os 4 modos de daltonismo, o alto contraste e a fonte para dislexia funcionam nela.
+- Troquei a logo antiga pela pixelada na aba e na capa do PDF. O PDF também usa as fontes e cores do site.
+- Os números ficam na fonte do texto, porque no Pixelify o 5 parece S. No meu primeiro teste, "2,5 mi" apareceu como "2,8 mi".
+- Corrigi na aba: rolagem horizontal no manual em celular, letras pequenas, linhas longas e cantos arredondados nos gráficos.
+- Na prévia daqui, o botão de baixar só abre o PDF. No site real ele baixa.
+
+**Relatório** (`docs/relatorio-coerencia-acessibilidade.md`)
+- **O que está bom:** o contraste de texto passou em todas as páginas e em todos os modos. Só medi texto sobre fundo liso.
+- **Três identidades visuais:** o site usa Pixelify, Atkinson Next e azul `#1F6FB2`. O gerador de HTML do backend (`renderizador.py`) ainda usa a identidade antiga (Lexend e azul `#1F5FBF`). Sugiro adotar a do site em tudo.
+- **Códigos diferentes para as regras:** o site usa `R-DALT-01` e o manual usa `P1.1`. O `web/README.md` e o comentário de `js/dados.js` ainda apontam para o `regras.json`, que não existe mais.
+- **Etapas com nomes diferentes:** o site tem 5 etapas e o manual 6.
+- **Frase do site que o manual não sustenta:** "cada regra do Manual vira uma automação". No manual, 31 dos 51 critérios são automáticos. Os outros 18 dependem de IA mais revisão do professor e 2 são manuais. Vale corrigir antes do pitch.
+- **A ficha do site descumpre o P2.2:** pede 14 pt e ela usa 14 px (versão padrão) e 16 px (versão TEA).
+- **O site e o manual não seguem os critérios do próprio manual:** rótulos em maiúsculas, texto de 11 a 13 px e frases longas. Sugiro escrever no manual que os critérios P2 e P3 valem para o material que a plataforma gera, e não para a interface.
+- **Celular (320 px):** `entrar.html` passa 24 px da tela e a página inicial passa 5 px, e o conteúdo fica cortado. Na aba isso já está corrigido.
+- **Daltonismo:** em acromatopsia o azul-escuro e o laranja-escuro ficam quase iguais. Em protanopia e deuteranopia o verde vira um azul parecido com o céu.
+
+O relatório tem as 5 decisões em ordem para o grupo. Atualizei o `CLAUDE.md` com a identidade do site e o `LEIA-ME` da aba. Também revisei os pushes dos colegas: o Raphael enviou a API do backend (envio, revisão, aprovação e biblioteca do aluno). Tudo está nas pastas certas e não houve conflito com o meu trabalho.
+
+Quando quiser seguir para o backend, é só dar a luz verde. Os itens de visual do `renderizador.py` (C1 e C6 do relatório) cabem nessa etapa.
+
+A prévia é privada: só você abre até compartilhar pelo menu Compartilhar.
