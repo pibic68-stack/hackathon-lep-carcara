@@ -44,6 +44,7 @@ class Car:
     negrito: bool = False
     usado: bool = False
     papel: str = ""      # "" | "sup" | "sub"
+    ancora: float | None = None   # limite de ∫/∑: fica logo depois do operador, mesmo que comece mais à esquerda
 
     @property
     def topo(self) -> float:
@@ -87,7 +88,7 @@ class Pagina:
     cars: list[Car] = field(default_factory=list)
     barras: list[Barra] = field(default_factory=list)
     imagens: list[Figura] = field(default_factory=list)
-    desenhos_cor: list[tuple] = field(default_factory=list)   # cores de preenchimento de formas desenhadas
+    desenhos_cor: list[tuple] = field(default_factory=list)   # (cor RGB, (x0, y0, x1, y1)) de formas preenchidas
 
 
 @dataclass
@@ -218,7 +219,7 @@ def _ler_pymupdf(caminho: Path) -> list[Pagina]:
                 cor = d.get("fill") or d.get("color")
                 r = d.get("rect")
                 if cor and r is not None and r.width * r.height > 30:
-                    pg.desenhos_cor.append(tuple(cor[:3]) if len(cor) >= 3 else (cor[0],) * 3)
+                    pg.desenhos_cor.append((tuple(cor[:3]) if len(cor) >= 3 else (cor[0],) * 3, (r.x0, r.y0, r.x1, r.y1)))
             paginas.append(pg)
     return paginas
 
@@ -251,7 +252,7 @@ def _ler_pdfminer(caminho: Path) -> list[Pagina]:
                 if o.height < 1.6 and o.width > 2:
                     pg.barras.append(Barra(o.x0, o.x1, H - (o.y0 + o.y1) / 2))
                 elif getattr(o, "fill", False) and o.width * o.height > 30:
-                    pg.desenhos_cor.append(_rgb_tupla(getattr(o, "non_stroking_color", None)))
+                    pg.desenhos_cor.append((_rgb_tupla(getattr(o, "non_stroking_color", None)), (o.x0, H - o.y1, o.x1, H - o.y0)))
             elif isinstance(o, LTImage):
                 dados, ext = _bytes_imagem_pdfminer(o)
                 if dados:
@@ -301,6 +302,24 @@ def nome_da_cor(rgb: tuple) -> str | None:
     if mx - mn < 0.18 or mx < 0.2:
         return None
     return min(NOMES_COR, key=lambda nc: sum((a - b) ** 2 for a, b in zip((r, g, b), nc[1])))[0]
+
+
+def desenho_informativo(pg: Pagina) -> list[str]:
+    """Cores de um desenho feito no próprio arquivo (gráfico do Word, mapa) que pode carregar informação.
+    Enfeite de modelo de slide (faixa na borda, bolinha no canto) não conta: precisa de 2 formas coloridas
+    ou mais, de 2 cores ou mais, na área de conteúdo da página."""
+    formas = []
+    for cor, (x0, y0, x1, y1) in pg.desenhos_cor:
+        nome = nome_da_cor(cor)
+        if not nome:
+            continue
+        w, h = x1 - x0, y1 - y0
+        if x1 < 0.1 * pg.largura or x0 > 0.88 * pg.largura or y1 < 0.06 * pg.altura or y0 > 0.94 * pg.altura:
+            continue                       # margem
+        if w > 0.9 * pg.largura or h > 0.9 * pg.altura or max(w, h) > 15 * max(min(w, h), 1):
+            continue                       # fundo inteiro ou faixa fina decorativa
+        formas.append(nome)
+    return sorted(set(formas)) if len(formas) >= 2 and len(set(formas)) >= 2 else []
 
 
 def imagem_colorida(dados: bytes) -> bool:
@@ -358,15 +377,19 @@ def _acentos(cars: list[Car]) -> None:
 
 
 def _operadores_grandes(cars: list[Car]) -> None:
-    """∫ e ∑ grandes ficam com a "linha de base" fora da linha do texto; encaixa na linha da expressão ao lado."""
+    """∫ e ∑ grandes podem ficar com a "linha de base" fora da linha do texto; encaixa na linha da expressão ao lado.
+    Se o operador já está na altura de uma linha (caso do Word), não mexe."""
     for op in cars:
         if op.c not in OPERADOR_GRANDE or op.usado:
             continue
-        perto = [c for c in cars if c is not op and not c.usado and c.c.strip() and c.c not in OPERADOR_GRANDE
-                 and -1 <= c.x0 - op.x1 <= 2.5 * op.tam and op.base - 0.6 * op.tam <= c.base <= op.base + 2.6 * op.tam
-                 and c.tam >= 0.86 * op.tam]
+        vizinhos = [c for c in cars if c is not op and not c.usado and c.c.strip() and c.c not in OPERADOR_GRANDE
+                    and c.tam >= 0.86 * op.tam and -op.tam <= c.x0 - op.x1 <= 2.5 * op.tam]
+        if any(abs(c.base - op.base) < 0.35 * op.tam for c in vizinhos):
+            continue
+        perto = [c for c in vizinhos if op.base - 0.6 * op.tam <= c.base <= op.base + 2.6 * op.tam
+                 and c.x0 - op.x1 <= 1.2 * op.tam]
         if perto:
-            op.base = min(perto, key=lambda c: c.x0).base
+            op.base = min(perto, key=lambda c: (abs(c.base - op.base), c.x0)).base
 
 
 def _token(texto: str, x0: float, x1: float, base: float, tam: float, modelo: Car) -> Car:
@@ -464,7 +487,7 @@ def _montar_linhas(cars: list[Car], corpo: float):
     if not cars:
         return []
     for c in cars:
-        c.papel = ""
+        c.papel, c.ancora = "", None
     grupos = _linhas_de_base(cars)
     # linhas "principais": tamanho de texto normal para a vizinhança
     principais = [g for g in grupos if statistics.median(c.tam for c in g) >= 0.86 * corpo or len(grupos) == 1]
@@ -482,6 +505,7 @@ def _montar_linhas(cars: list[Car], corpo: float):
                 grande = [c for c in P if c.c in OPERADOR_GRANDE and c.x0 - 2 <= s.cx <= c.x1 + 0.5 * ref]
                 if grande and abs(s.base - pbase) < 2.2 * ref:
                     dono, papel = P, ("sub" if s.base > pbase else "sup")
+                    s.ancora = grande[0].x1 - 0.01
                     break
                 vizinho = any(-0.2 * ref <= s.x0 - c.x1 <= 0.6 * ref for c in P) or any(c.x0 <= s.cx <= c.x1 for c in P)
                 if vizinho and abs(s.base - pbase) < 0.75 * ref and abs(s.base - pbase) > 0.12 * ref:
@@ -496,7 +520,7 @@ def _montar_linhas(cars: list[Car], corpo: float):
     linhas = [g for g in principais] + [g for g in pequenos if g]
     saida = []
     for g in linhas:
-        g.sort(key=lambda c: (c.x0, c.papel != ""))
+        g.sort(key=lambda c: (c.ancora if c.ancora is not None else c.x0, c.papel != ""))
         saida.append((_texto_linha(g), g))
     saida.sort(key=lambda t: min(c.base for c in t[1] if not c.papel) if any(not c.papel for c in t[1]) else t[1][0].base)
     return saida

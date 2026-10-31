@@ -173,7 +173,7 @@ def com_cache(tarefa: str, entrada: str, produzir) -> str:
 
 
 SISTEMA_IMAGEM = """Você escreve texto alternativo de imagens de materiais escolares, em português do Brasil, para estudantes que não enxergam a imagem.
-Regras: vá do geral para o particular; inclua textos, números e cores que a imagem traz quando importarem para o conteúdo; use frases curtas e palavras simples; no máximo 3 frases; não invente o que não está visível; não comece com "Imagem de".
+Regras: vá do geral para o particular; inclua números e cores que a imagem traz quando importarem para o conteúdo; se a imagem tiver textos escritos (rótulos, setas com nome, fórmulas como CO2 ou H2O), inclua TODOS, porque o estudante só os recebe por esta descrição; use frases curtas e palavras simples; no máximo 3 frases, ou 5 se a imagem tiver muitos rótulos; não invente o que não está visível; não comece com "Imagem de".
 Se a imagem for só enfeite, sem informação para a aula, comece a resposta com a palavra DECORATIVA: e depois descreva em uma frase.
 Responda só com a descrição."""
 
@@ -186,7 +186,7 @@ def descrever_imagem(provedor: Provedor, caminho: Path, colorida: bool = False) 
     mime = mimetypes.guess_type(str(caminho))[0] or "image/png"
     sistema = SISTEMA_IMAGEM + (REFORCO_COR if colorida else "")
     return com_cache(
-        "descrever_imagem_v2" + ("_cor" if colorida else ""), cache.impressao_digital(dados),
+        "descrever_imagem_v3" + ("_cor" if colorida else ""), cache.impressao_digital(dados),
         lambda: provedor.gerar(sistema, "Descreva esta imagem.", (dados, mime)).strip(),
     )
 

@@ -234,17 +234,22 @@ def _ler_pdf(caminho: Path, pasta_trabalho: Path) -> Documento:
             grupo.append(L)
         fechar_grupo()
         # formas coloridas desenhadas no PDF (gráficos de barras, mapas feitos no Word)
-        nomes = {lp.nome_da_cor(c) for c in pg.desenhos_cor} - {None}
-        if len(nomes) >= 2:
+        nomes = lp.desenho_informativo(pg)
+        if nomes:
             figuras_coloridas.append(f"desenho na página {n + 1} ({', '.join(sorted(nomes))})")
 
     blocos = _juntar_itens_de_letra(blocos)
     titulo, blocos = _tirar_titulo(blocos, caminho.stem)
     doc = Documento(titulo, blocos, cores=cores, figuras_coloridas=figuras_coloridas)
-    if not any(b.tipo in ("paragrafo", "lista") for b in blocos):
-        doc.pendencias.append(
-            "Este PDF parece ser uma imagem escaneada (sem texto). É preciso aplicar OCR antes."
-        )
+    # escaneado = página sem nenhuma letra de verdade (um slide com só título e figura não é escaneado)
+    letras = sum(1 for pg in paginas for c in pg.cars if c.c.strip())
+    if letras < 20 and not any(b.tipo in ("paragrafo", "lista") for b in blocos):
+        if letras == 0:
+            doc.pendencias.append("Este PDF parece ser uma imagem escaneada (sem texto). É preciso aplicar OCR antes.")
+        elif any(b.tipo == "imagem" for b in blocos):
+            doc.pendencias.append(
+                "Quase todo o conteúdo deste material está dentro de imagem. Na descrição, escreva também os textos "
+                "que aparecem na figura: é o único jeito de eles chegarem à versão Ouvir e ao leitor de tela.")
     return doc
 
 
