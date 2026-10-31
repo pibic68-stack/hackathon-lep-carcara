@@ -253,3 +253,6 @@ Thumbs.db
 *.key
 secrets.*
 web/prisma-instrucoes/_previa_artifact.html
+
+# ===== Backend: saídas geradas (o cache/ é versionado de propósito, para a demo offline) =====
+backend/saida/

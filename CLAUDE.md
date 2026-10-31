@@ -20,6 +20,7 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
 - O nome antigo `regras.json` foi substituído por `padroes.json` em todo o repositório.
 - Identidade visual: Lexend (títulos), Atkinson Hyperlegible (texto), IBM Plex Mono (códigos); azul #1F5FBF e âmbar #C26A00, validados para daltonismo.
 - Fontes lidas e lacunas: `docs/pesquisa/fontes.md` e `docs/pesquisa/lacunas.md`.
+- Backend (30/10): pacote Python `backend/adaptador/` (guia em `backend/README.md`). Fluxo: leitor por formato (.txt/.pdf/.pptx/vídeo) → `Documento` (lista de blocos) → regras determinísticas P1, P4, P6 → HTML acessível (P2) + `revisao.json` (P7). Parâmetros numéricos vêm de `padroes.json`. Não existe uma linguagem que adapte tudo: são bibliotecas por formato (PyMuPDF, python-pptx, faster-whisper). A IA só entra em Leitura Fácil (P3), descrição de imagens (P4) e roteiro de áudio (P5), via `ia.py`; provedor ainda NÃO escolhido. Cache em `backend/cache/` é versionado de propósito (demo offline).
 
 ## Regras para o Claude
 - Responder em português.

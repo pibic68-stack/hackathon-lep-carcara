@@ -1,0 +1,11 @@
+# Instalar com:  python -m pip install -r requirements.txt
+pymupdf>=1.24        # ler PDF (texto, títulos, imagens)
+python-pptx>=1.0     # ler PowerPoint
+
+# Só para vídeo/áudio (baixa um modelo de voz na primeira vez; depois funciona offline):
+# faster-whisper>=1.0
+
+# Próxima etapa (API para o site enviar arquivos):
+# fastapi
+# uvicorn
+# python-multipart

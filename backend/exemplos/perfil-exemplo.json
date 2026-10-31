@@ -1,0 +1,7 @@
+{
+  "aluno": "Aluno Fictício A",
+  "serie": "5º ano",
+  "necessidades": ["baixa_visao", "daltonismo", "instrucoes_em_etapas"],
+  "preferencias": ["audio", "fonte_ampliada"],
+  "observacoes_professor": "Se distrai com páginas muito cheias."
+}
