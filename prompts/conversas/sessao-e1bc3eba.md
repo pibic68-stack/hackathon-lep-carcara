@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 10
-- **Exportado em:** 31/10/2026 09:02
+- **Mensagens do time:** 11
+- **Exportado em:** 31/10/2026 09:50
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -775,3 +775,80 @@ Para testar:
 3. O texto sai para o professor conferir. No vídeo aparece também a lista "O que aparece na tela".
 
 A transcrição usa o Gemini, que pode dar o erro 503 de novo. Para a apresentação, coloquem os dois arquivos na pasta `materiais-teste` e rodem o `preparar-para-apresentacao.bat`, como nos outros materiais. Assim, na hora, o resultado sai na hora. Os arquivos também já estão no GitHub, dentro de `materiais-teste`.
+
+
+---
+
+## 🧑 Time · 31/10 09:45
+
+esta tudo perfeito e funcionando, sem exceçoes, mas vale aparos que voce optar.
+precisamos de uma ultima coisa. precisamos que mantenha esse formato que estamos fazendo, e ALEM dele ter o mesmo site na nuvem, fixo. iremos usar essa de agora para a apresentaçao e para ter maior controle como administrador, mas precisamos ter um publico, fixo, pra que outras pessoas usem, ja que exigem deploy. provavelmente teremos problemas com a integraçao com a ia, foi uma luta ate voce encontrar o melhor de faze-la funcionar (com a ideia das repetiçoes e espera), tera de fazer o mesmo. recomendaram que usemos o site railway, acha que é o caso integrar com voce, fazer so por la ou so por aqui? 
+enviei os criterios da parte final, estou cuidando dessa etapa 3 (deplou/mvp)
+
+<details><summary>Ações executadas pelo Claude (4)</summary>
+
+- 🔧 `Bash`: Inspect data paths and env config
+- 🔧 `WebSearch`: Railway volumes free trial hobby plan 2026 deploy Dockerfile PORT healthcheck
+- 🔧 `WebFetch`: https://snapdeploy.dev/blog/railway-trial-migration-docker-host
+- 🔧 `Bash`: Read adaptar endpoint and session helpers
+
+</details>
+
+
+## 🤖 Claude · 31/10 09:46
+
+Now the cloud-mode code: data folder, port, one-click demo login, and automatic demo materials.
+
+<details><summary>Ações executadas pelo Claude (19)</summary>
+
+- 🔧 `Bash`: Add cloud data dir, PORT, demo login, refactor material creation
+- 🔧 `Bash`: Add demo seeding of published test materials
+- 🔧 `Bash`: Simplify seeding id handling
+- 🔧 `Bash`: See login redirect and health usage
+- 🔧 `Bash`: Add one-click demo login on the sign-in page
+- 🔧 `Bash`: Add Dockerfile, Railway config, cloud requirements
+- 🔧 `Bash`: Simulate cloud mode with fake IA
+- 🔧 `Bash`: End-to-end check of the public demo mode
+- 🔧 `Read`: /tmp/claude-0/-home-claude/e1bc3eba-f5ba-5dd7-b147-1d937ca31571/scratchpad/v2/nuvem-entrar.png
+- 🔧 `Bash`: Nicer titles for audio and video materials
+- 🔧 `Bash`: Check whether edits applied
+- 🔧 `Bash`: Apply title edits again and run tests
+- 🔧 `Bash`: Read README start
+- 🔧 `Bash`: Write deploy guide and update README
+- 🔧 `Bash`: Check login rate limiting logic
+- 🔧 `Bash`: See what login functions return
+- 🔧 `Bash`: Passwordless demo sessions without lockout; tests
+- 🔧 `Bash`: Record decision, commit and push
+- 🔧 `Bash`: Try building the Docker image
+
+</details>
+
+
+## 🤖 Claude · 31/10 09:50
+
+Deixei tudo pronto no repositório (já está no GitHub) para o site fixo no Railway. Falta só a parte que exige login de vocês no Railway, uns 10 minutos.
+
+**Integrar comigo, só lá ou só aqui?** Os dois, ligados pelo GitHub. Vocês conectam o Railway ao repositório uma vez. Depois disso, tudo que eu mudar aqui e subir para a `main` atualiza o site da nuvem sozinho. Daqui eu não consigo clicar no Railway, mas também não precisa de mais nada depois da configuração. O PC (`publicar.bat`) continua do mesmo jeito, para a apresentação e para vocês terem o controle.
+
+**Passo a passo** (está no `DEPLOY.md`):
+1. Entrem em railway.com com a conta do GitHub. Segundo o que encontrei, o teste grátis dá crédito inicial sem cartão.
+2. Cliquem em **New Project › Deploy from GitHub repo** e escolham o `hackathon-lep-carcara`.
+3. Em **Variables**, criem `GEMINI_API_KEY`. De preferência, usem uma chave nova, de outra conta do Google: assim a nuvem não divide o limite gratuito com o PC da apresentação.
+4. Em **Attach Volume**, usem o caminho `/data`. Sem isso, contas e materiais somem a cada atualização.
+5. Em **Settings › Networking › Generate Domain**, gerem o link fixo. Coloquem esse link no topo do `README.md` e no portal.
+
+**O site da nuvem já resolve o "a banca abre sem senha":**
+- **Entrar sem senha:** na tela Entrar aparece "Experimentar sem cadastro". Com um clique, a pessoa entra como professora, aluna Bia (cores), aluno Caio (texto direto), aluna Duda (letra grande), família ou escola. Alguém errando senha de propósito não tranca esses botões. Eles só aparecem na nuvem; no PC não.
+- **Materiais já publicados:** quando o site sobe, ele publica sozinho os 4 materiais de teste para a turma de demonstração. A IA tem a mesma paciência do PC: se o Google der 503, ela tenta de novo a cada 90 segundos. Nos Logs do Railway aparece "[demo] publicado: …" para cada um; pode levar alguns minutos depois do deploy.
+
+**Para o critério de Tech:**
+- **README que roda do zero:** reescrevi o começo, com instruções para rodar com git clone, no Windows e com Docker.
+- **Correção:** o fluxo no README ainda dizia "mini-check"; agora diz "avaliação".
+- **Pasta de prompts:** no repositório ela se chama `prompts` (minúsculo), e o edital fala em /PROMPTS. Talvez valha confirmar se a banca exige o nome exato.
+
+**O que testei:** simulei aqui o modo nuvem com uma IA de mentira. Os 4 materiais foram publicados, a aluna entrou com um clique e viu os materiais, e a professora viu os 4 no painel. Quem acessa de fora não vê as senhas. Os 109 testes passam.
+
+**O que não testei:** o Docker não roda neste ambiente, então não montei a imagem nem testei com o Gemini real. Se o primeiro deploy der erro, me mandem um print do log e eu corrijo na hora.
+
+Sources:
+- [Railway: teste grátis e planos (snapdeploy)](https://snapdeploy.dev/blog/railway-trial-migration-docker-host)
