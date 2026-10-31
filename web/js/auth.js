@@ -28,7 +28,7 @@ Prisma.auth = (function () {
   function traduzir(promessa, campoPadrao) {
     return promessa.then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (corpo) {
-        if (r.ok) return { ok: true, nome: corpo.nome, destino: corpo.destino };
+        if (r.ok) return { ok: true, nome: corpo.nome, destino: corpo.destino, assinatura: corpo.assinatura };
         var d = corpo.detail || {};
         var texto = typeof d === "string" ? d : (d.erro || "Não deu certo. Tente de novo.");
         return { ok: false, erro: { campo: d.campo || campoPadrao, texto: texto } };
@@ -68,6 +68,9 @@ Prisma.auth = (function () {
       if (!d.senha || d.senha.length < 8) return Promise.resolve({ ok: false, erro: { campo: "escola_senha", texto: "A senha precisa ter pelo menos 8 caracteres." } });
       var cod = (d.codigo || "").replace(/[^A-Za-z0-9]/g, "");
       if (cod.length < 6) return Promise.resolve({ ok: false, erro: { campo: "escola_codigo", texto: "O código para os professores precisa ter pelo menos 6 letras ou números." } });
+      if (!d.plano) return Promise.resolve({ ok: false, erro: { campo: "plano", texto: "Escolha um plano." } });
+      if (!d.periodo) return Promise.resolve({ ok: false, erro: { campo: "periodo", texto: "Escolha semestral ou anual." } });
+      if (!d.pagamento) return Promise.resolve({ ok: false, erro: { campo: "pagamento", texto: "Escolha a forma de pagamento: Pix ou cartão." } });
       if (location.protocol === "file:") return Promise.resolve({ ok: false, erro: { campo: "escola_nome", texto: "Para cadastrar, abra o site pelo servidor do PRISMA, não pelo arquivo." } });
       return traduzir(pedir("/api/contas/escola", d), "escola_codigo");
     },

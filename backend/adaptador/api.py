@@ -307,6 +307,9 @@ class NovaEscola(BaseModel):
     senha: str
     codigo: str
     lembrar: bool = False
+    plano: str = ""
+    periodo: str = ""
+    pagamento: str = ""
 
 
 class Entrada(BaseModel):
@@ -328,8 +331,15 @@ def cadastrar_professor(corpo: NovoProfessor, request: Request, resposta: Respon
 
 @app.post("/api/contas/escola", status_code=201)
 def cadastrar_escola(corpo: NovaEscola, request: Request, resposta: Response) -> dict:
-    token, duracao, info = contas.criar_escola(corpo.nome, corpo.email, corpo.senha, corpo.codigo, _ip(request), corpo.lembrar)
-    return _abrir_sessao(request, resposta, token, duracao, corpo.lembrar, info)
+    token, duracao, info = contas.criar_escola(corpo.nome, corpo.email, corpo.senha, corpo.codigo, _ip(request),
+                                               corpo.lembrar, corpo.plano, corpo.periodo, corpo.pagamento)
+    plano = contas.assinatura(corpo.plano, corpo.periodo, corpo.pagamento)   # pagamento de verdade: em breve
+    return {**_abrir_sessao(request, resposta, token, duracao, corpo.lembrar, info), "assinatura": plano}
+
+
+@app.get("/api/planos")
+def planos() -> dict:
+    return {"planos": contas.PLANOS, "periodos": contas.PERIODOS, "pagamentos": contas.PAGAMENTOS}
 
 
 @app.post("/api/entrar")

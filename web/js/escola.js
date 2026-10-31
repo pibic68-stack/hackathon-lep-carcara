@@ -37,6 +37,17 @@
         el("li", {}, [el("strong", { texto: String(alunos) }), el("span", { texto: alunos === 1 ? " aluno" : " alunos" })]),
         el("li", {}, [el("strong", { texto: String(d.materiais.length) }), el("span", { texto: d.materiais.length === 1 ? " material" : " materiais" })])
       ]));
+      if (d.assinatura) {
+        var a = d.assinatura;
+        area.appendChild(el("section", { classe: "cartao assinatura", "aria-labelledby": "titulo-assinatura" }, [
+          el("h2", { id: "titulo-assinatura", texto: "Assinatura" }),
+          el("p", {}, [el("strong", { texto: "Plano " + a.plano_nome }), " (até " + a.alunos.toLocaleString("pt-BR") + " alunos) · " +
+            a.periodo_nome + ": R$ " + a.valor.toLocaleString("pt-BR") + (a.periodo === "anual" ? " por ano" : " por semestre")]),
+          el("p", {}, [el("strong", { texto: "Forma de pagamento: " }), a.pagamento_nome + ". ",
+            el("span", { classe: "etiqueta etiqueta--sol", texto: "Pagamento em breve" })]),
+          el("p", { classe: "dica", texto: "A conta da escola está ativa e pode ser usada agora. A cobrança ainda não foi ligada ao PRISMA: os dados de pagamento chegam em breve." })
+        ]));
+      }
       area.appendChild(el("p", { classe: "dica", texto: "O código para os professores foi criado no cadastro. Por segurança, o PRISMA guarda só uma impressão dele e não consegue mostrá-lo de novo." }));
 
       // professores

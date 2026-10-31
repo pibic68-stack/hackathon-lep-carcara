@@ -66,6 +66,10 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
 
 - Plano de negócio (31/10): `pitch/plano-negocio/` (PDF gerado por `gerar_pdf.py` a partir de `modelo.py`; nunca editar o PDF à mão). Escola particular paga por tamanho: Essencial até 200 alunos R$ 9.000/ano, Escola 201 a 500 R$ 21.000, Ampliado 501 a 1.000 R$ 45.000 (âncora R$ 60/aluno/ano); semestral +10%; teste grátis de 14 dias; redes públicas a partir de 2029; R$ 500 mil de investidor-anjo (cenário base: lucro mensal em ago/2029, 310 escolas e R$ 5,4 mi de receita anual recorrente em dez/2029).
 
+- Decisões de 31/10, 12h (site da Vercel no ar; últimos ajustes):
+  - **Login na Vercel voltava para Entrar**: cada pedido cai numa cópia diferente do servidor, cada uma com seu `/tmp`. Correção: `backend/adaptador/estado_nuvem.py` guarda a pasta de dados (banco, materiais, cache) como .tar.gz num Postgres (Neon, em Storage da Vercel; variável `DATABASE_URL`) e cada cópia baixa a versão mais nova antes do pedido e sobe depois de mudar algo. Ligado em `app.py`. Sem `DATABASE_URL`, nada muda.
+  - **Cadastro da escola com pagamento**: plano (Essencial até 200 alunos, Escola até 500, Ampliado até 1.000), assinatura (semestral R$ 4.950 / 11.550 / 24.750; anual R$ 9.000 / 21.000 / 45.000, do plano de negócio) e forma de pagamento (Pix ou cartão). Botão "Confirmar e criar a conta da escola"; depois aparece "Conta da escola criada!" com o resumo e "Pagamento: em breve" (nenhum dado de Pix ou cartão é pedido). O painel da escola mostra a assinatura. Guardado nas colunas `plano`, `periodo`, `pagamento` de `escolas`.
+
 ## Regras para o Claude
 - Responder em português.
 - Depois de uma compactação, ou se faltar contexto, reler `prompts/conversas/` e `docs/` antes de responder.

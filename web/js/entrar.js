@@ -135,6 +135,7 @@
         (acao || Prisma.auth.entrar)(perfil, dados()).then(function (r) {
           botao.disabled = false;
           if (!r.ok) { $("status").textContent = ""; mostrarErro(r.erro); return; }
+          if (r.assinatura) { escolaCriada(r); return; }     // escola: mostra que a conta foi criada antes de ir
           $("status").textContent = "Pronto, " + r.nome + "! Abrindo o seu painel…";
           setTimeout(function () { location.href = r.destino; }, 600);
         });
@@ -145,9 +146,47 @@
       return { nome: $("nome").value.trim(), email_novo: $("email_novo").value.trim(), senha_nova: $("senha_nova").value,
                codigo_escola: $("codigo_escola").value.trim(), lembrar: $("lembrar_novo").checked };
     }, function (_, d) { return Prisma.auth.cadastrar(d); });
+    function marcado(nome) { var i = document.querySelector('#form-escola input[name="' + nome + '"]:checked'); return i ? i.value : ""; }
+    var PRECOS = { essencial: [4950, 9000], escola: [11550, 21000], ampliado: [24750, 45000] };   // plano de negócio
+    var NOMES = { essencial: "Essencial", escola: "Escola", ampliado: "Ampliado", pix: "Pix", cartao: "cartão de crédito" };
+    function reais(n) { return "R$ " + n.toLocaleString("pt-BR"); }
+    function atualizarResumo() {
+      var periodo = marcado("periodo") || "anual", anual = periodo === "anual";
+      document.querySelectorAll("#form-escola .preco").forEach(function (s) {
+        var p = PRECOS[s.dataset.plano];
+        s.textContent = anual ? reais(p[1]) + " por ano" : reais(p[0]) + " por semestre";
+      });
+      var plano = marcado("plano"), pag = marcado("pagamento"), r = $("resumo-pagamento");
+      r.textContent = "";
+      var p1 = document.createElement("p");
+      if (plano && pag) {
+        p1.textContent = "Você escolheu: plano " + NOMES[plano] + ", " + periodo + ", " +
+          (anual ? reais(PRECOS[plano][1]) + " por ano" : reais(PRECOS[plano][0]) + " por semestre") + ", no " + NOMES[pag] +
+          ". Os 14 primeiros dias são grátis. Confira e clique em \"Confirmar e criar a conta da escola\": a conta é criada na hora e os dados de pagamento chegam em breve.";
+      } else {
+        p1.textContent = "Escolha o plano, a assinatura e a forma de pagamento.";
+      }
+      r.appendChild(p1);
+    }
+    $("form-escola").addEventListener("change", function (ev) {
+      if (ev.target.type === "radio") { var e = $("erro-" + ev.target.name); if (e) { e.hidden = true; e.textContent = ""; } }
+      atualizarResumo();
+    });
+    atualizarResumo();
+    function escolaCriada(r) {
+      var a = r.assinatura;
+      $("status").textContent = "";
+      $("form-escola").hidden = true;
+      $("escola-criada-resumo").textContent = r.nome + ": plano " + a.plano_nome + " (até " + a.alunos.toLocaleString("pt-BR") +
+        " alunos), " + a.periodo_nome.toLowerCase() + ", " + reais(a.valor) + (a.periodo === "anual" ? " por ano." : " por semestre.");
+      $("escola-criada-forma").textContent = a.pagamento_nome + ":";
+      $("escola-criada").hidden = false;
+      $("titulo-escola-criada").focus();
+    }
     enviar($("form-escola"), function () {
       return { nome: $("escola_nome").value.trim(), email: $("escola_email").value.trim(), senha: $("escola_senha").value,
-               codigo: $("escola_codigo").value.trim(), lembrar: $("lembrar_escola").checked };
+               codigo: $("escola_codigo").value.trim(), lembrar: $("lembrar_escola").checked,
+               plano: marcado("plano"), periodo: marcado("periodo"), pagamento: marcado("pagamento") };
     }, function (_, d) { return Prisma.auth.cadastrarEscola(d); });
     enviar($("form-codigo"), function () { return { codigo: $("codigo").value }; });
     enviar($("form-aluno"), function () { return { turma: $("turma").value, figuras: figuras.slice() }; });

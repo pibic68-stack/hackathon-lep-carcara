@@ -14,14 +14,31 @@ except ImportError:  # pragma: no cover
     api = None
 
 
+PLANO = {"plano": "escola", "periodo": "anual", "pagamento": "pix"}
+
+
 @unittest.skipIf(TestClient is None, "fastapi/httpx não instalados")
 class TestEscola(Base):
+    def test_cadastro_pede_plano_e_mostra_assinatura_no_painel(self):
+        c = self.cliente()
+        r = c.post("/api/contas/escola", json={"nome": "Escola Y", "email": "y@e.br", "senha": "senha-da-escola",
+                                                "codigo": "CODIGO-Y-2026"})
+        self.assertEqual(r.status_code, 400, r.text)
+        self.assertEqual(r.json()["detail"]["campo"], "plano")
+        r = c.post("/api/contas/escola", json={"nome": "Escola Y", "email": "y@e.br", "senha": "senha-da-escola",
+                                                "codigo": "CODIGO-Y-2026", "plano": "essencial", "periodo": "semestral",
+                                                "pagamento": "cartao"})
+        self.assertEqual(r.status_code, 201, r.text)
+        a = c.get("/api/escola").json()["assinatura"]
+        self.assertEqual((a["plano_nome"], a["valor"], a["pagamento_nome"]), ("Essencial", 4950, "Cartão de crédito"))
+
     def escola(self, codigo="CODIGO-PROF-2026", email="coord@escola.br"):
         c = self.cliente()
         r = c.post("/api/contas/escola", json={"nome": "Escola Municipal Teste", "email": email,
-                                                "senha": "senha-da-escola", "codigo": codigo})
+                                                "senha": "senha-da-escola", "codigo": codigo, **PLANO})
         self.assertEqual(r.status_code, 201, r.text)
         self.assertEqual(r.json()["destino"], "painel/escola.html")
+        self.assertEqual(r.json()["assinatura"]["valor"], 21000)
         return c
 
     def test_professor_entra_com_codigo_da_escola_cadastrada(self):
@@ -34,11 +51,11 @@ class TestEscola(Base):
 
     def test_codigo_e_senha_separados_e_unicos(self):
         c = self.cliente()
-        r = c.post("/api/contas/escola", json={"nome": "Escola X", "email": "x@e.br", "senha": "mesmo1234", "codigo": "mesmo1234"})
+        r = c.post("/api/contas/escola", json={"nome": "Escola X", "email": "x@e.br", "senha": "mesmo1234", "codigo": "mesmo1234", **PLANO})
         self.assertEqual(r.status_code, 400)
         self.assertEqual(r.json()["detail"]["campo"], "escola_codigo")
         self.escola()
-        r = self.cliente().post("/api/contas/escola", json={"nome": "Outra", "email": "o@e.br", "senha": "senha-boa-1", "codigo": "CODIGO-PROF-2026"})
+        r = self.cliente().post("/api/contas/escola", json={"nome": "Outra", "email": "o@e.br", "senha": "senha-boa-1", "codigo": "CODIGO-PROF-2026", **PLANO})
         self.assertEqual(r.status_code, 409)
 
     def test_escola_entra_e_so_le(self):

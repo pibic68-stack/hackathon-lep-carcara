@@ -92,6 +92,11 @@ def _migrar(con) -> None:
     colunas = {r["name"] for r in con.execute("PRAGMA table_info(professores)")}
     if "escola_id" not in colunas:
         con.execute("ALTER TABLE professores ADD COLUMN escola_id INTEGER REFERENCES escolas(id)")
+    # assinatura da escola (31/10): plano, período e forma de pagamento escolhidos no cadastro
+    colunas = {r["name"] for r in con.execute("PRAGMA table_info(escolas)")}
+    for coluna in ("plano", "periodo", "pagamento"):
+        if coluna not in colunas:
+            con.execute(f"ALTER TABLE escolas ADD COLUMN {coluna} TEXT NOT NULL DEFAULT ''")
 
 
 @contextmanager
@@ -246,7 +251,31 @@ def _email_usado(con, email: str) -> bool:
 
 # ---------- escola ----------
 
-def criar_escola(nome: str, email: str, senha: str, codigo: str, ip: str, lembrar: bool = False):
+# Planos do plano de negócio (pitch/plano-negocio/modelo.py): semestral = 10% a mais que metade do anual.
+PLANOS = {
+    "essencial": {"nome": "Essencial", "alunos": 200, "semestral": 4950, "anual": 9000},
+    "escola": {"nome": "Escola", "alunos": 500, "semestral": 11550, "anual": 21000},
+    "ampliado": {"nome": "Ampliado", "alunos": 1000, "semestral": 24750, "anual": 45000},
+}
+PERIODOS = {"semestral": "Semestral", "anual": "Anual"}
+PAGAMENTOS = {"pix": "Pix", "cartao": "Cartão de crédito"}
+
+
+def assinatura(plano: str, periodo: str, pagamento: str) -> dict:
+    if plano not in PLANOS:
+        raise ErroConta("Escolha um plano.", "plano")
+    if periodo not in PERIODOS:
+        raise ErroConta("Escolha semestral ou anual.", "periodo")
+    if pagamento not in PAGAMENTOS:
+        raise ErroConta("Escolha a forma de pagamento.", "pagamento")
+    p = PLANOS[plano]
+    return {"plano": plano, "plano_nome": p["nome"], "alunos": p["alunos"], "periodo": periodo,
+            "periodo_nome": PERIODOS[periodo], "valor": p[periodo], "pagamento": pagamento,
+            "pagamento_nome": PAGAMENTOS[pagamento]}
+
+
+def criar_escola(nome: str, email: str, senha: str, codigo: str, ip: str, lembrar: bool = False,
+                 plano: str = "", periodo: str = "", pagamento: str = ""):
     """A escola escolhe o código que vai passar aos professores. Ele é diferente da senha do painel."""
     nome, email, cod = (nome or "").strip(), (email or "").strip().lower(), normalizar_codigo(codigo)
     with conexao() as con:
@@ -269,8 +298,10 @@ def criar_escola(nome: str, email: str, senha: str, codigo: str, ip: str, lembra
                 or (legado and cod == normalizar_codigo(legado)):
             _falhou(con, f"nova-escola:{ip}")
             raise ErroConta("Esse código já está em uso. Escolha outro.", "escola_codigo", 409)
-        cur = con.execute("INSERT INTO escolas (nome, email, senha, codigo_hash, criado) VALUES (?, ?, ?, ?, ?)",
-                          (nome, email, _hash_senha(senha), _hash_codigo(cod), time.time()))
+        assinatura(plano, periodo, pagamento)          # plano, período e forma de pagamento escolhidos
+        cur = con.execute("INSERT INTO escolas (nome, email, senha, codigo_hash, criado, plano, periodo, pagamento) "
+                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                          (nome, email, _hash_senha(senha), _hash_codigo(cod), time.time(), plano, periodo, pagamento))
         token, duracao = _abrir_sessao(con, "escola", cur.lastrowid, lembrar)
     return token, duracao, {"perfil": "escola", "nome": nome}
 
@@ -297,7 +328,11 @@ def resumo_da_escola(escola_id: int) -> dict:
                 alunos = [a["apelido"] for a in con.execute("SELECT apelido FROM alunos WHERE turma_id = ? ORDER BY criado", (t["id"],))]
                 turmas.append({"id": t["id"], "nome": t["nome"], "alunos": alunos})
             profs.append({"id": p["id"], "nome": p["nome"], "email": p["email"], "turmas": turmas})
-        return {"professores": profs}
+        e = con.execute("SELECT plano, periodo, pagamento FROM escolas WHERE id = ?", (escola_id,)).fetchone()
+        plano = None
+        if e and e["plano"] in PLANOS and e["periodo"] in PERIODOS and e["pagamento"] in PAGAMENTOS:
+            plano = assinatura(e["plano"], e["periodo"], e["pagamento"])
+        return {"professores": profs, "assinatura": plano}
 
 
 def ha_escolas() -> bool:

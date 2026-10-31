@@ -118,3 +118,17 @@
 .demo-publica { display: grid; gap: 12px; margin: 0 0 24px; }
 .demo-publica h2 { margin: 0; }
 .demo-botoes { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* cadastro da escola: plano, assinatura e forma de pagamento */
+.form-subtitulo { margin: 8px 0 0; }
+.opcoes-pagamento { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+.opcoes-pagamento legend { font-weight: 700; margin-bottom: 6px; }
+.opcao { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; border: 3px solid var(--tinta); background: var(--papel); cursor: pointer; }
+.opcao input { width: 24px; height: 24px; margin: 2px 0 0; accent-color: var(--tinta); flex: none; }
+.opcao:has(input:checked) { background: var(--sol-claro); }
+.opcao:has(input:focus-visible) { outline: 3px solid var(--cor-foco); outline-offset: 3px; }
+.preco { display: block; color: var(--cor-texto-suave); }
+.resumo-pagamento { padding: 12px 14px; border: 3px dashed var(--tinta); }
+.resumo-pagamento p { margin: 0; }
+.escola-criada { display: grid; gap: 12px; }
+.escola-criada h2 { margin: 0; }

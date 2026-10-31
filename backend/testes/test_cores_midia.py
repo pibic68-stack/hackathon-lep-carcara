@@ -267,3 +267,19 @@ class TestDemoPublica(Base if Base else unittest.TestCase):
                     self.assertEqual(r.json()["destino"], destino)
                     self.assertEqual(c.get("/api/eu").json()["perfil"], perfil)
                 self.assertTrue(self.cliente().get("/api/saude").json()["demo_publica"])
+
+
+class TestEstadoNuvem(unittest.TestCase):
+    def test_duas_copias_enxergam_a_mesma_pasta(self):
+        from adaptador import estado_nuvem as e
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            a, b = d / "a", d / "b"
+            a.mkdir(); b.mkdir()
+            with mock.patch.dict("os.environ", {"PRISMA_ESTADO_ARQUIVO": str(d / "estado.bin")}), \
+                    mock.patch.object(e, "_armazem", None), mock.patch.object(e, "_versao_local", -1):
+                (a / "prisma.db").write_text("contas da cópia A")
+                e.subir(a)
+                e._versao_local = -1            # outra cópia do servidor, que ainda não viu nada
+                e.baixar(b)
+                self.assertEqual((b / "prisma.db").read_text(), "contas da cópia A")

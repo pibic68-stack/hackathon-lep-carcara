@@ -53,7 +53,8 @@ def garantir() -> dict:
                 con.execute("DELETE FROM turmas WHERE professor_id = ?", (pid,))
                 con.execute("DELETE FROM professores WHERE id = ?", (pid,))
             con.execute("DELETE FROM escolas WHERE email = ?", (EMAIL_ESCOLA,))
-        contas.criar_escola("Escola de Demonstração PRISMA", EMAIL_ESCOLA, senha_escola, codigo, "demo")
+        contas.criar_escola("Escola de Demonstração PRISMA", EMAIL_ESCOLA, senha_escola, codigo, "demo",
+                            False, "escola", "anual", "pix")
         contas.criar_professor("Professora Demonstração", EMAIL_PROF, senha_prof, codigo, "demo")
         pid = _professor_id()
         turma = contas.criar_turma(pid, "5º ano A (demonstração)")

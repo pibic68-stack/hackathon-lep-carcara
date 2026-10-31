@@ -8,10 +8,14 @@ O repositório já tem `app.py`, `requirements.txt` e `vercel.json` na raiz.
 2. Deixe tudo como a Vercel sugerir (ela reconhece o FastAPI sozinha). Em **Environment Variables**, crie
    `GEMINI_API_KEY` (de preferência uma chave de outra conta do Google, para não dividir o limite com o PC).
 3. **Deploy**. O link fixo é o `…vercel.app` que aparece no fim. Coloque no `README.md` e no portal.
+3b. **Obrigatório para o login funcionar:** no projeto, aba **Storage › Create Database › Neon (Postgres)** › plano grátis ›
+   **Connect** a este projeto. A Vercel cria sozinha a variável `DATABASE_URL`. Depois, **Deployments › Redeploy**.
+   Sem isso, cada pedido pode cair numa cópia diferente do servidor e a pessoa entra no painel e volta para a tela
+   de entrada. Com o Postgres, todas as cópias guardam e leem as mesmas contas e materiais (`backend/adaptador/estado_nuvem.py`).
 4. Abra o link › **Entrar** › **Experimentar sem cadastro**.
 
 Como a Vercel funciona e o que muda lá:
-- Não há disco fixo: contas e materiais ficam numa pasta temporária que **zera de tempos em tempos**.
+- Não há disco fixo: sem o Postgres do passo 3b, contas e materiais ficam numa pasta temporária que **zera**.
   No primeiro clique em "Experimentar sem cadastro", o PRISMA recria as contas e publica os 2 PDFs de teste
   (em segundos, sem IA): Padrão, Letras grandes, Ouvir e o desenho com símbolos.
 - Áudio e vídeo de teste: entre como Professora e envie `materiais-teste/3-audio-aula.wav` e `4-video-aula.mp4`

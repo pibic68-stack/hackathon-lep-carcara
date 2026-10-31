@@ -14,3 +14,7 @@ Path(os.environ["PRISMA_DADOS"]).mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(Path(__file__).resolve().parent / "backend"))
 
 from adaptador.api import app  # noqa: E402,F401
+from adaptador import estado_nuvem  # noqa: E402
+
+# Várias cópias do servidor na Vercel: contas e materiais ficam num Postgres (Storage › Neon) e todas enxergam igual.
+estado_nuvem.instalar(app, Path(os.environ["PRISMA_DADOS"]))

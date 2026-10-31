@@ -158,10 +158,43 @@
             <input id="escola_codigo" name="escola_codigo" type="text" autocomplete="off" autocapitalize="characters" aria-describedby="dica-escola_codigo erro-escola_codigo">
             <p class="erro" id="erro-escola_codigo" hidden></p>
           </div>
+          <h3 class="form-subtitulo">Pagamento</h3>
+          <fieldset class="campo opcoes-pagamento">
+            <legend>Plano</legend>
+            <label class="opcao"><input type="radio" name="plano" value="essencial" id="plano"> <span><strong>Essencial</strong> · até 200 alunos <span class="preco" data-plano="essencial"></span></span></label>
+            <label class="opcao"><input type="radio" name="plano" value="escola"> <span><strong>Escola</strong> · até 500 alunos <span class="preco" data-plano="escola"></span></span></label>
+            <label class="opcao"><input type="radio" name="plano" value="ampliado"> <span><strong>Ampliado</strong> · até 1.000 alunos <span class="preco" data-plano="ampliado"></span></span></label>
+            <p class="erro" id="erro-plano" hidden></p>
+          </fieldset>
+          <fieldset class="campo opcoes-pagamento">
+            <legend>Assinatura</legend>
+            <label class="opcao"><input type="radio" name="periodo" value="semestral" id="periodo"> <span><strong>Semestral</strong> · paga a cada 6 meses</span></label>
+            <label class="opcao"><input type="radio" name="periodo" value="anual" checked> <span><strong>Anual</strong> · sai mais em conta</span></label>
+            <p class="erro" id="erro-periodo" hidden></p>
+          </fieldset>
+          <fieldset class="campo opcoes-pagamento">
+            <legend>Forma de pagamento</legend>
+            <label class="opcao"><input type="radio" name="pagamento" value="pix" id="pagamento"> <span><strong>Pix</strong></span></label>
+            <label class="opcao"><input type="radio" name="pagamento" value="cartao"> <span><strong>Cartão de crédito</strong></span></label>
+            <p class="erro" id="erro-pagamento" hidden></p>
+          </fieldset>
+          <div class="resumo-pagamento" id="resumo-pagamento" aria-live="polite">
+            <p>Escolha o plano, a assinatura e a forma de pagamento.</p>
+          </div>
           <label class="lembrar"><input type="checkbox" id="lembrar_escola"> Lembrar de mim neste computador</label>
-          <button type="submit" class="botao botao--largo"><span data-icone="plus"></span> Cadastrar a escola</button>
+          <button type="submit" class="botao botao--largo"><span data-icone="check"></span> Confirmar e criar a conta da escola</button>
           <p class="links"><button type="button" class="link" id="voltar-entrar-escola">A escola já tem conta</button></p>
         </form>
+
+        <!-- escola: conta criada (o pagamento de verdade chega em breve) -->
+        <section id="escola-criada" class="cartao escola-criada" hidden aria-labelledby="titulo-escola-criada">
+          <h2 id="titulo-escola-criada" tabindex="-1">Conta da escola criada!</h2>
+          <p id="escola-criada-resumo"></p>
+          <p><strong>Pagamento:</strong> <span id="escola-criada-forma"></span> <span class="etiqueta etiqueta--sol">em breve</span></p>
+          <p class="dica">A conta já está ativa: a escola entra no painel e os professores já podem se cadastrar com o código.
+            A cobrança ainda não está ligada ao PRISMA, então nenhum dado de Pix ou de cartão é pedido agora.</p>
+          <a class="botao botao--largo" id="escola-criada-ir" href="painel/escola.html"><span data-icone="arrow-right"></span> Ir para o painel da escola</a>
+        </section>
 
         <!-- família: código enviado pela escola -->
         <form id="form-codigo" class="form" novalidate hidden>
