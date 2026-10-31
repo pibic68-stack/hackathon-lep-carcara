@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `5f9e39b8`
 
 - **Início:** 30/10 19:41
-- **Mensagens do time:** 7
-- **Exportado em:** 30/10/2026 21:01
+- **Mensagens do time:** 8
+- **Exportado em:** 30/10/2026 21:03
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -1208,3 +1208,64 @@ Not now
 ## 🤖 Claude · 30/10 21:01
 
 Combinado, não vou mexer no GitHub Pages por enquanto. O [PR #2](https://github.com/pibic68-stack/hackathon-lep-carcara/pull/2) continua aberto, esperando um colega revisar e fazer o merge. Quando quiser o link público, é só pedir.
+
+
+---
+
+## 🧑 Time · 30/10 21:02
+
+meus colegas ainda estão na dúvida de como entrar e ver o site. Pode detalhar o passo a passo?
+
+<details><summary>Ações executadas pelo Claude (1)</summary>
+
+- 🔧 `Bash`: Check whether the repository is public
+
+</details>
+
+
+## 🤖 Claude · 30/10 21:02
+
+O repositório é público, então ninguém precisa de conta nem de senha no GitHub. O jeito mais fácil é baixar o ZIP da branch. Abaixo está uma mensagem pronta para colar no grupo:
+
+---
+
+**Como ver o site do PRISMA** 🖥️
+
+O site ainda não está na `main`, está no PR #2. Por enquanto, siga um destes caminhos.
+
+**Opção 1: sem instalar nada (mais fácil)**
+
+1. Clique neste link para baixar o ZIP:
+   https://github.com/pibic68-stack/hackathon-lep-carcara/archive/refs/heads/ricardo/site-inicial.zip
+2. Extraia o ZIP. No Windows, clique com o botão direito no arquivo → **Extrair tudo…** → **Extrair**. No Mac, ele extrai sozinho ao abrir.
+   ⚠️ Não abra o site de dentro do ZIP sem extrair: ele aparece sem cores e sem imagens.
+3. Entre na pasta `hackathon-lep-carcara-ricardo-site-inicial` → pasta `web`.
+4. Dê **duplo clique em `index.html`** e o site abre no navegador. Funciona até sem internet.
+
+**Opção 2: quem já tem o repositório clonado**
+
+No terminal, dentro da pasta do projeto, rode:
+
+```bash
+git fetch origin
+```
+
+```bash
+git switch ricardo/site-inicial
+```
+
+Depois abra `web/index.html` com duplo clique. Para voltar ao que estava fazendo, rode `git switch main`.
+
+**O que testar**
+- **Página inicial:** role até o fim. Os diagramas mudam quando você escolhe uma necessidade no seletor (daltonismo, baixa visão, TEA).
+- **Barra preta no topo:** teste letra maior, alto contraste, fonte para dislexia, daltonismo e pausar animações.
+- **Entrar** (canto superior direito): escolha professor, família ou aluno. O login é de mentira, qualquer e-mail válido e senha com 6 caracteres ou mais entram.
+- **No celular:** mande o ZIP para o computador e abra lá. No celular o arquivo local não abre direito, então para ver no celular é melhor esperar o link público.
+
+**Comentários e aprovação:** pelo PR, em https://github.com/pibic68-stack/hackathon-lep-carcara/pull/2. Para comentar ou aprovar é preciso estar logado no GitHub.
+
+---
+
+Depois do merge, o link do ZIP muda para o da `main`. E, se vocês ligarem o GitHub Pages, o site ganha um endereço que abre direto no navegador, inclusive no celular, sem baixar nada.
+
+Se quiser, transformo esse passo a passo numa página com link para mandar ao grupo.
