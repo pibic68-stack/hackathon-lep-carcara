@@ -1,0 +1,60 @@
+/* Base das cenas do vídeo: tela 1920x1080 com a identidade do site. */
+@import url("/web/css/tokens.css");
+
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }
+body {
+  background-color: var(--papel);
+  background-image: radial-gradient(var(--cor-pontos) 1.6px, transparent 1.7px);
+  background-size: 28px 28px;
+  color: var(--tinta);
+  font-family: var(--fonte-texto);
+  font-size: 32px;
+  -webkit-font-smoothing: antialiased;
+}
+html.alfa body { background: transparent; }
+
+/* área livre para a legenda: os 190 px de baixo */
+.palco { position: absolute; inset: 0 0 190px 0; }
+.camada { position: absolute; inset: 0; }
+
+.pixel { image-rendering: pixelated; }
+.titulo { font-family: var(--fonte-titulo); font-weight: 700; line-height: 1.05; }
+.rotulo { font-family: var(--fonte-mono); font-size: 26px; letter-spacing: .04em; color: var(--tinta-3); }
+.numero { font-family: var(--fonte-texto); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* cartão pixel do site: borda grossa e sombra sólida */
+.cartao {
+  background: var(--branco);
+  border: 4px solid var(--tinta);
+  box-shadow: 8px 8px 0 var(--tinta);
+  padding: 24px 28px;
+}
+.etiqueta {
+  display: inline-block; font-family: var(--fonte-mono); font-size: 24px;
+  background: var(--tinta); color: var(--papel); padding: 4px 12px;
+}
+.balao {
+  position: absolute; background: var(--branco); border: 4px solid var(--tinta);
+  box-shadow: 6px 6px 0 var(--tinta); padding: 14px 20px; font-size: 30px; font-weight: 700;
+}
+
+/* ---------- animações (todas começam paradas: o motor define o atraso) ---------- */
+.entra   { animation: entra .55s cubic-bezier(.2,.8,.2,1) both; }
+.surge   { animation: surge .45s cubic-bezier(.3,1.5,.5,1) both; }
+.desce   { animation: desce .6s cubic-bezier(.2,.8,.2,1) both; }
+.esq     { animation: esq .6s cubic-bezier(.2,.8,.2,1) both; }
+.dir     { animation: dir .6s cubic-bezier(.2,.8,.2,1) both; }
+.entra-sai { animation: entra .55s cubic-bezier(.2,.8,.2,1) both, sai .45s ease-in forwards; }
+.surge-sai { animation: surge .45s cubic-bezier(.3,1.5,.5,1) both, sai .45s ease-in forwards; }
+.esq-sai   { animation: esq .6s cubic-bezier(.2,.8,.2,1) both, sai .45s ease-in forwards; }
+.sai     { animation: sai .45s ease-in forwards; }
+.apaga   { animation: apaga .5s ease both; }
+
+@keyframes entra { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+@keyframes surge { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes desce { from { opacity: 0; transform: translateY(-40px); } to { opacity: 1; transform: none; } }
+@keyframes esq { from { opacity: 0; transform: translateX(-80px); } to { opacity: 1; transform: none; } }
+@keyframes dir { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: none; } }
+@keyframes sai { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+@keyframes apaga { from { opacity: 1; } to { opacity: .28; } }

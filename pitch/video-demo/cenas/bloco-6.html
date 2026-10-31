@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Bloco 6: por que funciona</title>
+<link rel="stylesheet" href="/web/css/tokens.css">
+<link rel="stylesheet" href="/web/css/ficha.css">
+<link rel="stylesheet" href="comum.css">
+<style>
+  .cena { position: absolute; inset: 0; }
+  /* 0-1: barreira, não diagnóstico */
+  #nao { position: absolute; left: 160px; top: 120px; width: 700px; text-align: center; }
+  #nao .titulo { font-size: 70px; text-decoration: line-through; text-decoration-thickness: 10px; text-decoration-color: var(--laranja-escuro); color: var(--tinta-3); }
+  #sim { position: absolute; left: 1000px; top: 120px; width: 760px; text-align: center; }
+  #sim .titulo { font-size: 70px; color: var(--ceu-escuro); }
+  .sub { font-size: 32px; margin-top: 12px; }
+  #fichas { position: absolute; left: 560px; top: 300px; width: 800px; height: 520px; }
+  #fichas .f { position: absolute; left: 95px; top: 0; width: 610px; transform: scale(.85); transform-origin: top center; }
+  #seta-x { position: absolute; left: 0; right: 0; top: 330px; text-align: center; }
+  .marca { position: absolute; border: 8px solid var(--laranja-escuro); border-radius: 50%; }
+
+  /* 2-3: mesmo conteúdo, caminhos diferentes */
+  #caminhos { position: absolute; inset: 0; }
+  #alvo { position: absolute; left: 1380px; top: 250px; width: 420px; text-align: center; }
+  #alvo .cartao { font-size: 40px; font-weight: 700; }
+  .quem { position: absolute; left: 140px; width: 130px; height: 130px; border: 5px solid var(--tinta); image-rendering: pixelated; }
+
+  /* 4-5: avaliação */
+  #avalia { position: absolute; left: 260px; top: 120px; width: 1400px; display: flex; gap: 60px; align-items: center; }
+  .estrelas { font-size: 120px; letter-spacing: 10px; color: var(--tinta-3); position: relative; }
+  .estrelas .cheias { position: absolute; left: 0; top: 0; color: #C98A00; overflow: hidden; white-space: nowrap; width: 0; }
+  .ciclo { display: flex; gap: 22px; margin-top: 50px; }
+  .ciclo .cartao { font-size: 34px; font-weight: 700; padding: 18px 26px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <marker id="ponta" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#1E2235"/></marker>
+</defs></svg>
+<div class="palco">
+  <div class="cena sai" data-f="2-0.3">
+    <div id="nao" class="entra" data-f="@0.1"><div class="titulo">diagnóstico</div><div class="sub">a PRISMA não rotula alunos</div></div>
+    <div id="sim" class="entra" data-f="@0.7"><div class="titulo">barreira no material</div><div class="sub">é isso que a PRISMA procura e tira</div></div>
+    <div id="fichas" class="entra" data-f="1">
+      <div class="f" id="f-antes"></div>
+      <div class="f" id="f-depois-wrap" style="opacity:0"></div>
+    </div>
+  </div>
+
+  <div class="cena sai" data-f="4-0.3">
+    <svg id="caminhos" viewBox="0 0 1920 890">
+      <path class="tr" data-f="2+0.3" d="M300 160 C 700 160, 900 400, 1360 400" stroke="#1F6FB2" stroke-width="12" fill="none" marker-end="url(#ponta)"/>
+      <path class="tr" data-f="2+0.5" d="M300 360 L 800 360 L 800 420 L 1360 420" stroke="#A3401F" stroke-width="12" fill="none" stroke-dasharray="30 18" marker-end="url(#ponta)"/>
+      <path class="tr" data-f="2+0.7" d="M300 560 C 600 700, 1000 460, 1360 440" stroke="#2E7D32" stroke-width="12" fill="none" stroke-dasharray="4 18" stroke-linecap="round" marker-end="url(#ponta)"/>
+      <path class="tr" data-f="2+0.9" d="M300 760 L 600 760 L 600 600 L 1000 600 L 1000 460 L 1360 460" stroke="#8A5A2B" stroke-width="12" fill="none" marker-end="url(#ponta)"/>
+    </svg>
+    <img class="quem surge" data-f="2" style="top:95px" src="/web/assets/img/aluno.png" alt="">
+    <img class="quem surge" data-f="2+0.2" style="top:295px" src="/web/assets/img/familia.png" alt="">
+    <img class="quem surge" data-f="2+0.4" style="top:495px" src="/web/assets/img/professor.png" alt="">
+    <img class="quem surge" data-f="2+0.6" style="top:695px" src="/web/assets/img/aluno.png" alt="">
+    <div id="alvo" class="surge" data-f="2+0.8"><div class="cartao">o mesmo conteúdo</div><div class="titulo entra" data-f="3" style="font-size:48px;margin-top:30px;color:var(--ceu-escuro)">só muda o caminho</div></div>
+  </div>
+
+  <div class="cena">
+    <div id="avalia" class="entra" data-f="4">
+      <img src="/web/assets/img/aluno.png" alt="" style="width:220px;border:5px solid var(--tinta);image-rendering:pixelated">
+      <div>
+        <div class="rotulo">como foi esta versão?</div>
+        <div class="estrelas">★★★★★<div class="cheias" id="cheias">★★★★★</div></div>
+      </div>
+    </div>
+    <div class="ciclo" style="position:absolute;left:260px;top:520px">
+      <div class="cartao entra" data-f="5">versão 1</div>
+      <div class="titulo entra" data-f="5+0.3" style="font-size:60px;align-self:center">→</div>
+      <div class="cartao entra" data-f="5+0.5">opinião dos alunos</div>
+      <div class="titulo entra" data-f="5+0.8" style="font-size:60px;align-self:center">→</div>
+      <div class="cartao entra" data-f="5+1.0" style="background:var(--sol-claro)">versão 2, melhor</div>
+    </div>
+  </div>
+</div>
+<script src="/web/js/dados.js"></script>
+<script src="/web/js/icones.js"></script>
+<script src="/web/js/material.js"></script>
+<script src="motor.js"></script>
+<script>
+  window.BLOCO = 6; window.SOBRA = 0.6;
+  window.montar = function () {
+    document.getElementById("f-antes").innerHTML = Prisma.ficha("original");
+    var w = document.getElementById("f-depois-wrap");
+    w.innerHTML = Prisma.ficha("deuteranopia");
+    document.querySelectorAll(".tr").forEach(function (p) {
+      var L = p.getTotalLength();
+      p.style.strokeDasharray = p.getAttribute("stroke-dasharray") ? p.getAttribute("stroke-dasharray") : L;
+      p.style.opacity = 0;
+    });
+  };
+  window.aoTempo = function (t) {
+    // a ficha original vira a versão sem barreira
+    var p = Math.max(0, Math.min(1, (t - (F(1) + 2.2)) / 0.8));
+    document.getElementById("f-depois-wrap").style.opacity = p;
+    document.getElementById("f-depois-wrap").style.visibility = "visible";
+    document.getElementById("f-antes").style.opacity = 1 - p;
+    // caminhos aparecem
+    document.querySelectorAll(".tr").forEach(function (el) {
+      var t0 = quando(el.dataset.f);
+      el.style.opacity = Math.max(0, Math.min(1, (t - t0) / 0.5));
+    });
+    // estrelas enchem até 4,5
+    var q = Math.max(0, Math.min(1, (t - (F(4) + 0.6)) / 1.2));
+    document.getElementById("cheias").style.width = (q * 90) + "%";
+  };
+</script>
+</body>
+</html>

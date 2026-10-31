@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Bloco 5: a plataforma</title>
+<link rel="stylesheet" href="/web/css/tokens.css">
+<link rel="stylesheet" href="/web/css/ficha.css">
+<link rel="stylesheet" href="comum.css">
+<style>
+  .cena { position: absolute; inset: 0; }
+  /* janela de navegador */
+  .janela { position: absolute; background: var(--branco); border: 4px solid var(--tinta); box-shadow: 10px 10px 0 var(--tinta); overflow: hidden; }
+  .janela .barra { height: 52px; background: var(--tinta); display: flex; align-items: center; gap: 10px; padding: 0 16px; }
+  .janela .barra i { width: 16px; height: 16px; background: var(--papel); opacity: .6; }
+  .janela .barra span { margin-left: 14px; font-family: var(--fonte-mono); font-size: 22px; color: var(--papel); opacity: .9; }
+  .janela iframe { border: 0; width: 1600px; height: 900px; transform-origin: top left; display: block; }
+  .janela .corpo { padding: 34px 40px; }
+
+  /* 0: logo */
+  #logo { position: absolute; left: 0; right: 0; top: 260px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  #logo img { width: 260px; image-rendering: pixelated; }
+  #logo .titulo { font-size: 130px; }
+
+  /* 1: envio */
+  #envio { left: 160px; top: 40px; width: 1000px; height: 780px; }
+  .zona { border: 5px dashed var(--tinta-3); height: 380px; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 22px; background: var(--papel); position: relative; }
+  .zona .dica { position: absolute; top: 20px; left: 0; right: 0; text-align: center; font-family: var(--fonte-mono); font-size: 24px; color: var(--tinta-3); }
+  .arq { width: 170px; height: 200px; border: 4px solid var(--tinta); background: var(--branco); box-shadow: 6px 6px 0 var(--tinta); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; font-weight: 700; font-size: 30px; }
+  .arq b { font-family: var(--fonte-mono); font-weight: 400; font-size: 26px; padding: 4px 10px; color: #fff; }
+  .barra-prog { height: 34px; border: 4px solid var(--tinta); margin-top: 34px; background: var(--papel); }
+  .barra-prog div { height: 100%; width: 0; background: var(--ceu-escuro); }
+  #regras { position: absolute; left: 1210px; top: 40px; width: 600px; }
+  #regras li { list-style: none; display: flex; gap: 14px; align-items: center; font-size: 28px; padding: 9px 0; border-bottom: 2px solid var(--papel-2); }
+  #regras li b { font-family: var(--fonte-mono); font-weight: 400; background: var(--ceu-claro); padding: 2px 8px; font-size: 24px; min-width: 64px; text-align: center; }
+  #regras li .ok { margin-left: auto; color: var(--grama-escuro); font-weight: 700; }
+  #regras ul { padding: 0; margin: 12px 0 0; }
+
+  /* 3: versões */
+  .mini { position: absolute; top: 60px; width: 400px; height: 560px; overflow: hidden; border: 4px solid var(--tinta); background: var(--papel-2); box-shadow: 8px 8px 0 var(--tinta); }
+  .mini .ficha { width: 610px; transform: scale(.62); transform-origin: top left; margin: 10px; }
+  .mini-rot { position: absolute; top: 650px; width: 400px; text-align: center; font-weight: 700; font-size: 32px; }
+  .ouvir { position: absolute; left: 1490px; top: 60px; width: 380px; height: 560px; display: flex; flex-direction: column; gap: 24px; }
+  .ouvir .cartao { font-size: 30px; }
+  .onda { display: flex; gap: 8px; align-items: center; height: 90px; }
+  .onda i { width: 14px; background: var(--ceu-escuro); animation: onda .8s ease-in-out infinite alternate; }
+  @keyframes onda { from { height: 18px; } to { height: 84px; } }
+
+  /* 4-5: aprovação */
+  #rev { left: 520px; top: 40px; width: 1000px; height: 760px; }
+  #rev .linha { display: flex; gap: 16px; align-items: center; font-size: 30px; padding: 14px 0; border-bottom: 2px solid var(--papel-2); }
+  #rev .linha b { font-family: var(--fonte-mono); font-weight: 400; background: var(--sol-claro); padding: 2px 10px; font-size: 24px; }
+  .botao-ap { margin-top: 36px; display: inline-flex; gap: 14px; align-items: center; font-family: var(--fonte-titulo); font-size: 40px; font-weight: 700; padding: 16px 34px; background: var(--sol); border: 4px solid var(--tinta); box-shadow: 6px 6px 0 var(--tinta); }
+  .clique { animation: clique .35s ease both; }
+  @keyframes clique { 50% { transform: translate(5px, 5px); box-shadow: 1px 1px 0 var(--tinta); } }
+  #carimbo { position: absolute; left: 1130px; top: 520px; font-family: var(--fonte-titulo); font-weight: 700; font-size: 44px; color: var(--grama-escuro); border: 7px solid var(--grama-escuro); padding: 8px 24px; rotate: -8deg; background: rgba(255,255,255,.9); }
+  #cursor { position: absolute; width: 0; height: 0; border-left: 22px solid transparent; border-right: 22px solid transparent; border-bottom: 50px solid var(--tinta); rotate: -30deg; }
+  #rev-coruja { position: absolute; left: 140px; top: 260px; width: 300px; image-rendering: pixelated; }
+
+  /* 6-7: biblioteca */
+  #bib { left: 120px; top: 30px; width: 1680px; height: 790px; }
+  .estante { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; margin-top: 18px; }
+  .livro { border: 4px solid var(--tinta); box-shadow: 6px 6px 0 var(--tinta); padding: 22px; background: var(--papel); }
+  .livro h3 { margin: 0 0 6px; font-size: 36px; }
+  .livro .rotulo { font-size: 22px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .chip { border: 3px solid var(--tinta); padding: 4px 12px; font-size: 24px; background: var(--branco); font-weight: 700; }
+  .chip.sel { background: var(--sol); outline: 5px solid var(--ceu-escuro); outline-offset: 3px; }
+  #bib-aluno { position: absolute; left: 1580px; top: 590px; width: 200px; border: 4px solid var(--tinta); image-rendering: pixelated; }
+
+  /* 8-9: guia; 10-11: minicurso */
+  #guia { left: 90px; top: 30px; width: 1208px; height: 800px; }
+  #guia iframe, #curso iframe { transform: scale(.75); height: 1000px; }
+  .conta { position: absolute; left: 1380px; width: 460px; }
+  .conta .numero { font-size: 150px; color: var(--ceu-escuro); line-height: 1; }
+  .conta .titulo { font-size: 54px; }
+  #curso { left: 90px; top: 30px; width: 1208px; height: 800px; }
+  .trilha { position: absolute; left: 1380px; width: 470px; display: flex; gap: 18px; align-items: center; font-size: 32px; font-weight: 700; }
+  .trilha img { width: 100px; border: 5px solid; image-rendering: pixelated; }
+
+  /* 12: painéis */
+  .painel { position: absolute; top: 90px; width: 400px; height: 640px; display: flex; flex-direction: column; }
+  .painel img { width: 100%; height: 300px; object-fit: cover; border: 4px solid var(--tinta); image-rendering: pixelated; }
+  .painel h3 { font-family: var(--fonte-titulo); font-size: 56px; margin: 18px 0 8px; }
+  .painel p { margin: 0; font-size: 30px; line-height: 1.3; color: var(--tinta-2); }
+</style>
+</head>
+<body>
+<div class="palco">
+
+  <!-- 0: a PRISMA faz isso -->
+  <div class="cena sai" data-f="1-0.3">
+    <div id="logo" class="surge" data-f="@0.1"><img src="/web/assets/img/prisma-logo.svg" alt=""><div class="titulo">PRISMA</div></div>
+  </div>
+
+  <!-- 1-2: envio e regras -->
+  <div class="cena sai" data-f="3-0.3">
+    <div id="envio" class="janela entra" data-f="1-0.2">
+      <div class="barra"><i></i><i></i><i></i><span>prisma · painel do professor</span></div>
+      <div class="corpo">
+        <div class="titulo" style="font-size:52px;margin-bottom:22px">novo material</div>
+        <div class="zona">
+          <div class="dica">arraste o arquivo da aula</div>
+          <div class="arq surge" data-f="1+0.9"><b style="background:#A3401F">PDF</b>ficha</div>
+          <div class="arq surge" data-f="1+1.6"><b style="background:#8A5A2B">PPTX</b>slide</div>
+          <div class="arq surge" data-f="1+2.3"><b style="background:#1F6FB2">TXT</b>texto</div>
+          <div class="arq surge" data-f="1+3.0"><b style="background:#2E7D32">MP4</b>vídeo</div>
+        </div>
+        <div class="barra-prog"><div id="prog"></div></div>
+        <div class="rotulo" style="margin-top:12px" id="prog-txt">preparando as versões…</div>
+      </div>
+    </div>
+    <div id="regras" class="cartao entra" data-f="2">
+      <div class="titulo" style="font-size:44px">Manual PRISMA</div>
+      <ul id="lista-regras"></ul>
+    </div>
+  </div>
+
+  <!-- 3: versões -->
+  <div class="cena sai" data-f="4-0.3">
+    <div id="versoes"></div>
+    <div class="ouvir">
+      <div class="cartao entra" data-f="3+1.6"><div class="rotulo">leitura fácil</div>A água sobe para o céu. Lá em cima, ela forma as nuvens.</div>
+      <div class="cartao entra" data-f="3+2.0"><div class="rotulo">ouvir ▶</div><div class="onda" id="onda"></div></div>
+    </div>
+  </div>
+
+  <!-- 4-5: aprovação -->
+  <div class="cena sai" data-f="6-0.3">
+    <img id="rev-coruja" class="esq" data-f="4" src="/web/assets/img/professor.png" alt="">
+    <div id="rev" class="janela entra" data-f="4">
+      <div class="barra"><i></i><i></i><i></i><span>prisma · revisão</span></div>
+      <div class="corpo">
+        <div class="titulo" style="font-size:52px">o caminho da água</div>
+        <div class="rotulo" style="margin:6px 0 10px">rascunho · confira antes de publicar</div>
+        <div class="linha entra" data-f="4+0.5"><b>P4</b>descrição da figura do ciclo da água <span style="margin-left:auto">✓ revisado</span></div>
+        <div class="linha entra" data-f="4+0.8"><b>P3</b>texto em Leitura Fácil <span style="margin-left:auto">✓ revisado</span></div>
+        <div class="linha entra" data-f="4+1.1"><b>P1</b>setas com símbolo e nome <span style="margin-left:auto">✓ revisado</span></div>
+        <div class="botao-ap entra clique" data-f="4+1.4, 5-0.2">✓ aprovar e publicar</div>
+      </div>
+    </div>
+    <div id="cursor"></div>
+    <div id="carimbo" class="surge" data-f="5">aprovado pela professora</div>
+  </div>
+
+  <!-- 6-7: biblioteca -->
+  <div class="cena sai" data-f="8-0.3">
+    <div id="bib" class="janela entra" data-f="6">
+      <div class="barra"><i></i><i></i><i></i><span>prisma · biblioteca da turma</span></div>
+      <div class="corpo">
+        <div class="titulo" style="font-size:52px">biblioteca do 5º ano</div>
+        <div class="estante">
+          <div class="livro entra" data-f="6+0.3"><div class="rotulo">ciências</div><h3>O caminho da água</h3>
+            <div class="chips"><span class="chip">original</span><span class="chip">leitura fácil</span><span class="chip" id="chip-sel">letra grande</span><span class="chip">ouvir ▶</span><span class="chip">cores seguras</span></div></div>
+          <div class="livro entra" data-f="6+0.5"><div class="rotulo">matemática</div><h3>Frações na pizza</h3>
+            <div class="chips"><span class="chip">original</span><span class="chip">leitura fácil</span><span class="chip">ouvir ▶</span><span class="chip">página calma</span></div></div>
+          <div class="livro entra" data-f="6+0.7"><div class="rotulo">ciências</div><h3>Fotossíntese</h3>
+            <div class="chips"><span class="chip">original</span><span class="chip">cores seguras</span><span class="chip">letra grande</span></div></div>
+        </div>
+      </div>
+    </div>
+    <img id="bib-aluno" class="surge" data-f="7" src="/web/assets/img/aluno.png" alt="">
+  </div>
+
+  <!-- 8-9: guia do professor -->
+  <div class="cena sai" data-f="10-0.3">
+    <div id="guia" class="janela entra" data-f="8">
+      <div class="barra"><i></i><i></i><i></i><span>prisma · instruções · manual</span></div>
+      <iframe id="if-guia" src="/web/prisma-instrucoes/index.html" scrolling="no"></iframe>
+    </div>
+    <div class="conta entra" data-f="9" style="top:110px"><div class="numero" id="n10">0</div><div class="titulo">padrões</div></div>
+    <div class="conta entra" data-f="9+0.8" style="top:420px"><div class="numero" id="n51">0</div><div class="titulo">critérios</div></div>
+  </div>
+
+  <!-- 10-11: minicurso e certificado -->
+  <div class="cena sai" data-f="12-0.3">
+    <div id="curso" class="janela entra" data-f="10">
+      <div class="barra"><i></i><i></i><i></i><span>prisma · certificado do mini curso</span></div>
+      <iframe id="if-cert" src="/web/certificado/modelo.html" scrolling="no"></iframe>
+    </div>
+    <div class="trilha entra" data-f="11" style="top:140px"><img src="/web/assets/img/professor.png" alt="" style="border-color:#1F6FB2">professores</div>
+    <div class="trilha entra" data-f="11+0.5" style="top:330px"><img src="/web/assets/img/familia.png" alt="" style="border-color:#A3401F">famílias</div>
+    <div class="trilha entra" data-f="11+1.0" style="top:520px"><img src="/web/assets/img/aluno.png" alt="" style="border-color:#2E7D32">estudantes</div>
+  </div>
+
+  <!-- 12: painéis -->
+  <div class="cena">
+    <div class="painel entra" data-f="12+0.2" style="left:60px"><img src="/web/assets/img/escola.jpg" alt=""><h3>escola</h3><p>acompanha turmas, materiais e avaliações</p></div>
+    <div class="painel entra" data-f="12+0.6" style="left:520px"><img src="/web/assets/img/professor.png" alt=""><h3>professor</h3><p>envia, revisa e aprova</p></div>
+    <div class="painel entra" data-f="12+1.0" style="left:980px"><img src="/web/assets/img/aluno.png" alt=""><h3>aluno</h3><p>escolhe a versão e avalia</p></div>
+    <div class="painel entra" data-f="12+1.4" style="left:1440px"><img src="/web/assets/img/familia.png" alt=""><h3>família</h3><p>vê o que a criança estuda e como ajudar</p></div>
+  </div>
+</div>
+
+<script src="/web/js/dados.js"></script>
+<script src="/web/js/icones.js"></script>
+<script src="/web/js/material.js"></script>
+<script src="motor.js"></script>
+<script>
+  window.BLOCO = 5; window.SOBRA = 0.8;
+  var REGRAS = [["P1", "cor nunca sozinha"], ["P2", "página limpa e legível"], ["P3", "linguagem simples"],
+                ["P4", "imagem descrita"], ["P5", "mais de um caminho"], ["P6", "estrutura previsível"]];
+  var NOME = "Marina Duarte";
+  window.montar = function () {
+    var ul = document.getElementById("lista-regras");
+    REGRAS.forEach(function (r, i) {
+      var li = document.createElement("li");
+      li.className = "entra"; li.style.animationDelay = (F(2) + 0.4 + i * 0.4) + "s";
+      li.innerHTML = "<b>" + r[0] + "</b>" + r[1] + '<span class="ok">✓</span>';
+      ul.appendChild(li);
+    });
+    var vs = [["original", "original"], ["deuteranopia", "cores seguras"], ["baixa-visao", "letra grande"], ["tea", "página calma"]];
+    var box = document.getElementById("versoes");
+    vs.forEach(function (v, i) {
+      var x = 50 + i * 360;
+      var m = document.createElement("div");
+      m.className = "mini surge"; m.style.left = x + "px"; m.style.width = "330px";
+      m.style.animationDelay = (F(3) + i * 0.35) + "s";
+      m.innerHTML = Prisma.ficha(v[0]);
+      if (v[0] === "baixa-visao") m.querySelector(".ficha").style.transform = "scale(.5)";
+      box.appendChild(m);
+      var r = document.createElement("div");
+      r.className = "mini-rot entra"; r.style.left = x + "px"; r.style.width = "330px";
+      r.style.animationDelay = (F(3) + 0.2 + i * 0.35) + "s"; r.textContent = v[1];
+      box.appendChild(r);
+    });
+    var onda = document.getElementById("onda");
+    for (var k = 0; k < 18; k++) { var b = document.createElement("i"); b.style.animationDelay = (-k * 0.13) + "s"; onda.appendChild(b); }
+    // as animações de dentro dos iframes não devem ser congeladas pelo motor
+  };
+  var curva = function (p) { p = Math.max(0, Math.min(1, p)); return p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; };
+  window.aoTempo = function (t) {
+    // progresso do envio
+    var p = curva((t - (F(1) + 3.4)) / 4);
+    document.getElementById("prog").style.width = (p * 100) + "%";
+    document.getElementById("prog-txt").textContent = p >= 1 ? "pronto: 6 versões para revisar" : "preparando as versões…";
+    // cursor vai até o botão
+    var c = document.getElementById("cursor"), t0 = F(4) + 0.6, t1 = F(5) - 0.2;
+    var q = curva((t - t0) / (t1 - t0));
+    c.style.left = (1500 - 640 * q) + "px"; c.style.top = (900 - 330 * q) + "px";
+    c.style.opacity = t < t0 - 0.2 ? 0 : 1;
+    // aluno escolhe a versão
+    var sel = document.getElementById("chip-sel");
+    sel.classList.toggle("sel", t > F(7) + 0.6);
+    // contadores
+    contar(document.getElementById("n10"), t, F(9) + 0.2, F(9) + 1.5, 0, 10, Math.round);
+    contar(document.getElementById("n51"), t, F(9) + 1.0, F(9) + 2.6, 0, 51, Math.round);
+    // guia: rola a página de instruções
+    var g = document.getElementById("if-guia");
+    try { g.contentWindow.scrollTo(0, 1800 * curva((t - F(8)) / (FIM(9) - F(8) + 1))); } catch (e) {}
+    // certificado: digita o nome
+    try {
+      var d = document.getElementById("if-cert").contentDocument;
+      var campo = d.querySelector("input[type=text], input:not([type])");
+      var n = Math.max(0, Math.min(NOME.length, Math.floor((t - F(10) - 0.8) / 0.08)));
+      if (campo && campo.value !== NOME.slice(0, n)) { campo.value = NOME.slice(0, n); campo.dispatchEvent(new Event("input", { bubbles: true })); }
+    } catch (e) {}
+  };
+</script>
+</body>
+</html>

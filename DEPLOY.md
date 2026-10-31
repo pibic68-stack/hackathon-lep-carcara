@@ -22,6 +22,9 @@ Como a Vercel funciona e o que muda lá:
   (a IA transcreve na hora). A Vercel aceita envios de **até 4,5 MB**; arquivos maiores, só no PC.
 - Cada pedido pode durar até 5 minutos (`maxDuration` no `vercel.json`): suficiente para a IA com as novas tentativas.
 - Cada `git push` na `main` atualiza a Vercel sozinho.
+- O projeto que vale é o **`hackathon-lep-carcara-backend`**, com Root Directory vazio (a raiz do repositório).
+  O `hackathon-lep-carcara` tinha Root Directory = `backend` e falhava em todo push (lá não há `app.py`, o
+  `requirements.txt` traz o faster-whisper e o site `web/` fica de fora). Ele foi desconectado do Git em 31/10.
 
 ## Railway ou Render (servidor de verdade, com o `Dockerfile`)
 

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Bloco 7: para quem</title>
+<link rel="stylesheet" href="/web/css/tokens.css">
+<link rel="stylesheet" href="comum.css">
+<style>
+  .linha { position: absolute; left: 220px; width: 1480px; display: flex; gap: 40px; align-items: center; }
+  .linha img { width: 150px; height: 150px; object-fit: cover; border: 5px solid var(--tinta); image-rendering: pixelated; }
+  .linha .quem { font-family: var(--fonte-titulo); font-weight: 700; font-size: 64px; width: 360px; }
+  .linha .oque { font-size: 50px; font-weight: 700; }
+  #fim { position: absolute; inset: 0; background-color: var(--papel);
+    background-image: radial-gradient(var(--cor-pontos) 1.6px, transparent 1.7px); background-size: 28px 28px; }
+  #fim-logo { position: absolute; left: 0; right: 0; top: 120px; display: flex; flex-direction: column; align-items: center; }
+  #fim-logo img { width: 300px; image-rendering: pixelated; }
+  #fim-logo .titulo { font-size: 150px; margin-top: 10px; }
+  #lema { position: absolute; left: 0; right: 0; top: 560px; text-align: center; font-size: 60px; font-weight: 700; color: var(--ceu-escuro); }
+  #sigla { position: absolute; left: 0; right: 0; top: 660px; text-align: center; }
+  #time { position: absolute; left: 0; right: 0; justify-content: center; top: 730px; display: flex; gap: 18px; align-items: center; }
+  #time img { width: 110px; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<div class="palco">
+  <div class="linha esq" data-f="0" style="top:40px"><img src="/web/assets/img/escola.jpg" alt=""><div class="quem">escola</div><div class="oque">inclusão com dados</div></div>
+  <div class="linha esq" data-f="1" style="top:240px"><img src="/web/assets/img/professor.png" alt=""><div class="quem">professor</div><div class="oque">tempo de volta</div></div>
+  <div class="linha esq" data-f="2" style="top:440px"><img src="/web/assets/img/familia.png" alt=""><div class="quem">família</div><div class="oque">entender e ajudar</div></div>
+  <div class="linha esq" data-f="3" style="top:640px"><img src="/web/assets/img/aluno.png" alt=""><div class="quem">aluno</div><div class="oque">aprender com a turma</div></div>
+
+  <div id="fim" class="entra" data-f="4-0.3">
+    <div id="fim-logo" class="surge" data-f="4"><img src="/web/assets/img/prisma-logo.svg" alt=""><div class="titulo">PRISMA</div></div>
+    <div id="lema" class="entra" data-f="5">uma aula, várias versões, para todos</div>
+    <div id="sigla" class="rotulo entra" data-f="5+0.6">Plataforma de Recursos Inclusivos e Sala de Materiais Acessíveis</div>
+    <div id="time" class="entra" data-f="5+1.0"><img src="/web/assets/img/carcara.png" alt=""><div class="rotulo">carcará 3301</div></div>
+  </div>
+</div>
+<script src="motor.js"></script>
+<script>window.BLOCO = 7; window.SOBRA = 2.5;</script>
+</body>
+</html>
