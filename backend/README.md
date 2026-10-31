@@ -151,6 +151,14 @@ Ela lê o texto na tela e não gera arquivo de áudio.
   nem no `.env.exemplo`**: o chat é publicado em `prompts/` (o exportador esconde chaves conhecidas, mas não confie só nisso)
   e o `.env.exemplo` vai para o GitHub. Se uma chave vazar, apague-a em https://aistudio.google.com/apikey e crie outra.
 
+## Acompanhar a produção e a IA
+
+- `GET /api/ia/teste` (professor): pergunta curtinha, sem cache. Diz se a IA respondeu, em quantos segundos e com qual modelo.
+- `GET /api/progresso/{codigo}`: o site manda o cabeçalho `X-Prisma-Acompanhar: codigo` em `/api/adaptar`, `/refazer` e
+  `/descricoes` e pergunta este endereço a cada segundo (etapa, passos, diário, pedidos à IA, novas tentativas, modelo).
+- Erro 503 do Google (modelo sobrecarregado): o PRISMA tenta de novo, troca de caminho da API e depois usa os modelos
+  reserva (`PRISMA_IA_RESERVA` no `.env`). Só desiste quando todos falham, e diz isso ao professor.
+
 ## Vídeo e áudio
 
 Dois caminhos, nesta ordem (31/10):

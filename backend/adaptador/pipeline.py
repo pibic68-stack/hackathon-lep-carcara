@@ -5,6 +5,7 @@ import json
 import re
 from pathlib import Path
 
+from . import progresso
 from . import cache, leitores, regras, renderizador, transformacoes as t
 from . import ia as ia_mod
 from .modelo import Documento
@@ -20,6 +21,7 @@ PEDE_VERSAO = {
 }
 PRECISA_IA = {"lf1", "lf2"}
 ROTULO_VERSAO = {"lf1": "Leitura Fácil I", "lf2": "Leitura Fácil II"}
+NOME_VERSAO = {**ROTULO_VERSAO, "universal": "Padrão", "ampliada": "Ampliada", "audio": "Ouvir"}
 
 
 def versoes_do_perfil(perfil: dict | None) -> list[str]:
@@ -46,12 +48,14 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
              descricoes: dict | None = None, perfil: dict | None = None) -> tuple[Documento, Path]:
     """Lê o arquivo (usando o cache se já foi lido) e aplica as regras comuns a todos."""
     # "leitor-v2": leitor de PDF com matemática e cor (31/10). Mudou o leitor, o cache antigo não serve mais.
-    chave = cache.arquivo(caminho, extras=modelo_audio + "|leitor-v2")
+    chave = cache.arquivo(caminho, extras=modelo_audio + "|leitor-v3")
     pasta = cache.pasta_de(chave)
     guardado = cache.ler(chave, "documento")
     if guardado:
         doc = Documento.de_dict(guardado)
+        progresso.anotar("Arquivo já lido antes: usei a leitura guardada.")
     else:
+        progresso.etapa("Lendo o arquivo" + (" e transcrevendo o áudio" if caminho.suffix.lower() in leitores.EXT_MIDIA else ""))
         doc = leitores.ler(caminho, pasta, modelo_audio, ia)
         cache.gravar(chave, "documento", doc.para_dict())
 
@@ -63,16 +67,25 @@ def preparar(caminho: Path, manual: dict, ia=None, modelo_audio: str = "small",
     # P4: se a IA falhar (sem internet, limite...), a imagem fica "sem descrição" e o professor é avisado
     erros_ia: list[str] = []
 
+    faltam = [b for b in doc.blocos if b.tipo == "imagem" and not b.alt]
+    if ia and faltam:
+        progresso.etapa(f"Descrevendo {len(faltam)} imagem(ns) com a IA", len(faltam))
+
     def descrever(arquivo: str) -> str | None:
-        if not ia:
+        if not ia or erros_ia:             # a IA já falhou neste envio: não fica esperando imagem por imagem
+            progresso.passo()
             return None
         try:
-            return ia_mod.descrever_imagem(ia, pasta / arquivo, colorida=arquivo in doc.figuras_coloridas)
+            texto = ia_mod.descrever_imagem(ia, pasta / arquivo, colorida=arquivo in doc.figuras_coloridas)
+            progresso.passo(f"Imagem {Path(arquivo).name} descrita.")
+            return texto
         except ia_mod.ErroIA as erro:
             if str(erro) not in erros_ia:
                 erros_ia.append(str(erro))
+            progresso.passo(f"Imagem {Path(arquivo).name}: a IA falhou.")
             return None
 
+    doc = t.arrumar_estrutura(doc)                    # sumário, subtítulos numerados, marcadores (P6)
     doc = t.linhas_de_resposta(doc)                   # pontilhado vira espaço de resposta (antes da IA)
     doc = t.cor_com_simbolo(doc)                      # P1
     if pede_simbolos(perfil):
@@ -128,6 +141,7 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
     limites_p31 = regras.limites(manual, "P3.1")          # [20, 15, 10]: todos, nível II, nível I
 
     for v in versoes_do_perfil(perfil):
+        progresso.etapa(f"Gerando a versão {NOME_VERSAO.get(v, v)}")
         if v in PRECISA_IA:
             if not ia:
                 versoes[v] = {"status": "pendente_ia",
@@ -139,6 +153,7 @@ def adaptar(caminho: Path, perfil: dict | None = None, saida: Path = SAIDA_PADRA
                     doc, v, lambda textos, refazer=False, v=v, m=maximo: ia_mod.leitura_facil(ia, textos, v, m, refazer), maximo)
             except ia_mod.ErroIA as erro:
                 versoes[v] = {"status": "falhou", "motivo": str(erro)}
+                progresso.anotar(f"{NOME_VERSAO.get(v, v)} não saiu: {erro}", "erro")
                 continue
             extra_aplicados += versao_doc.aplicados[len(doc.aplicados):]
             extra_pendencias += versao_doc.pendencias[len(doc.pendencias):]

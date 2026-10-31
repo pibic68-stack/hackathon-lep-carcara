@@ -34,6 +34,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from . import progresso
 from . import contas, ia, pipeline, regras
 from .leitores import EXT_MIDIA, EXT_PDF, EXT_PPT, EXT_TEXTO
 
@@ -165,18 +166,29 @@ def _detalhe(id_: str, pasta: Path) -> dict:
     }
 
 
-def _processar(id_: str, arquivo: Path, perfil: dict | None, descricoes: dict | None) -> dict:
+def _processar(id_: str, arquivo: Path, perfil: dict | None, descricoes: dict | None,
+               request: Request | None = None, dono: int | None = None) -> dict:
+    # o site manda um código para acompanhar a produção ao vivo (GET /api/progresso/{codigo})
+    codigo = request.headers.get("X-Prisma-Acompanhar") if request is not None else None
+    progresso.comecar(codigo, dono)
+    erro_final = None
     try:
         return pipeline.adaptar(arquivo, perfil, SAIDA, ia.obter_provedor(),
                                 descricoes=descricoes, nome_pasta=id_)
     except ia.ErroIA as erro:                  # IA fora do ar, chave recusada, limite gratuito...
+        erro_final = str(erro)
         raise HTTPException(502, str(erro))
     except ValueError as erro:                 # formato não suportado
+        erro_final = str(erro)
         raise HTTPException(415, str(erro))
     except RuntimeError as erro:               # biblioteca opcional não instalada
+        erro_final = str(erro)
         raise HTTPException(501, str(erro))
     except Exception:                          # arquivo corrompido, protegido etc.
-        raise HTTPException(422, "Não consegui ler este arquivo. Ele pode estar corrompido ou protegido por senha.")
+        erro_final = "Não consegui ler este arquivo. Ele pode estar corrompido ou protegido por senha."
+        raise HTTPException(422, erro_final)
+    finally:
+        progresso.terminar(erro_final)
 
 
 def _servir(pasta: Path, caminho: str) -> FileResponse:
@@ -370,7 +382,7 @@ def adaptar(request: Request, arquivo: UploadFile, turma_id: int = Form(...), pe
             saida.write(bloco)
 
     try:
-        _processar(id_, caminho, perfil_final, None)
+        _processar(id_, caminho, perfil_final, None, request, prof["id"])
     except HTTPException:
         shutil.rmtree(pasta_envio, ignore_errors=True)
         shutil.rmtree(SAIDA / id_, ignore_errors=True)
@@ -420,8 +432,44 @@ def escrever_descricoes(id_: str, corpo: Descricoes, request: Request) -> dict:
     anteriores = _ler(pasta, "descricoes.json") if (pasta / "descricoes.json").exists() else {}
     todas = {**anteriores, **{k: v.strip()[:1000] for k, v in corpo.imagens.items() if v.strip()}}
     _gravar(pasta, "descricoes.json", todas)
-    _processar(id_, ENVIOS / estado["envio"], estado.get("perfil"), todas)
+    _processar(id_, ENVIOS / estado["envio"], estado.get("perfil"), todas, request, prof_id(request))
     return _detalhe(id_, pasta)
+
+
+def prof_id(request: Request) -> int | None:
+    u = usuario(request)
+    return u["id"] if u else None
+
+
+@app.get("/api/progresso/{codigo}")
+def ver_progresso(codigo: str, request: Request) -> dict:
+    """Como está a produção que o professor pediu (etapa, passos, diário, números da IA)."""
+    prof = exigir(request, "professor")
+    a = progresso.obter(codigo)
+    if not a or (a.dono is not None and a.dono != prof["id"]):
+        return {"codigo": codigo, "etapa": "Esperando o servidor começar", "passo": 0, "passos": 0,
+                "segundos": 0, "terminou": False, "erro": None, "diario": [], "ia": {}}
+    return a.para_dict()
+
+
+@app.get("/api/ia/teste")
+def testar_ia(request: Request) -> dict:
+    """Pergunta curtinha à IA, sem cache: mostra se ela está respondendo agora, em quanto tempo e com qual modelo."""
+    exigir(request, "professor")
+    try:
+        provedor = ia.obter_provedor()
+    except RuntimeError as erro:
+        return {"ligada": False, "ok": False, "erro": str(erro)}
+    if not provedor:
+        return {"ligada": False, "ok": False,
+                "erro": "A chave do Gemini não foi colocada neste computador. Abra o publicar.bat e cole a chave."}
+    inicio = time.time()
+    try:
+        resposta = provedor.gerar("Responda só com a palavra: ok", "Teste de conexão do PRISMA.")
+    except ia.ErroIA as erro:
+        return {"ligada": True, "ok": False, "erro": str(erro), "segundos": round(time.time() - inicio, 1)}
+    return {"ligada": True, "ok": True, "modelo": getattr(provedor, "modelo", ""),
+            "segundos": round(time.time() - inicio, 1), "resposta": resposta[:40]}
 
 
 @app.post("/api/materiais/{id_}/refazer")
@@ -432,7 +480,7 @@ def refazer(id_: str, request: Request) -> dict:
     if estado["estado"] == "publicado":
         raise HTTPException(409, "Material já publicado. Envie de novo para alterar.")
     descricoes = _ler(pasta, "descricoes.json") if (pasta / "descricoes.json").exists() else None
-    _processar(id_, ENVIOS / estado["envio"], estado.get("perfil"), descricoes)
+    _processar(id_, ENVIOS / estado["envio"], estado.get("perfil"), descricoes, request, prof_id(request))
     return _detalhe(id_, pasta)
 
 

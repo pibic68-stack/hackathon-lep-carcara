@@ -122,9 +122,77 @@ class TestGemini(unittest.TestCase):
 
         with mock.patch("urllib.request.urlopen", demora):
             with self.assertRaises(ia.ErroIA) as c:
-                ia.Gemini("k").gerar("s", "u")
+                ia.Gemini("k", reservas=[]).gerar("s", "u")
         self.assertEqual(len(chamadas), 2)
         self.assertIn("demorou demais", str(c.exception))
+
+    def setUp(self):
+        ia._ULTIMO_BOM.update(modelo="", quando=0.0)
+
+    def test_503_tenta_o_outro_caminho_da_api(self):
+        urls = []
+
+        def falso(pedido, timeout=0):
+            urls.append(pedido.full_url)
+            if pedido.full_url.endswith("/interactions"):
+                raise urllib.error.HTTPError("u", 503, "x", {}, None)
+            corpo = json.loads(pedido.data)
+            self.assertEqual(corpo["systemInstruction"]["parts"][0]["text"], "s")
+            return resposta_http({"candidates": [{"content": {"parts": [{"text": "pronto"}]}}]})
+
+        with mock.patch("urllib.request.urlopen", falso), mock.patch("time.sleep"):
+            self.assertEqual(ia.Gemini("k", "m1", reservas=[]).gerar("s", "u"), "pronto")
+        self.assertEqual(sum(u.endswith("/interactions") for u in urls), 3)     # 1 + 2 novas tentativas
+        self.assertTrue(urls[-1].endswith("/models/m1:generateContent"))
+
+    def test_modelo_fora_do_ar_passa_para_o_reserva_e_lembra(self):
+        usados = []
+
+        def falso(pedido, timeout=0):
+            modelo = json.loads(pedido.data).get("model") or pedido.full_url.split("/models/")[1].split(":")[0]
+            usados.append(modelo)
+            if modelo == "principal":
+                raise urllib.error.HTTPError("u", 503, "x", {}, None)
+            return resposta_http({"output_text": "ok de " + modelo})
+
+        with mock.patch("urllib.request.urlopen", falso), mock.patch("time.sleep"):
+            g = ia.Gemini("k", "principal", reservas=["inexistente", "reserva"])
+            usados_antes = len(usados)
+            self.assertEqual(g.gerar("s", "u"), "ok de inexistente")
+            usados.clear()
+            self.assertEqual(ia.Gemini("k", "principal", reservas=["inexistente", "reserva"]).gerar("s", "u"),
+                             "ok de inexistente")
+        self.assertEqual(usados, ["inexistente"])          # o segundo pedido já começa pelo que funcionou
+        self.assertGreater(usados_antes, -1)
+
+    def test_tudo_sobrecarregado_explica(self):
+        with mock.patch("urllib.request.urlopen", side_effect=urllib.error.HTTPError("u", 503, "x", {}, None)), \
+                mock.patch("time.sleep"):
+            with self.assertRaises(ia.ErroIA) as c:
+                ia.Gemini("k", "m1", reservas=["m2"]).gerar("s", "u")
+        self.assertIn("sobrecarregada", str(c.exception))
+        self.assertIn("m1, m2", str(c.exception))
+
+    def test_acompanhamento_registra_tentativas(self):
+        from adaptador import progresso
+        respostas = [urllib.error.HTTPError("u", 503, "x", {}, None), resposta_http({"output_text": "ok"})]
+
+        def falso(pedido, timeout=0):
+            r = respostas.pop(0)
+            if isinstance(r, Exception):
+                raise r
+            return r
+
+        a = progresso.comecar("teste-1")
+        with mock.patch("urllib.request.urlopen", falso), mock.patch("time.sleep"):
+            ia.Gemini("k", "m1", reservas=[]).gerar("s", "u")
+        progresso.terminar()
+        d = progresso.obter("teste-1").para_dict()
+        self.assertEqual(d["ia"]["pedidos"], 1)
+        self.assertEqual(d["ia"]["tentativas_extras"], 1)
+        self.assertTrue(any("ocupada" in x["texto"] for x in d["diario"]))
+        self.assertTrue(d["terminou"])
+        self.assertIs(a, progresso.obter("teste-1"))
 
     def test_sem_internet(self):
         with mock.patch("urllib.request.urlopen", side_effect=urllib.error.URLError("x")):

@@ -201,6 +201,77 @@ def _frases(texto: str) -> list[str]:
     return [f.strip() for f in re.split(r"(?<=[.!?])\s+", texto.strip()) if TEM_CONTEUDO.search(f)]
 
 
+# ---------- estrutura: sumário, subtítulos numerados, marcadores ----------
+
+NOMES_SUMARIO = {"sumário", "sumario", "índice", "indice", "conteúdo", "conteudo", "conteúdos", "lista de figuras",
+                 "lista de tabelas"}
+ENTRADA_SUMARIO = re.compile(r"^(?:\d+(?:\.\d+)*\s+)?[^\d=×].{0,90}?(?:\s*(?:[._…·]\s?){2,}\s*|\s+)\d{1,3}$")
+SUBTITULO_NUMERADO = re.compile(r"^(\d{1,2}(?:\.\d{1,2}){1,2})\s+([A-ZÁÉÍÓÚÂÊÔÃÕÇ][^=×<>]{2,80})$")
+MARCADOR = re.compile(r"^\s*[•▪●◦‣⁃■□➢✓–-]\s+(.+)$", re.S)
+
+
+def _setas(texto: str) -> str:
+    """Setas de equação química que o LaTeX desenha com pedaços ("−↽−−⇀−", "−−→") viram um símbolo só."""
+    texto = re.sub(r"[−-]*↽[−-]*⇀[−-]*|[−-]*⇀[−-]*↽[−-]*", " ⇌ ", texto)
+    texto = re.sub(r"[−-]{2,}\s*(⟦\^\{[^}]*\}⟧)\s*→", r" →\1 ", texto)
+    texto = re.sub(r"[−-]{2,}→", " → ", texto)
+    return re.sub(r"\s{2,}", " ", texto).strip()
+
+
+def arrumar_estrutura(doc: Documento) -> Documento:
+    """Ajustes de estrutura que muitos PDFs (relatórios, apostilas em LaTeX/Word) pedem:
+    - o sumário sai: os números de página não valem na versão adaptada, e o quadro "Hoje vamos" já lista os assuntos;
+    - "2.1 Materiais e reagentes" em letra comum vira subtítulo (P6: estrutura previsível);
+    - parágrafos seguidos que começam com "•" viram uma lista."""
+    novo = copy.deepcopy(doc)
+    saida: list[Bloco] = []
+    blocos = novo.blocos
+    i, sumario = 0, 0
+    while i < len(blocos):
+        b = blocos[i]
+        texto = (b.texto or "").strip()
+        if b.tipo in ("titulo", "paragrafo") and texto.lower().rstrip(":") in NOMES_SUMARIO:
+            j = i + 1
+            while j < len(blocos) and blocos[j].tipo in ("titulo", "paragrafo") \
+                    and ENTRADA_SUMARIO.match((blocos[j].texto or "").strip()):
+                j += 1
+            if j - i >= 3:                      # pelo menos 2 entradas: é sumário mesmo
+                sumario += j - i - 1
+                i = j
+                continue
+        if b.tipo == "paragrafo" and (m := SUBTITULO_NUMERADO.match(texto)) and not texto.endswith((".", ":", ";")) \
+                and len(texto.split()) <= 14:
+            saida.append(Bloco("titulo", texto=texto, nivel=3))
+            i += 1
+            continue
+        if b.tipo == "paragrafo" and MARCADOR.match(texto):
+            itens = []
+            while i < len(blocos) and blocos[i].tipo == "paragrafo" and (m := MARCADOR.match((blocos[i].texto or "").strip())):
+                itens.append(m.group(1).strip())
+                i += 1
+            if len(itens) >= 2:
+                saida.append(Bloco("lista", itens=itens))
+            else:
+                saida.append(Bloco("paragrafo", texto=texto))
+            continue
+        if b.tipo == "paragrafo":
+            b.texto = _setas(b.texto)
+            anterior = saida[-1] if saida else None
+            # parágrafo cortado pela troca de página: "...com água" + "dura. Ao término..."
+            if anterior is not None and anterior.tipo == "paragrafo" and re.match(r"[a-zà-ú]", texto) \
+                    and not re.search(r"[.!?:;)]$", anterior.texto.strip()):
+                anterior.texto = anterior.texto.rstrip() + " " + b.texto.lstrip()
+                i += 1
+                continue
+        saida.append(b)
+        i += 1
+    novo.blocos = saida
+    if sumario:
+        novo.aplicados.append(f"P6: o sumário ({sumario} linhas) saiu, porque os números de página não valem "
+                              "na versão adaptada. O quadro \"Hoje vamos\" mostra os assuntos.")
+    return novo
+
+
 # ---------- linhas para o aluno escrever a resposta ----------
 
 TEM_CONTEUDO = re.compile(r"[^\W_]")                     # letra ou número

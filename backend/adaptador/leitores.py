@@ -49,7 +49,8 @@ def ler(caminho: Path, pasta_trabalho: Path, modelo_audio: str = "small", ia=Non
 def _tirar_titulo(blocos: list[Bloco], padrao: str) -> tuple[str, list[Bloco]]:
     """O título principal (nível mais alto entre os 3 primeiros blocos) vira o título do documento.
     Cobre apostilas com cabeçalho pequeno antes do título ("Ciências - 5º ano")."""
-    candidatos = [(b.nivel, i) for i, b in enumerate(blocos[:3]) if b.tipo == "titulo"]
+    # capa de trabalho acadêmico: nome da instituição vem antes do título de verdade (que é o maior)
+    candidatos = [(b.nivel, i) for i, b in enumerate(blocos[:10]) if b.tipo == "titulo"]
     if not candidatos:
         return padrao, blocos
     _, i = min(candidatos)

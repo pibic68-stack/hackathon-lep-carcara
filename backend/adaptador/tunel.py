@@ -127,6 +127,27 @@ def ligar(cloudflared: str, espera: float = 40, comando: list[str] | None = None
     return None
 
 
+def testar_ia() -> None:
+    """Antes da apresentação: a IA está respondendo? Em quanto tempo? (pergunta curtinha, sem cache)"""
+    try:
+        from . import ia
+        provedor = ia.obter_provedor()
+    except Exception as erro:          # configuração incompleta
+        print(f"  IA: {erro}")
+        return
+    if not provedor:
+        print("  IA: desligada (sem chave). Leitura Fácil e descrição de imagens não vão sair.")
+        return
+    print("  Testando a IA...")
+    inicio = time.time()
+    try:
+        provedor.gerar("Responda só com a palavra: ok", "Teste de conexão do PRISMA.")
+        print(f"  IA: respondendo em {time.time() - inicio:.1f} s (modelo {provedor.modelo}).")
+    except Exception as erro:
+        print(f"  [AVISO] IA não respondeu agora: {erro}")
+        print("          O site funciona; as versões com IA podem demorar ou falhar. No painel use \"Testar a IA agora\".")
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print("Uso: python -m adaptador.tunel CAMINHO_DO_CLOUDFLARED")
@@ -138,6 +159,7 @@ def main() -> int:
     if not responde(LOCAL, 3):
         print("  [ERRO] O servidor do PRISMA não está respondendo. Abra o publicar.bat de novo.")
         return 1
+    testar_ia()
 
     tentativas = 0
     while True:

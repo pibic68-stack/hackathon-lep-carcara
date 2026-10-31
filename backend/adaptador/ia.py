@@ -44,6 +44,11 @@ LIMITE_IMAGEM = 15 * 1024 * 1024     # imagem inline: o pedido todo pode ter no 
 TEXTOS_POR_PEDIDO = 6
 CARACTERES_POR_PEDIDO = 1800
 TEMPO_LIMITE = 90                    # segundos esperando a IA responder
+ESPERAS_IA = (2, 6)                  # segundos entre novas tentativas quando o Google está ocupado (503/429)
+# Se o modelo principal estiver fora do ar, estes são tentados, nesta ordem. Nome que não existe é pulado.
+# Trocar em backend/.env: PRISMA_IA_RESERVA=modelo-a,modelo-b
+MODELOS_RESERVA = [m.strip() for m in (os.environ.get("PRISMA_IA_RESERVA")
+                   or "gemini-3-flash-preview,gemini-flash-latest,gemini-flash-lite-latest").split(",") if m.strip()]
 
 
 class ErroIA(RuntimeError):
@@ -88,51 +93,123 @@ def obter_provedor() -> Provedor | None:
         chave = _config("GEMINI_API_KEY")
         if not chave:
             raise RuntimeError("A IA está ligada, mas falta a chave: preencha GEMINI_API_KEY em backend/.env.")
-        return Gemini(chave, _config("PRISMA_IA_MODELO") or MODELO_PADRAO)
+        reservas = [m.strip() for m in _config("PRISMA_IA_RESERVA").split(",") if m.strip()] or None
+        return Gemini(chave, _config("PRISMA_IA_MODELO") or MODELO_PADRAO, reservas)
     raise RuntimeError(f"Provedor de IA '{nome}' desconhecido. Use: gemini.")
 
 
 # ---------- Gemini ----------
 
+_ULTIMO_BOM = {"modelo": "", "quando": 0.0}
+
+
+class _Proximo(Exception):
+    """Este modelo/caminho não deu: tente o próximo. Guarda o erro para mostrar se todos falharem."""
+    def __init__(self, erro: "ErroIA", sobrecarga: bool = False):
+        super().__init__(str(erro))
+        self.erro, self.sobrecarga = erro, sobrecarga
+
+
 class Gemini:
+    """Pede ao Gemini com paciência: tenta de novo quando o Google está ocupado (429/500/503/504),
+    tenta o outro caminho da API (generateContent) e, se o modelo continuar fora, passa para os modelos
+    reserva. Quando um reserva funciona, os próximos pedidos já começam por ele."""
     nome = "gemini"
 
-    def __init__(self, chave: str, modelo: str = MODELO_PADRAO):
+    def __init__(self, chave: str, modelo: str = MODELO_PADRAO, reservas: list[str] | None = None):
         self.chave, self.modelo = chave, modelo
+        reservas = MODELOS_RESERVA if reservas is None else reservas
+        self.modelos = [modelo] + [m for m in reservas if m and m != modelo]
 
     def gerar(self, sistema: str, usuario: str, imagem: tuple[bytes, str] | None = None) -> str:
-        entrada = usuario
+        from . import progresso
+        midia = None
         if imagem:
             dados, mime = imagem
-            if isinstance(dados, str):                      # arquivo já enviado à IA (Files API): dados = uri
-                parte = {"type": _tipo_midia(mime), "uri": dados, "mime_type": mime}
-            else:
-                if len(dados) > LIMITE_IMAGEM:
-                    raise ErroIA("O arquivo é grande demais para mandar de uma vez à IA (máximo 15 MB).")
-                parte = {"type": _tipo_midia(mime), "data": base64.b64encode(dados).decode("ascii"), "mime_type": mime}
-            entrada = [{"type": "text", "text": usuario}, parte]
-        corpo = json.dumps({"model": self.modelo, "system_instruction": sistema, "input": entrada}).encode("utf-8")
-        cabecalhos = {"x-goog-api-key": self.chave, "Content-Type": "application/json"}
+            if not isinstance(dados, str) and len(dados) > LIMITE_IMAGEM:
+                raise ErroIA("O arquivo é grande demais para mandar de uma vez à IA (máximo 15 MB).")
+            midia = (dados, mime)
+        # o último modelo que funcionou (nos últimos 10 min) vai primeiro: não perde tempo com o que está fora
+        if _ULTIMO_BOM["modelo"] in self.modelos and time.time() - _ULTIMO_BOM["quando"] < 600:
+            self.modelo = _ULTIMO_BOM["modelo"]
+        ordem = [self.modelo] + [m for m in self.modelos if m != self.modelo]
+        erros: list[_Proximo] = []
+        for modelo in ordem:
+            for via in ("interactions", "generate"):
+                try:
+                    inicio = time.time()
+                    texto = self._pedir(via, modelo, sistema, usuario, midia)
+                except _Proximo as p:
+                    erros.append(p)
+                    progresso.anotar(f"IA: {modelo} não respondeu ({p.erro}).", "aviso")
+                    if not p.sobrecarga:
+                        break                    # modelo inexistente ou lento: o outro caminho não ajuda
+                    continue
+                progresso.pedido_ia(time.time() - inicio, modelo)
+                _ULTIMO_BOM.update(modelo=modelo, quando=time.time())
+                if modelo != self.modelo:
+                    progresso.anotar(f"IA: passei a usar o modelo reserva {modelo}.", "aviso")
+                    self.modelo = modelo
+                return texto
+        progresso.falha_ia()
+        if erros and all(e.sobrecarga for e in erros):
+            raise ErroIA("A IA do Google está sobrecarregada agora (erro 503) em todos os modelos tentados ("
+                         + ", ".join(dict.fromkeys(ordem)) + "). Espere 1 ou 2 minutos e use \"Gerar as versões de novo\".")
+        raise erros[0].erro if erros else ErroIA("A IA não respondeu.")
 
-        for tentativa in range(4):
-            pedido = urllib.request.Request(URL_GEMINI, data=corpo, headers=cabecalhos, method="POST")
+    def _corpo(self, via: str, modelo: str, sistema: str, usuario: str, midia) -> tuple[str, bytes]:
+        if via == "interactions":
+            entrada = usuario
+            if midia:
+                dados, mime = midia
+                parte = ({"type": _tipo_midia(mime), "uri": dados, "mime_type": mime} if isinstance(dados, str) else
+                         {"type": _tipo_midia(mime), "data": base64.b64encode(dados).decode("ascii"), "mime_type": mime})
+                entrada = [{"type": "text", "text": usuario}, parte]
+            return URL_GEMINI, json.dumps({"model": modelo, "system_instruction": sistema, "input": entrada}).encode("utf-8")
+        partes = [{"text": usuario}]
+        if midia:
+            dados, mime = midia
+            partes.append({"file_data": {"mime_type": mime, "file_uri": dados}} if isinstance(dados, str) else
+                          {"inline_data": {"mime_type": mime, "data": base64.b64encode(dados).decode("ascii")}})
+        corpo = {"systemInstruction": {"parts": [{"text": sistema}]}, "contents": [{"role": "user", "parts": partes}]}
+        return f"{URL_BASE}/models/{modelo}:generateContent", json.dumps(corpo).encode("utf-8")
+
+    def _pedir(self, via: str, modelo: str, sistema: str, usuario: str, midia) -> str:
+        from . import progresso
+        url, corpo = self._corpo(via, modelo, sistema, usuario, midia)
+        cabecalhos = {"x-goog-api-key": self.chave, "Content-Type": "application/json"}
+        esperas = list(ESPERAS_IA)
+        lento = 0
+        while True:
+            pedido = urllib.request.Request(url, data=corpo, headers=cabecalhos, method="POST")
             try:
                 with urllib.request.urlopen(pedido, timeout=TEMPO_LIMITE) as resposta:
                     return _extrair_texto(json.load(resposta))
             except urllib.error.HTTPError as erro:
-                if erro.code in (429, 500, 503) and tentativa < 3:
-                    time.sleep(2 ** (tentativa + 1))       # 2 s, 4 s, 8 s
-                    continue
-                raise ErroIA(_mensagem_http(erro, self.modelo)) from None
+                if erro.code in (429, 500, 502, 503, 504):
+                    if esperas:
+                        espera = esperas.pop(0)
+                        try:
+                            espera = min(max(espera, float(erro.headers.get("Retry-After") or 0)), 30)
+                        except (TypeError, ValueError, AttributeError):
+                            pass
+                        progresso.tentativa_extra_ia()
+                        progresso.anotar(f"IA ocupada ({modelo}, erro {erro.code}). Nova tentativa em {espera:g} s.", "aviso")
+                        time.sleep(espera)
+                        continue
+                    raise _Proximo(ErroIA(_mensagem_http(erro, modelo)), sobrecarga=True) from None
+                if erro.code == 404 or (erro.code == 400 and via == "interactions"):
+                    raise _Proximo(ErroIA(_mensagem_http(erro, modelo))) from None
+                raise ErroIA(_mensagem_http(erro, modelo)) from None
             except TimeoutError:
-                if tentativa < 1:
+                lento += 1
+                if lento < 2:
+                    progresso.anotar(f"IA demorando ({modelo}). Tentando de novo.", "aviso")
                     continue                                   # uma segunda chance
-                raise ErroIA(f"A IA demorou demais para responder (modelo {self.modelo}). "
-                             "Tente de novo ou troque PRISMA_IA_MODELO em backend/.env.") from None
+                raise _Proximo(ErroIA(f"A IA demorou demais para responder (modelo {modelo}). "
+                                      "Tente de novo ou troque PRISMA_IA_MODELO em backend/.env.")) from None
             except urllib.error.URLError:
                 raise ErroIA("Não consegui falar com a IA. Confira a internet.") from None
-        raise ErroIA("A IA não respondeu.")
-
 
     def enviar_arquivo(self, caminho: Path, mime: str) -> str:
         """Files API (upload resumível): para áudio/vídeo acima de 15 MB. Devolve a uri. O Google apaga em 48 h."""
@@ -181,12 +258,18 @@ def _mensagem_http(erro: urllib.error.HTTPError, modelo: str = "") -> str:
                 "Troque PRISMA_IA_MODELO em backend/.env (ex.: gemini-3.1-flash-lite).")
     if erro.code == 429:
         return "O limite gratuito da IA foi atingido. Espere um minuto e tente de novo."
+    if erro.code in (500, 502, 503, 504):
+        return f"a IA do Google está sobrecarregada (erro {erro.code})"
     return f"A IA devolveu um erro (código {erro.code})."
 
 
 def _extrair_texto(resposta: dict) -> str:
     if isinstance(resposta.get("output_text"), str) and resposta["output_text"].strip():
         return resposta["output_text"].strip()
+    for cand in resposta.get("candidates") or []:                # formato do generateContent
+        texto = "".join(p.get("text", "") for p in (cand.get("content") or {}).get("parts") or [] if isinstance(p, dict))
+        if texto.strip():
+            return texto.strip()
     for passo in reversed(resposta.get("steps", [])):          # formato da Interactions API
         for parte in passo.get("content") or []:
             if isinstance(parte, dict) and str(parte.get("text", "")).strip():
@@ -210,6 +293,8 @@ def com_cache(tarefa: str, entrada: str, produzir) -> str:
     chave = cache.impressao_digital(tarefa, entrada)
     guardado = cache.ler("ia", chave)
     if guardado is not None:
+        from . import progresso
+        progresso.resposta_guardada()
         return guardado["resposta"]
     resposta = produzir()
     cache.gravar("ia", chave, {"tarefa": tarefa, "resposta": resposta})
@@ -454,18 +539,30 @@ def leitura_facil(provedor: Provedor, textos: list[str], nivel: str, max_palavra
     if atual:
         lotes.append(atual)
 
+    from . import progresso
     revisar: dict[int, str] = {}
     sem_ia: list[int] = []
     respondeu = False
     erro_ia: ErroIA | None = None
-    for lote in lotes:
+    falhas_seguidas = 0
+    if not refazer:
+        progresso.etapa(f"Leitura Fácil {rotulo}: {len(lotes)} pedido(s) à IA", len(lotes))
+    for n, lote in enumerate(lotes, 1):
+        if falhas_seguidas >= 2:            # IA fora do ar: não fica esperando lote por lote
+            sem_ia.extend(lote)
+            progresso.passo()
+            continue
         entrada = json.dumps({"textos": [protegidos[k][0] for k in lote]}, ensure_ascii=False)
         try:
             resposta = com_cache(tarefa, entrada, lambda: provedor.gerar(sistema, entrada))
         except ErroIA as erro:              # sem internet, limite gratuito: não insiste texto por texto
             erro_ia = erro
+            falhas_seguidas += 1
             sem_ia.extend(lote)
+            progresso.passo(f"Leitura Fácil {rotulo}: o pedido {n} de {len(lotes)} falhou.")
             continue
+        falhas_seguidas = 0
+        progresso.passo(f"Leitura Fácil {rotulo}: pedido {n} de {len(lotes)} pronto.")
         respondeu = True
         try:
             dados = _extrair_json(resposta)
@@ -484,14 +581,17 @@ def leitura_facil(provedor: Provedor, textos: list[str], nivel: str, max_palavra
     if pendentes and not respondeu:
         raise erro_ia or ErroIA("A IA não respondeu. Tente de novo em alguns minutos.")
 
+    sem_simplificar: list[tuple[str, str]] = []
+
     def plano_b(k: int, motivo: str) -> None:
         saida[k] = restaurar(dividir_frases_longas(protegidos[k][0], max_palavras), protegidos[k][1])
-        trecho = re.sub(r"\s+", " ", textos[k])[:70]
-        avisos.append(f"P3 (Leitura Fácil {rotulo}): a IA não conseguiu simplificar o trecho \"{trecho}…\" "
-                      f"({motivo}). Ele ficou só com as frases divididas. Reescreva à mão se precisar.")
+        sem_simplificar.append((re.sub(r"\s+", " ", textos[k])[:60], motivo))
 
     # 2) o que voltou com problema: de novo, um por vez, com a instrução reforçada
+    if revisar:
+        progresso.etapa(f"Leitura Fácil {rotulo}: conferindo {len(revisar)} trecho(s) de novo", len(revisar))
     for k, motivo in revisar.items():
+        progresso.passo()
         entrada = json.dumps({"textos": [protegidos[k][0]]}, ensure_ascii=False)
         sist = _sistema_lf(nivel, max_palavras) + REFORCO_UM.format(motivo=motivo, n=max_palavras)
         novo = ""
@@ -510,5 +610,11 @@ def leitura_facil(provedor: Provedor, textos: list[str], nivel: str, max_palavra
             plano_b(k, motivo2)
     for k in sem_ia:
         plano_b(k, "a IA ficou indisponível no meio do material")
+    if sem_simplificar:                      # um aviso só, com exemplos: a lista do professor não vira um muro
+        exemplos = "; ".join(f"\"{t}…\" ({m})" for t, m in sem_simplificar[:3])
+        mais = f" e mais {len(sem_simplificar) - 3}" if len(sem_simplificar) > 3 else ""
+        avisos.append(f"P3 (Leitura Fácil {rotulo}): {len(sem_simplificar)} trecho(s) a IA não conseguiu simplificar e "
+                      f"ficaram só com as frases divididas: {exemplos}{mais}. Reescreva à mão se precisar, "
+                      "ou use \"Gerar as versões de novo\".")
     return [x if x is not None else textos[k] for k, x in enumerate(saida)], \
         [{"termo": k, "significado": v} for k, v in glossario.items()], avisos

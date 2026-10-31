@@ -190,3 +190,48 @@ class TestSimbolosSoComDaltonismo(unittest.TestCase):
         self.assertFalse(pipeline.pede_simbolos(None))
         self.assertFalse(pipeline.pede_simbolos({"necessidades": ["baixa_visao"], "preferencias": ["audio"]}))
         self.assertTrue(pipeline.pede_simbolos({"necessidades": ["daltonismo"], "preferencias": []}))
+
+
+class TestEstrutura(unittest.TestCase):
+    def test_sumario_sai_subtitulos_e_marcadores(self):
+        from adaptador import transformacoes as t
+        doc = Documento("Relatório", [
+            Bloco("titulo", texto="Sumário", nivel=2),
+            Bloco("titulo", texto="1 Introdução 3", nivel=3),
+            Bloco("paragrafo", texto="2.1 Materiais, reagentes e equipamentos ______ 4"),
+            Bloco("titulo", texto="Referências Bibliográficas 9", nivel=3),
+            Bloco("titulo", texto="1 Introdução", nivel=2),
+            Bloco("paragrafo", texto="2.1 Materiais, reagentes e equipamentos"),
+            Bloco("paragrafo", texto="• Vidrarias: tubos de ensaio."),
+            Bloco("paragrafo", texto="• Indicador: Preto de Eriocromo T."),
+            Bloco("paragrafo", texto="Cerca de 40 mL de água foram titulados até a viragem da água"),
+            Bloco("paragrafo", texto="dura. Depois, lavamos tudo."),
+            Bloco("paragrafo", texto="CaCO3(s) + CO2(g) −↽−−⇀− Ca2+(aq) (1)"),
+        ])
+        novo = t.arrumar_estrutura(doc)
+        tipos = [(b.tipo, b.texto or b.itens) for b in novo.blocos]
+        self.assertEqual(tipos[0], ("titulo", "1 Introdução"))
+        self.assertEqual(tipos[1], ("titulo", "2.1 Materiais, reagentes e equipamentos"))
+        self.assertEqual(tipos[2], ("lista", ["Vidrarias: tubos de ensaio.", "Indicador: Preto de Eriocromo T."]))
+        self.assertEqual(tipos[3][1], "Cerca de 40 mL de água foram titulados até a viragem da água dura. Depois, lavamos tudo.")
+        self.assertIn("⇌", tipos[4][1])
+        self.assertTrue(any("sumário" in a for a in novo.aplicados))
+
+
+@unittest.skipIf(Base is None, "fastapi/httpx não instalados")
+class TestAcompanhar(Base if Base else unittest.TestCase):
+    def test_progresso_do_envio_e_teste_da_ia(self):
+        c = self.professor()
+        t, _ = self.turma_com_aluno(c)
+        with open(Path(__file__).resolve().parents[1] / "exemplos" / "aula-ciclo-da-agua.txt", "rb") as f:
+            r = c.post("/api/adaptar", files={"arquivo": ("aula.txt", f, "text/plain")},
+                       data={"turma_id": str(t["id"])}, headers={"X-Prisma-Acompanhar": "abc123"})
+        self.assertEqual(r.status_code, 201, r.text)
+        p = c.get("/api/progresso/abc123").json()
+        self.assertTrue(p["terminou"])
+        self.assertIsNone(p["erro"])
+        self.assertTrue(any("Gerando a versão Padrão" in d["texto"] for d in p["diario"]))
+        self.assertEqual(c.get("/api/progresso/nao-existe").json()["terminou"], False)
+        teste = c.get("/api/ia/teste").json()        # nos testes a IA está desligada
+        self.assertFalse(teste["ok"])
+        self.assertIn("chave", teste["erro"])

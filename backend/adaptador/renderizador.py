@@ -105,7 +105,7 @@ ol.etapas li::marker {{ font-weight:700; color:var(--destaque); }}
 aside.quadro {{ background:var(--quadro); border:3px solid var(--borda); border-radius:0;
                 padding:.6rem 1.2rem; margin:1.2rem 0; }}
 aside.quadro h2 {{ margin:.4rem 0; font-size:1.1em; }}
-figure {{ margin:1.2rem 0; }} img {{ max-width:100%; height:auto; }}
+figure {{ margin:1.2rem 0; }} img {{ max-width:100%; height:auto; }} figure img {{ max-height:70vh; width:auto; }}
 .pendente {{ border:2px dashed var(--borda); padding:.5rem; }}
 .pular {{ position:absolute; left:-999px; }} .pular:focus {{ left:1rem; top:1rem; background:#fff; padding:.5rem; }}
 :focus-visible {{ outline:4px solid var(--destaque); outline-offset:2px; }}

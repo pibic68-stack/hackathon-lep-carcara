@@ -46,6 +46,11 @@ Time Carcará 3301 (4 alunos do IME) no hackathon da Liga de Empreendedorismo da
   - **Linhas para responder** (pontilhado ou sublinhado) viram o bloco `resposta` (pauta desenhada na página, "Espaço para escrever a resposta" no Ouvir) e não vão para a IA; pontilhado no fim de título é cortado (`transformacoes.linhas_de_resposta`). Corrige a Leitura Fácil cheia de "." soltos.
   - **Link público** (`backend/adaptador/tunel.py`, chamado pelo `publicar.bat`): só mostra o link depois de testá-lo pela internet (evita o "Error 1033"), copia para a área de transferência, grava em `link.txt`, confere a cada 20 s e recria se cair, tenta http2 e depois quic, e não deixa o PC dormir. O servidor agora escuta na rede local (`0.0.0.0`): no mesmo Wi-Fi abre em `http://IP:8000`.
 
+- Decisões de 31/10, 7h30 (relatório real deu erro 503 da IA):
+  - **IA mais paciente** (`ia.Gemini`): no 429/5xx tenta de novo (2 s, 6 s), depois o outro caminho da API (`generateContent`), depois os **modelos reserva** (`PRISMA_IA_RESERVA`, padrão gemini-3-flash-preview, gemini-flash-latest, gemini-flash-lite-latest) e lembra por 10 min o que funcionou. Na Leitura Fácil, 2 lotes seguidos sem IA param os pedidos (o resto vai para o plano B) e os avisos de plano B viram um item só.
+  - **Acompanhar a produção** (`backend/adaptador/progresso.py`): o site manda `X-Prisma-Acompanhar` e lê `GET /api/progresso/{codigo}` a cada segundo; o painel do professor mostra etapa, barra, tempo, pedidos à IA, novas tentativas, modelo e um diário. Botão "Testar a IA agora" (`GET /api/ia/teste`); o `publicar.bat` também testa a IA ao abrir.
+  - **PDF acadêmico** (`transformacoes.arrumar_estrutura`): sumário sai, "2.1 Título" vira subtítulo, "•" vira lista, parágrafo cortado pela troca de página é juntado, setas de reação do LaTeX viram ⇌ e →. O título do material é o maior dos 10 primeiros blocos (capa com nome da instituição). Imagens limitadas a 70% da altura da tela.
+
 ## Regras para o Claude
 - Responder em português.
 - Depois de uma compactação, ou se faltar contexto, reler `prompts/conversas/` e `docs/` antes de responder.
