@@ -1,8 +1,8 @@
 # Conversa com IA · sessão `e1bc3eba`
 
 - **Início:** 30/10 19:55
-- **Mensagens do time:** 11
-- **Exportado em:** 31/10/2026 09:50
+- **Mensagens do time:** 12
+- **Exportado em:** 31/10/2026 10:01
 - **Ferramenta:** Claude (Anthropic)
 
 > Exportação automática. Raciocínio interno e saídas brutas de ferramentas foram omitidos.
@@ -852,3 +852,55 @@ Deixei tudo pronto no repositório (já está no GitHub) para o site fixo no Rai
 
 Sources:
 - [Railway: teste grátis e planos (snapdeploy)](https://snapdeploy.dev/blog/railway-trial-migration-docker-host)
+
+
+---
+
+## 🧑 Time · 31/10 09:59
+
+Passo a passo (está no `DEPLOY.md`):
+
+1. Entrem em railway.com com a conta do GitHub. Segundo o que encontrei, o teste grátis dá crédito inicial sem cartão.
+2. Cliquem em New Project › Deploy from GitHub repo e escolham o `hackathon-lep-carcara`.
+3. Em Variables, criem `GEMINI_API_KEY`. De preferência, usem uma chave nova, de outra conta do Google: assim a nuvem não divide o limite gratuito com o PC da apresentação.
+4. Em Attach Volume, usem o caminho `/data`. Sem isso, contas e materiais somem a cada atualização.
+5. Em Settings › Networking › Generate Domain, gerem o link fixo. Coloquem esse link no topo do `README.md` e no portal.
+
+entao, o railway esta fora do ar e estou usando vercel, help
+
+<details><summary>Ações executadas pelo Claude (5)</summary>
+
+- 🔧 `WebSearch`: Vercel FastAPI deploy 2026 python runtime request body limit 4.5MB max duration hobby fluid compute static files
+- 🔧 `WebFetch`: https://vercel.com/docs/functions/runtimes/python?from=graph
+- 🔧 `Bash`: Check repo state and processing helper
+- 🔧 `Bash`: Add Vercel entrypoint and test serverless mode locally
+- 🔧 `Bash`: Docs, tests, commit and push
+
+</details>
+
+
+## 🤖 Claude · 31/10 10:01
+
+Já subi para o GitHub o que a Vercel precisa: `app.py`, `requirements.txt` e `vercel.json` na raiz. Simulei aqui o modo da Vercel e o login de demonstração funcionou, com os materiais aparecendo para a aluna. Não testei na Vercel de verdade, porque daqui não tenho acesso a ela.
+
+**Na Vercel (uns 5 minutos):**
+1. Em vercel.com, entrem com o GitHub e cliquem em **Add New › Project**. Importem o `hackathon-lep-carcara`.
+2. Aceitem o que ela sugerir; ela reconhece o FastAPI sozinha. Em **Environment Variables**, criem `GEMINI_API_KEY`. De preferência, usem uma chave de outra conta do Google, para não dividir o limite com o PC da apresentação.
+3. Cliquem em **Deploy**. O link fixo é o `….vercel.app` que aparece no fim. Coloquem esse link no topo do `README.md` (já deixei o lugar marcado) e no portal.
+4. Abram o link › **Entrar** › **Experimentar sem cadastro**.
+
+**O que muda na Vercel:** ela não tem servidor ligado o tempo todo nem disco fixo. Por isso ajustei o PRISMA:
+- **Dados:** contas e materiais ficam numa pasta temporária que zera de tempos em tempos.
+- **Materiais de teste:** no primeiro clique em "Experimentar sem cadastro", o PRISMA recria as contas fictícias e publica os 2 PDFs de teste em segundos, sem depender da IA. Saem as versões Padrão, Letras grandes e Ouvir, e o desenho com símbolos.
+- **Áudio e vídeo:** não são publicados sozinhos. Para mostrar, entrem como Professora e enviem `3-audio-aula.wav` (2,2 MB) e `4-video-aula.mp4` (0,4 MB); a IA transcreve na hora.
+- **Limite de envio:** 4,5 MB por arquivo. Arquivos maiores, só no PC.
+- **Tempo:** cada pedido pode durar até 5 minutos, o que basta para a IA com as novas tentativas.
+- **Atualização:** cada `git push` na `main` atualiza a Vercel sozinho.
+
+**Se a Vercel der problema:** deixei o Render como plano B. Em render.com, **New › Blueprint**, escolham o repositório; ele usa o mesmo Dockerfile do Railway. O plano grátis dorme depois de 15 minutos sem uso e demora cerca de 1 minuto para acordar.
+
+Se o deploy falhar, me mandem um print do erro em **Deployments › Build Logs** e eu corrijo na hora.
+
+Sources:
+- [Vercel: Python runtime](https://vercel.com/docs/functions/runtimes/python?from=graph)
+- [Vercel: limites das funções](https://vercel.com/docs/functions/limitations?from=graph)
